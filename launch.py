@@ -7,8 +7,6 @@ import file_manager
 import sap_date
 from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK
 
-LINE_CLEAR = '\x1b[2K'
-
 
 def wait(period):
     while period > 0:
@@ -16,7 +14,7 @@ def wait(period):
         print(text, end="\r")
         time.sleep(1)
         period -= 1
-    print(end=LINE_CLEAR)
+        print(' ' * len(text), end="\r")
 
 
 def print_introduction():
@@ -44,3 +42,4 @@ if __name__ == '__main__':
     while True:
         main()
         wait(TIME_OF_BREAK)
+        print(' ')

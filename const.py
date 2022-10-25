@@ -23,4 +23,4 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Trusted_Connection=yes;")
 CURSOR = CONN.cursor()
 
-TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
