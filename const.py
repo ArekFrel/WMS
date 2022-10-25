@@ -1,6 +1,6 @@
 import pyodbc
 """Number of second to wait before new refreshing"""
-TIME_OF_BREAK = 300
+TIME_OF_BREAK = 5
 
 """ PRODUCTION - catalogs where drawings are stored. """
 PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'

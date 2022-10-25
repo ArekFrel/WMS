@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+from timer_dec import time_break
 import add_new_files
 import new_data_uploader
 import file_manager
@@ -29,6 +30,7 @@ def print_introduction():
     print(50 * '-')
 
 
+@time_break(from_=2, to_=6)
 def main():
     sap_date.update(column='Automat')
     add_new_files.main()
@@ -36,11 +38,9 @@ def main():
     new_data_uploader.main()
     file_manager.main()
     wait(TIME_OF_BREAK)
-    print(' ')
 
 
 if __name__ == '__main__':
     print_introduction()
     while True:
-        # main()
-        wait(5)
+        main()

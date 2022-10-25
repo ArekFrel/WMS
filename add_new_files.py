@@ -1,6 +1,7 @@
 import os
 import time
 import shutil
+import pyodbc
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
@@ -15,7 +16,12 @@ def list_new_files():
     directly to PRODUCTION catalog."""
     source_cat = PRODUCTION
     query = 'Select Plik From Technologia;'
-    result = CURSOR.execute(query)
+    try:
+        result = CURSOR.execute(query)
+    except pyodbc.Error:
+        print('Connection to database failed.')
+        return None
+
     new_files, current_db_files = [], []
 
     print('Data Base refreshed.')
