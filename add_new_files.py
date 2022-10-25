@@ -65,14 +65,22 @@ def list_new_files():
 
 def list_new_files_new_way():
     source_cat = START_CATALOG
+    now = time.time()
 
     for catalog in os.listdir(source_cat):
-        files_counter_good = 0
-        files_counter_bad = 0
-
+        """ First condition if path is taken into consideration"""
         deep_path = os.path.join(source_cat, catalog)
         if not os.path.isdir(deep_path):
             continue
+
+        folder_data = os.path.getctime(deep_path)
+        folder_age = now - folder_data
+        if folder_age < 1800:
+            continue
+
+        files_counter_good = 0
+        files_counter_bad = 0
+
         new_files = os.listdir(deep_path)
 
         for file in new_files:
