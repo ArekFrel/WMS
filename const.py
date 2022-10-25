@@ -18,3 +18,5 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Database="+DATABASE+";"
                           "Trusted_Connection=yes;")
 CURSOR = CONN.cursor()
+
+TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
