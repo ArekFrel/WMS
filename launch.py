@@ -5,7 +5,7 @@ import add_new_files
 import new_data_uploader
 import file_manager
 import sap_date
-from const import TIME_OF_BREAK
+from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK
 
 LINE_CLEAR = '\x1b[2K'
 
@@ -30,17 +30,17 @@ def print_introduction():
     print(50 * '-')
 
 
-@time_break(from_=2, to_=6)
+@time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)
 def main():
     sap_date.update(column='Automat')
     add_new_files.main()
     sap_date.update(column='Automat_Start')
     new_data_uploader.main()
     file_manager.main()
-    wait(TIME_OF_BREAK)
 
 
 if __name__ == '__main__':
     print_introduction()
     while True:
         main()
+        wait(TIME_OF_BREAK)
