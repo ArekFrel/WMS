@@ -4,7 +4,7 @@ import shutil
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
-from constant import PRODUCTION, START_CATALOG, CURSOR
+from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE
 
 catalogs_to_remove = []
 
@@ -12,7 +12,7 @@ catalogs_to_remove = []
 @timer
 def list_new_files():
     """ Adding to database drawing uploaded
-    directly to PRODUCTION catalog, which is a long way."""
+    directly to PRODUCTION catalog."""
     source_cat = PRODUCTION
     query = 'Select Plik From Technologia;'
     result = CURSOR.execute(query)
@@ -49,6 +49,7 @@ def list_new_files():
 
     for new_file in new_files:
         new_rec(new_pdf=new_file)
+        archive(file_name=new_file)
 
     if len(new_files) == 0:
         print('No new files.')
@@ -97,6 +98,12 @@ def list_new_files_new_way():
             print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
         if files_counter_bad > 0:
             print(f'{files_counter_bad} bad {num_b_files}')
+
+
+def archive(file_name):
+    with open(TRANSFER_FILE, 'a', encoding='utf-8') as history_file:
+        now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
+        history_file.write(f'{now}____{file_name} \n')
 
 
 def contains_pdfs(catalog):
@@ -168,7 +175,6 @@ def new_bad_file(new_pdf, catalog):
                 f" VALUES ('{catalog}', '{new_pdf}') " \
                 f"End " \
                 f"End"
-        # print(new_pdf)
         CURSOR.execute(query)
         CURSOR.commit()
         return True

@@ -2,7 +2,7 @@ import csv
 import os
 import os.path
 import sap_date
-from constant import CURSOR, RAPORT_CATALOG
+from const import CURSOR, RAPORT_CATALOG
 
 
 def upload_new_data():
@@ -104,7 +104,7 @@ def main():
         upload_new_data()
         sap_date.update(column='SAP_Skrypt_zmiana')
     else:
-        print('No new uploaded.')
+        print('No new data uploaded.')
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import add_new_files
 import new_data_uploader
 import file_manager
 import sap_date
-from constant import TIME_OF_BREAK
+from const import TIME_OF_BREAK
 
 LINE_CLEAR = '\x1b[2K'
 

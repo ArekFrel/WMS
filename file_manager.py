@@ -1,6 +1,6 @@
 import os
-from constant import CURSOR
-from constant import RAPORT_CATALOG
+from const import CURSOR
+from const import RAPORT_CATALOG
 from datetime import datetime
 
 s_ins = 'SAP_INSERT.csv'

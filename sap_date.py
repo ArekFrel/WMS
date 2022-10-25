@@ -1,6 +1,6 @@
 from datetime import datetime
 import time
-from constant import CURSOR
+from const import CURSOR
 
 
 def update(column):
