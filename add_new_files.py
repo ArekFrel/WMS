@@ -5,7 +5,7 @@ import pyodbc
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
-from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE
+from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
 
 catalogs_to_remove = []
 
@@ -75,7 +75,7 @@ def list_new_files_new_way():
 
         folder_data = os.path.getctime(deep_path)
         folder_age = now - folder_data
-        if folder_age < 1800:
+        if folder_age < TIMEOUT_FOR_PLANERS:
             continue
 
         files_counter_good = 0
