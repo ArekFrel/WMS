@@ -46,7 +46,7 @@ def rename_new():
             file_to_rename = os.path.join(RAPORT_CATALOG, s + '.xlsx')
             new_name = os.path.join(RAPORT_CATALOG, s + '_old.xlsx')
             os.rename(file_to_rename, new_name)
-        print('SAP files reamed into SAP_old.')
+        print('SAP files renamed into SAP_old.')
 
 
 def sap_script_date(date):

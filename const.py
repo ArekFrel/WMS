@@ -2,8 +2,15 @@ import pyodbc
 """Number of second to wait before new refreshing"""
 TIME_OF_BREAK = 300
 
+"""Number of second after which the catalog is moved."""
+TIMEOUT_FOR_PLANERS = 1800
+
 """ Time between the script is not running"""
+
+# time when script stops running
 FROM_OCLOCK = 2
+
+# time when script starts running
 TO_OCLOCK = 6
 
 """ PRODUCTION - catalogs where drawings are stored. """
@@ -15,6 +22,7 @@ START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
 
+'''Database information'''
 SERVER = 'SELUSQL16'
 DATABASE = 'PRODUKCJAWORKFLOW'
 CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
@@ -23,7 +31,6 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Trusted_Connection=yes;")
 CURSOR = CONN.cursor()
 
+'''Text file, arhivising files added the old way.'''
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 
-"""Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 18000

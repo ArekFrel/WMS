@@ -68,7 +68,7 @@ def list_new_files_new_way():
     now = time.time()
 
     for catalog in os.listdir(source_cat):
-        """ First condition if path is taken into consideration"""
+        """ First, condition if path is taken into consideration"""
         deep_path = os.path.join(source_cat, catalog)
         if not os.path.isdir(deep_path):
             continue
@@ -93,6 +93,7 @@ def list_new_files_new_way():
                     files_counter_good += 1
             else:
                 if new_bad_file(new_pdf=file, catalog=catalog):
+                    print(f'bad file: {file}')
                     files_counter_bad += 1
 
         if not contains_pdfs(catalog=catalog):
@@ -181,6 +182,8 @@ def cut_file(file, catalog):
 
 def new_bad_file(new_pdf, catalog):
     if new_pdf.lower().endswith('.pdf'):
+        while '--' in new_pdf:
+            new_pdf = new_pdf.replace('--', '-')
         table = "Złe_Pliki"
         query = f"Begin " \
                 f"If Not Exists (Select * From {table} Where u_Folder = {catalog} And u_Plik = '{new_pdf}') " \
@@ -220,6 +223,9 @@ def validate_file(name, catalog):
         return False
 
     if base_name.endswith('_99'):
+        return False
+
+    if '--' in name:
         return False
 
     return base_name
