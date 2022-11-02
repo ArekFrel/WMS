@@ -110,7 +110,7 @@ def list_new_files_new_way():
             num_b_files = 'file'
 
         if files_counter_good > 0:
-            print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
+            print(f'{files_counter_good} {num_g_files} moved to production and added to Database__ {catalog}')
         if files_counter_bad > 0:
             print(f'{files_counter_bad} bad {num_b_files}')
 
@@ -213,8 +213,9 @@ def validate_file(name, catalog):
     if extension.lower() != 'pdf':
         return False
 
-    if catalog != name[0:7]:
-        return False
+    if catalog:
+        if catalog != name[0:7]:
+            return False
 
     if name[7] != ' ':
         return False
