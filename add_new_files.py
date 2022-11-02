@@ -66,20 +66,25 @@ def list_new_files():
 def list_new_files_new_way():
     source_cat = START_CATALOG
     now = time.time()
+    files_counter_good = 0
+    files_counter_bad = 0
 
-    for catalog in os.listdir(source_cat):
+    for any_file in os.listdir(source_cat):
         """ First, condition if path is taken into consideration"""
-        deep_path = os.path.join(source_cat, catalog)
+        deep_path = os.path.join(source_cat, any_file)
         if not os.path.isdir(deep_path):
+            any_file_name = validate_file(name=any_file)
+            if any_file_name:
+                os.chmod(deep_path, S_IWRITE)
+                if cut_file(file=any_file_name, catalog=any_file_name[0:7], no_dir=False):
+                    files_counter_good += 1
             continue
 
+        catalog = any_file
         folder_data = os.path.getctime(deep_path)
         folder_age = now - folder_data
-        if folder_age < TIMEOUT_FOR_PLANERS:
-            continue
-
-        files_counter_good = 0
-        files_counter_bad = 0
+        # if folder_age < TIMEOUT_FOR_PLANERS:
+        #     continue
 
         new_files = os.listdir(deep_path)
 
@@ -151,13 +156,16 @@ def del_empty_catalogs():
     catalogs_to_remove.clear()
 
 
-def cut_file(file, catalog):
+def cut_file(file, catalog, no_dir=True):
     dest_cat = os.path.join(PRODUCTION, catalog)
     moved_file = file + '.pdf'
     dest_file = os.path.join(dest_cat, moved_file)
 
-    if not os.path.exists(dest_cat):
+    if not os.path.exists(dest_cat) and no_dir:
         os.mkdir(dest_cat)
+    elif not os.path.exists(dest_cat) and not no_dir:
+        print(f'{file} --  not moved, catalog does not exist.')
+        return False
 
     a = 1
     new_name_moved_file = moved_file
@@ -166,7 +174,10 @@ def cut_file(file, catalog):
         dest_file = os.path.join(PRODUCTION, catalog, new_name_moved_file)
         a += 1
 
-    moved_file_path = os.path.join(START_CATALOG, catalog, moved_file)
+    if no_dir:
+        moved_file_path = os.path.join(START_CATALOG, catalog, moved_file)
+    else:
+        moved_file_path = os.path.join(START_CATALOG, moved_file)
 
     try:
         os.rename(moved_file_path, moved_file_path)
@@ -198,7 +209,7 @@ def new_bad_file(new_pdf, catalog):
     return False
 
 
-def validate_file(name, catalog):
+def validate_file(name, catalog=''):
 
     """ If name is proper, returns name without extension"""
 
@@ -213,8 +224,9 @@ def validate_file(name, catalog):
     if extension.lower() != 'pdf':
         return False
 
-    if catalog != name[0:7]:
-        return False
+    if catalog:
+        if catalog != name[0:7]:
+            return False
 
     if name[7] != ' ':
         return False
