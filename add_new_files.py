@@ -111,21 +111,21 @@ def list_new_files_new_way():
         if not contains_pdfs(catalog=catalog):
             catalogs_to_remove.append(catalog)
 
-        if files_counter_good != 1:
-            num_g_files = 'files'
-        else:
-            num_g_files = 'file'
+    if files_counter_good != 1:
+        num_g_files = 'files'
+    else:
+        num_g_files = 'file'
 
-        if files_counter_bad != 1:
-            num_b_files = 'files'
-        else:
-            num_b_files = 'file'
+    if files_counter_bad != 1:
+        num_b_files = 'files'
+    else:
+        num_b_files = 'file'
 
-        if files_counter_good > 0:
-            print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
+    if files_counter_good > 0:
+        print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
 
-        if files_counter_bad > 0:
-            print(f'{files_counter_bad} bad {num_b_files}')
+    if files_counter_bad > 0:
+        print(f'{files_counter_bad} bad {num_b_files}')
 
 
 def archive(file_name):
