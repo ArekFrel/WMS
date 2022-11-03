@@ -34,3 +34,7 @@ CURSOR = CONN.cursor()
 '''Text file, arhivising files added the old way.'''
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 
+'''Permission for adding loose files from START_CATALOG'''
+LOOSE_FILE_PERMISSION = True
+
+

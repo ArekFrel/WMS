@@ -5,7 +5,9 @@ import pyodbc
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
-from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
+from const import LOOSE_FILE_PERMISSION, PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
+
+
 
 catalogs_to_remove = []
 
@@ -70,28 +72,33 @@ def list_new_files_new_way():
     files_counter_bad = 0
 
     for any_file in os.listdir(source_cat):
-        """ First, condition if path is taken into consideration"""
         deep_path = os.path.join(source_cat, any_file)
-        if not os.path.isdir(deep_path):
+
+        """ First, condition if path is taken into consideration"""
+        if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
             any_file_name = validate_file(name=any_file)
             if any_file_name:
                 os.chmod(deep_path, S_IWRITE)
                 if cut_file(file=any_file_name, catalog=any_file_name[0:7], no_dir=False):
                     files_counter_good += 1
             continue
+        elif not os.path.isdir(deep_path):
+            continue
 
         catalog = any_file
         folder_data = os.path.getctime(deep_path)
         folder_age = now - folder_data
-        # if folder_age < TIMEOUT_FOR_PLANERS:
-        #     continue
+        if folder_age < TIMEOUT_FOR_PLANERS:
+            continue
 
         new_files = os.listdir(deep_path)
 
         for file in new_files:
             if file in ['Thumbs.db', '_v']:
                 continue
+
             file_name = validate_file(file, catalog)
+
             if file_name:
                 os.chmod(os.path.join(deep_path, file), S_IWRITE)
                 if cut_file(file=file_name, catalog=catalog):
@@ -116,6 +123,7 @@ def list_new_files_new_way():
 
         if files_counter_good > 0:
             print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
+
         if files_counter_bad > 0:
             print(f'{files_counter_bad} bad {num_b_files}')
 
