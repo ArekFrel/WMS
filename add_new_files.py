@@ -8,7 +8,6 @@ from timer_dec import timer
 from const import LOOSE_FILE_PERMISSION, PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
 
 
-
 catalogs_to_remove = []
 
 
