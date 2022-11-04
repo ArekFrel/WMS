@@ -5,7 +5,9 @@ import pyodbc
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
-from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
+from const import LOOSE_FILE_PERMISSION, PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
+
+
 
 catalogs_to_remove = []
 
@@ -66,27 +68,37 @@ def list_new_files():
 def list_new_files_new_way():
     source_cat = START_CATALOG
     now = time.time()
+    files_counter_good = 0
+    files_counter_bad = 0
 
-    for catalog in os.listdir(source_cat):
+    for any_file in os.listdir(source_cat):
+        deep_path = os.path.join(source_cat, any_file)
+
         """ First, condition if path is taken into consideration"""
-        deep_path = os.path.join(source_cat, catalog)
-        if not os.path.isdir(deep_path):
+        if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
+            any_file_name = validate_file(name=any_file)
+            if any_file_name:
+                os.chmod(deep_path, S_IWRITE)
+                if cut_file(file=any_file_name, catalog=any_file_name[0:7], no_dir=False):
+                    files_counter_good += 1
+            continue
+        elif not os.path.isdir(deep_path):
             continue
 
+        catalog = any_file
         folder_data = os.path.getctime(deep_path)
         folder_age = now - folder_data
         if folder_age < TIMEOUT_FOR_PLANERS:
             continue
-
-        files_counter_good = 0
-        files_counter_bad = 0
 
         new_files = os.listdir(deep_path)
 
         for file in new_files:
             if file in ['Thumbs.db', '_v']:
                 continue
+
             file_name = validate_file(file, catalog)
+
             if file_name:
                 os.chmod(os.path.join(deep_path, file), S_IWRITE)
                 if cut_file(file=file_name, catalog=catalog):
@@ -99,20 +111,21 @@ def list_new_files_new_way():
         if not contains_pdfs(catalog=catalog):
             catalogs_to_remove.append(catalog)
 
-        if files_counter_good != 1:
-            num_g_files = 'files'
-        else:
-            num_g_files = 'file'
+    if files_counter_good != 1:
+        num_g_files = 'files'
+    else:
+        num_g_files = 'file'
 
-        if files_counter_bad != 1:
-            num_b_files = 'files'
-        else:
-            num_b_files = 'file'
+    if files_counter_bad != 1:
+        num_b_files = 'files'
+    else:
+        num_b_files = 'file'
 
-        if files_counter_good > 0:
-            print(f'{files_counter_good} {num_g_files} moved to production and added to Database__ {catalog}')
-        if files_counter_bad > 0:
-            print(f'{files_counter_bad} bad {num_b_files}')
+    if files_counter_good > 0:
+        print(f'{files_counter_good} {num_g_files} moved to production and added to Database')
+
+    if files_counter_bad > 0:
+        print(f'{files_counter_bad} bad {num_b_files}')
 
 
 def archive(file_name):
@@ -151,13 +164,16 @@ def del_empty_catalogs():
     catalogs_to_remove.clear()
 
 
-def cut_file(file, catalog):
+def cut_file(file, catalog, no_dir=True):
     dest_cat = os.path.join(PRODUCTION, catalog)
     moved_file = file + '.pdf'
     dest_file = os.path.join(dest_cat, moved_file)
 
-    if not os.path.exists(dest_cat):
+    if not os.path.exists(dest_cat) and no_dir:
         os.mkdir(dest_cat)
+    elif not os.path.exists(dest_cat) and not no_dir:
+        print(f'{file} --  not moved, catalog does not exist.')
+        return False
 
     a = 1
     new_name_moved_file = moved_file
@@ -166,7 +182,10 @@ def cut_file(file, catalog):
         dest_file = os.path.join(PRODUCTION, catalog, new_name_moved_file)
         a += 1
 
-    moved_file_path = os.path.join(START_CATALOG, catalog, moved_file)
+    if no_dir:
+        moved_file_path = os.path.join(START_CATALOG, catalog, moved_file)
+    else:
+        moved_file_path = os.path.join(START_CATALOG, moved_file)
 
     try:
         os.rename(moved_file_path, moved_file_path)
@@ -198,7 +217,7 @@ def new_bad_file(new_pdf, catalog):
     return False
 
 
-def validate_file(name, catalog):
+def validate_file(name, catalog=''):
 
     """ If name is proper, returns name without extension"""
 
