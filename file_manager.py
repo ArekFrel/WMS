@@ -42,9 +42,9 @@ def remove_old():
 def rename_new():
     files = ['SAP1', 'SAP2', 'SAP3']
     if files_permitted(files=files):
-        for s in files:
-            file_to_rename = os.path.join(RAPORT_CATALOG, s + '.xlsx')
-            new_name = os.path.join(RAPORT_CATALOG, s + '_old.xlsx')
+        for file in files:
+            file_to_rename = os.path.join(RAPORT_CATALOG, file + '.xlsx')
+            new_name = os.path.join(RAPORT_CATALOG, file + '_old.xlsx')
             os.rename(file_to_rename, new_name)
         print('SAP files renamed into SAP_old.')
 
@@ -70,7 +70,6 @@ def files_permitted(files):
         except FileNotFoundError:
             print(f'{name}  file not found.')
             return False
-
     return True
 
 

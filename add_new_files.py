@@ -73,7 +73,7 @@ def list_new_files_new_way():
     for any_file in os.listdir(source_cat):
         deep_path = os.path.join(source_cat, any_file)
 
-        """ First, condition if path is taken into consideration"""
+        """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
             any_file_name = validate_file(name=any_file)
             if any_file_name:
