@@ -4,7 +4,7 @@ import pyodbc
 TIME_OF_BREAK = 300
 
 """Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 1800
+TIMEOUT_FOR_PLANERS = 1
 
 """ Time between the script is not running"""
 # time when script stops running
@@ -27,6 +27,9 @@ TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 '''Permission for adding loose files to START_CATALOG'''
 LOOSE_FILE_PERMISSION = True
 
+'''Name of refill catalogue.'''
+REFILL_CAT = 'Uzupełnij_rysunki'
+
 
 '''
 **********************************
@@ -43,3 +46,11 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Database="+DATABASE+";"
                           "Trusted_Connection=yes;")
 CURSOR = CONN.cursor()
+
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()

@@ -83,18 +83,16 @@ def send_record_to_db(record):
 
 def uploader_checker():
     sap_insert_path = os.path.join(RAPORT_CATALOG, 'SAP_INSERT.csv')
-    if os.path.exists(sap_insert_path):
+    if not os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
 
         query = 'Select SAP_Skrypt_Zmiana From SAP_data;'
         result = CURSOR.execute(query)
-        sap_db_date = []
-        for _ in result:
-            sap_db_date = _
-        for _ in sap_db_date:
-            sap_db_date = _.timestamp()
-        if sap_insert_date > sap_db_date:
-            return True
+
+        for date_time in result:
+            sap_db_date = date_time[0].timestamp()
+            if sap_insert_date > sap_db_date:
+                return True
 
     return False
 
@@ -108,4 +106,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    uploader_checker()

@@ -29,7 +29,7 @@ def manage_files():
 
 
 def remove_old():
-    files = ['SAP1_old', 'SAP2_old', 'SAP3_old']
+    files = ['SAP1', 'SAP2', 'SAP3', 'SAP1_old', 'SAP2_old', 'SAP3_old']
     if not files_permitted(files=files):
         return False
     for s_old in files:

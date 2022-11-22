@@ -2,10 +2,11 @@ import os
 import time
 import shutil
 import pyodbc
+from class_file import File, Catalog
 from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
-from const import LOOSE_FILE_PERMISSION, PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE, TIMEOUT_FOR_PLANERS
+from const import *
 
 
 catalogs_to_remove = []
@@ -127,6 +128,71 @@ def list_new_files_new_way():
         print(f'{files_counter_bad} bad {num_b_files}')
 
 
+def list_new_files_new_way_class():
+
+    for any_file in os.listdir(START_CATALOG):
+        if any_file == REFILL_CAT:
+            refill_doc()
+        deep_path = os.path.join(START_CATALOG, any_file)
+
+        """ If path is not directory, and loose file are not forbidden."""
+        if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
+            file = File(name=any_file)
+            if validate_file_class(file=file):
+                os.chmod(file.start_path, S_IWRITE)
+                cut_file_class(file=file)
+            continue
+        elif not os.path.isdir(deep_path):
+            continue
+
+        catalog = Catalog(any_file)
+        if not catalog.ready:
+            continue
+
+        for file in catalog.catalog_content():
+            file = File(name=file, catalog=catalog.name)
+            if file.name in ['Thumbs.db', '_v']:
+                continue
+
+            if validate_file_class(file):
+                os.chmod(file.start_path, S_IWRITE)
+                cut_file_class(file=file)
+            else:
+                if new_bad_file(new_pdf=file.name, catalog=file.catalog):
+                    print(f'bad file: {file.file_name}')
+                    File.add_bad_file()
+
+        if not contains_pdfs(catalog=catalog.name):
+            catalogs_to_remove.append(catalog.name)
+
+    File.print_counter_status()
+    File.set_counter_zero()
+
+
+def refill_doc():
+    start_cat = os.path.join(START_CATALOG, REFILL_CAT)
+    for any_file in os.listdir(start_cat):
+        file = File(name=any_file, catalog=REFILL_CAT)
+
+        if os.path.isfile(file.dest_path):
+            try:
+                os.rename(file.start_path, file.start_path)
+                os.rename(file.dest_path, file.dest_path)
+                os.remove(file.dest_path)
+                cut_file(file)
+            except PermissionError:
+                print(f'One of the file is opened!')
+                continue
+        else:
+            try:
+                os.rename(file.start_path, file.start_path)
+                cut_file_class(file)
+                new_rec(file.file_name)
+            except PermissionError:
+                print(f'"{file.dest_path}" of the file is opened!')
+                continue
+
+
 def archive(file_name):
     with open(TRANSFER_FILE, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
@@ -150,15 +216,16 @@ def new_rec(new_pdf):
             f"'{new_pdf}', 6, 0, 11, '{now}'" \
             f");"
 
-    with CURSOR:
-        CURSOR.execute(query)
-        CURSOR.commit()
+    # with CURSOR:
+    #     CURSOR.execute(query)
+    #     CURSOR.commit()
+    print(query)
     return None
 
 
 def del_empty_catalogs():
-    for catalog in catalogs_to_remove:
-        catalog_to_remove = os.path.join(START_CATALOG, catalog)
+    for folder in catalogs_to_remove:
+        catalog_to_remove = os.path.join(START_CATALOG, folder)
         shutil.rmtree(catalog_to_remove, ignore_errors=True)
     catalogs_to_remove.clear()
 
@@ -195,6 +262,27 @@ def cut_file(file, catalog, no_dir=True):
 
     new_rec_name = new_name_moved_file[0:-4]
     new_rec(new_pdf=new_rec_name)
+    return True
+
+
+def cut_file_class(file):
+
+    if not os.path.exists(file.dest_catalog) and not file.loose:
+        os.mkdir(file.catalog_path)
+    elif not os.path.exists(file.dest_catalog) and file.loose:
+        print(f'{file} --  not moved, catalog does not exist.')
+        return False
+
+    while os.path.exists(file.dest_path):
+        file.name_if_exist_class()
+
+    try:
+        file.move_file()
+    except PermissionError:
+        print(f'{file.name} -- not moved, permission error .')
+        return False
+
+    new_rec(new_pdf=file.new_name)
     return True
 
 
@@ -250,8 +338,40 @@ def validate_file(name, catalog=''):
     return base_name
 
 
+def validate_file_class(file: File, catalog=''):
+
+    """ If name is proper, returns True"""
+
+    if file.name == '_V':
+        return False
+
+    if '.' not in file.name:
+        return False
+
+    if file.extension.lower() != 'pdf':
+        return False
+
+    if not file.loose:
+        if not file.proper_name:
+            return False
+
+    if file.file_name[7] != ' ':
+        return False
+
+    if not file.file_name[:6].isnumeric():
+        return False
+
+    if file.file_name.endswith('_99'):
+        return False
+
+    if '--' in file.file_name:
+        return False
+
+    return True
+
+
 def name_if_exist(file: str, number: int):
-    name, extension = file.rsplit('.', 1)
+    name, extension = file.rsplit(sep='.', maxsplit=1)
     if '_' in name[-3:-1]:
         base_name, ord_num = name.split(sep='_')
         new_name = f'{base_name}_{int(ord_num) + 1}.{extension}'
@@ -281,8 +401,8 @@ def new_files_to_db():
 def main():
     new_files_to_db()
     truncate_bad_files()
-    list_new_files()
-    list_new_files_new_way()
+    # list_new_files()
+    list_new_files_new_way_class()
     del_empty_catalogs()
 
 
