@@ -32,6 +32,10 @@ def redate(date):
 def send_record_to_db(record):
     table = 'SAP'
 
+    if len(record) < 29:
+        for i in range(0, (29 - len(record))):
+            record.append('')
+
     if record[23] != '':
         so = record[0]
         obiekt = record[1]
@@ -83,7 +87,7 @@ def send_record_to_db(record):
 
 def uploader_checker():
     sap_insert_path = os.path.join(RAPORT_CATALOG, 'SAP_INSERT.csv')
-    if not os.path.exists(sap_insert_path):
+    if os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
 
         query = 'Select SAP_Skrypt_Zmiana From SAP_data;'
@@ -106,5 +110,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    uploader_checker()
+    main()
+

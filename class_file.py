@@ -42,7 +42,16 @@ class File:
 
         os.rename(self.start_path, self.start_path)
         shutil.move(self.start_path, self.dest_path)
-        File.add_moved_file()
+
+    def name_if_exist_class(self):
+        """Changes a new name of the file in new location, if current already exists."""
+
+        if '_' in self.new_name[-8:-1]:
+            base_name, ord_num = self.base_and_number()
+            self.new_name = f'{base_name}_{int(ord_num) + 1}'
+        else:
+            self.new_name = f'{self.file_name}_1'
+        self.dest_path = os.path.join(PRODUCTION, self.catalog, self.new_name + '.' + self.extension)
 
     @staticmethod
     def moved_files_counter():
@@ -106,16 +115,6 @@ class File:
         File.print_good_files()
         File.print_refilled_files()
         File.print_replaced_files()
-
-    def name_if_exist_class(self):
-        """Changes a new name of the file in new location, if current already exists."""
-
-        if '_' in self.new_name[-8:-1]:
-            base_name, ord_num = self.base_and_number()
-            self.new_name = f'{base_name}_{int(ord_num) + 1}'
-        else:
-            self.new_name = f'{self.file_name}_1'
-        self.dest_path = os.path.join(PRODUCTION, self.catalog, self.new_name + '.' + self.extension)
 
     @staticmethod
     def set_counter_zero():

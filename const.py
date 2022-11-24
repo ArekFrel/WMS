@@ -28,7 +28,7 @@ TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 LOOSE_FILE_PERMISSION = True
 
 '''Name of refill catalogue.'''
-REFILL_CAT = 'Uzupełnij_rysunki'
+REFILL_CAT = 'X'
 
 
 '''

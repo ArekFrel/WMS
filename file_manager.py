@@ -32,6 +32,7 @@ def remove_old():
     files = ['SAP1', 'SAP2', 'SAP3', 'SAP1_old', 'SAP2_old', 'SAP3_old']
     if not files_permitted(files=files):
         return False
+    files = ['SAP1_old', 'SAP2_old', 'SAP3_old']
     for s_old in files:
         file_to_delete = os.path.join(RAPORT_CATALOG, s_old + '.xlsx')
         os.remove(file_to_delete)
