@@ -3,6 +3,7 @@ import os
 import os.path
 import sap_date
 from const import CURSOR, RAPORT_CATALOG
+from pyodbc import DatabaseError
 
 
 def upload_new_data():
@@ -15,6 +16,8 @@ def upload_new_data():
             if send_record_to_db(record=record):
                 i += 1
                 print(f'Records sent to database: {i}', end="\r")
+            else:
+                break
         print('\n', end='\r')
 
 
@@ -59,7 +62,7 @@ def send_record_to_db(record):
         release_aktualny = redate(record[19])
         release_plan = redate(record[20])
         network = record[21]
-        system_status = record[22]
+        system_status = record[22].split(' ')[-1]
         confirmation = record[23]
         start_po_aktualny = redate(record[24])
         finish_po_aktualny = redate(record[25])
@@ -79,10 +82,14 @@ def send_record_to_db(record):
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
                 f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_główne}')"
 
-        CURSOR.execute(query)
-        CURSOR.commit()
-        return True
-    return False
+        with CURSOR:
+            try:
+                CURSOR.execute(query)
+                CURSOR.commit()
+            except DatabaseError:
+                print('Time exceeded')
+                return False
+            return True
 
 
 def uploader_checker():

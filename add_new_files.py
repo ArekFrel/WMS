@@ -1,7 +1,7 @@
 import os
 import time
 import shutil
-import pyodbc
+import re
 from class_file import File, Catalog
 from datetime import datetime
 from stat import S_IWRITE
@@ -70,6 +70,7 @@ def list_new_files_new_way_class():
     for any_file in os.listdir(START_CATALOG):
         if any_file == REFILL_CAT:
             refill_doc()
+            continue
         deep_path = os.path.join(START_CATALOG, any_file)
 
         """ If path is not directory, and loose file are not forbidden."""
@@ -134,6 +135,9 @@ def refill_doc():
                 print(f'"{file.dest_path}" of the file is opened!')
                 continue
 
+    if not contains_pdfs(catalog=REFILL_CAT):
+        catalogs_to_remove.append(REFILL_CAT)
+
 
 def archive(file_name):
     with open(TRANSFER_FILE, 'a', encoding='utf-8') as history_file:
@@ -185,7 +189,7 @@ def cut_file_class(file):
     try:
         file.move_file()
     except PermissionError:
-        print(f'{file.name} -- not moved, permission error .')
+        print(f'{file.name} -- not moved, permission error.')
         return False
 
     new_rec(new_pdf=file.new_name)
@@ -204,8 +208,9 @@ def new_bad_file(new_pdf, catalog):
                 f" VALUES ('{catalog}', '{new_pdf}') " \
                 f"End " \
                 f"End"
-        CURSOR.execute(query)
-        CURSOR.commit()
+        with CURSOR:
+            CURSOR.execute(query)
+            CURSOR.commit()
         return True
     return False
 
@@ -248,24 +253,12 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if file.name == '_V':
-        return False
-
-    if '.' not in file.name:
-        return False
-
-    if file.extension.lower() != 'pdf':
+    if not (re.search(r"\d{7} .*[.]pdf", file.name.lower())):
         return False
 
     if not file.loose:
         if not file.proper_name:
             return False
-
-    if file.file_name[7] != ' ':
-        return False
-
-    if not file.file_name[:6].isnumeric():
-        return False
 
     if file.file_name.endswith('_99'):
         return False
@@ -289,8 +282,9 @@ def name_if_exist(file: str, number: int):
 def truncate_bad_files():
     table = "Złe_Pliki"
     query = f"Delete From {table}"
-    CURSOR.execute(query)
-    CURSOR.commit()
+    with CURSOR:
+        CURSOR.execute(query)
+        CURSOR.commit()
     return None
 
 
@@ -305,8 +299,8 @@ def new_files_to_db():
 
 
 def main():
-    new_files_to_db()
-    truncate_bad_files()
+    # new_files_to_db()
+    # truncate_bad_files()
     # list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()

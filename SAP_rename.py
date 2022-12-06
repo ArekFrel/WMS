@@ -1,7 +1,5 @@
 import os
 
-
-
 for x in os.listdir(path):
     if x in ['desktop.ini', 'Thumbs.db']:
         continue

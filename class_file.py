@@ -12,7 +12,6 @@ class File:
     replaced_files = 0
 
     def __init__(self, name, catalog=''):
-
         self.name = name
         self.file_name, self.extension = name.rsplit('.', 1)
         self.catalog_path = os.path.join(START_CATALOG, catalog)
