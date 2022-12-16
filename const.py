@@ -26,7 +26,7 @@ RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 
 '''Permission for adding loose files to START_CATALOG'''
-LOOSE_FILE_PERMISSION = False
+LOOSE_FILE_PERMISSION = True
 
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
@@ -46,7 +46,7 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Server="+SERVER+";"
                           "Database="+DATABASE+";"
                           "Trusted_Connection=yes;")
-# CONN.timeout = 1
+CONN.timeout = 10
 CURSOR = CONN.cursor()
 
 

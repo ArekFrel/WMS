@@ -109,7 +109,7 @@ def uploader_checker():
 
 
 def main():
-    if uploader_checker():
+    if not uploader_checker():
         upload_new_data()
         sap_date.update(column='SAP_Skrypt_zmiana')
     else:
@@ -118,4 +118,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

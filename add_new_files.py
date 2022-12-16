@@ -117,9 +117,10 @@ def refill_doc():
         file = File(name=any_file, catalog=REFILL_CAT)
 
         if os.path.isfile(file.dest_path):
+            os.chmod(file.dest_path, S_IWRITE)
             try:
                 os.rename(file.start_path, file.start_path)
-                os.rename(file.dest_path, file.dest_path)
+                # os.rename(file.dest_path, file.dest_path)
                 os.remove(file.dest_path)
                 shutil.move(file.start_path, file.dest_path)
                 File.add_replaced_file()
@@ -185,7 +186,6 @@ def cut_file_class(file):
 
     while os.path.exists(file.dest_path):
         file.name_if_exist_class()
-
     try:
         file.move_file()
     except PermissionError:
@@ -300,8 +300,8 @@ def new_files_to_db():
 
 def main():
     # new_files_to_db()
-    # truncate_bad_files()
-    # list_new_files()
+    truncate_bad_files()
+    list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 
