@@ -9,11 +9,11 @@ def timer(func):
         start_point = time.time()
         func(*args, **kwargs)
         exec_time = time.time() - start_point
-        print(f'Execution of {func.__name__}: {exec_time:.0f} s')
+        print(f'Execution of {func.__name__}: {exec_time:.6f} s')
     return wrapper
 
 
-def time_break(from_=1, to_=8):
+def time_break(from_=1, to_=6):
     def dec(func):
         def wrapper():
             if not from_ <= datetime.now().hour < to_:

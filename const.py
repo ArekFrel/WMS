@@ -5,7 +5,7 @@ import pyodbc
 TIME_OF_BREAK = 300
 
 """Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 1
+TIMEOUT_FOR_PLANERS = 1800
 
 """ Time between the script is not running"""
 # time when script stops running

@@ -2,6 +2,7 @@ import csv
 import os
 import os.path
 import sap_date
+import confirmation_deleter
 from const import CURSOR, RAPORT_CATALOG
 from pyodbc import DatabaseError
 
@@ -109,9 +110,10 @@ def uploader_checker():
 
 
 def main():
-    if not uploader_checker():
+    if uploader_checker():
         upload_new_data()
         sap_date.update(column='SAP_Skrypt_zmiana')
+        confirmation_deleter.delete_confirmation()
     else:
         print('No new data uploaded.')
 

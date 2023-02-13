@@ -7,6 +7,7 @@ from datetime import datetime
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
+import timeit
 
 
 catalogs_to_remove = []
@@ -28,8 +29,7 @@ def list_new_files():
 
     print('Data Base refreshed.')
 
-    for file in result:
-        current_db_files.append(file[0])
+    current_db_files = [file[0] for file in result]
     files_counter = 0
 
     for catalog in os.listdir(source_cat):
@@ -55,9 +55,9 @@ def list_new_files():
 
     print('\n', end='\r')
 
-    for new_file in new_files:
-        new_rec(new_pdf=new_file)
-        archive(file_name=new_file)
+    # for new_file in new_files:
+    #     new_rec(new_pdf=new_file)
+    #     archive(file_name=new_file)
 
     if len(new_files) == 0:
         print('No new files.')
@@ -299,7 +299,7 @@ def new_files_to_db():
 
 
 def main():
-    # new_files_to_db()
+    new_files_to_db()
     truncate_bad_files()
     list_new_files()
     list_new_files_new_way_class()
