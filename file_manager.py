@@ -6,11 +6,14 @@ from datetime import datetime
 s_ins = 'SAP_INSERT.csv'
 s3 = 'SAP3.xlsx'
 s3old = 'SAP3_old.xlsx'
+s7 = 'SAP7_ALL.xlsx'
+s7old = 'SAP7_ALL_old.xlsx'
+i_ins = 'ITEM_INSERT.csv'
 
 
 def manage_files():
 
-    cat_con = os.listdir(RAPORT_CATALOG)
+    cat_con = [x.lower() for x in os.listdir(RAPORT_CATALOG)]
 
     if s_ins in cat_con and s3 in cat_con and s3old in cat_con:
 
@@ -24,8 +27,23 @@ def manage_files():
             if remove_old():
                 rename_new()
 
-    if s_ins not in cat_con and s3old not in cat_con or s3old not in cat_con:
+    if s_ins.lower() not in cat_con and s3old.lower() not in cat_con or s3old.lower() not in cat_con:
         rename_new()
+
+    if i_ins.lower() in cat_con and s7.lower() in cat_con and s7old.lower() in cat_con:
+
+        item_insert_path = os.path.join(RAPORT_CATALOG, i_ins)
+        item_path = os.path.join(RAPORT_CATALOG, s7)
+        item_insert_date = os.path.getmtime(item_insert_path)
+        item_date = os.path.getmtime(item_path)
+
+        if item_insert_date > item_date:
+            item_script_date(date=item_date)
+            if remove_item_old():
+                rename_new_item()
+
+    if s_ins not in cat_con and s3old not in cat_con or s3old not in cat_con:
+        rename_new_item()
 
 
 def remove_old():
@@ -40,6 +58,18 @@ def remove_old():
     return True
 
 
+def remove_item_old():
+    files = ['SAP7_ALL', 'SAP7_ALL_old']
+    if not files_permitted(files=files):
+        return False
+    files = ['SAP7_ALL_old']
+    for s_old in files:
+        file_to_delete = os.path.join(RAPORT_CATALOG, s_old + '.xlsx')
+        os.remove(file_to_delete)
+    print('SAP7_ALL_old files removed.')
+    return True
+
+
 def rename_new():
     files = ['SAP1', 'SAP2', 'SAP3']
     if files_permitted(files=files):
@@ -50,6 +80,15 @@ def rename_new():
         print('SAP files renamed into SAP_old.')
 
 
+def rename_new_item():
+    file = 'SAP7_All'
+    if file_permitted(file=file):
+        file_to_rename = os.path.join(RAPORT_CATALOG, file + '.xlsx')
+        new_name = os.path.join(RAPORT_CATALOG, file + '_old.xlsx')
+        os.rename(file_to_rename, new_name)
+    print('SAP7_ALL file renamed into SAP7_ALL_old.')
+
+
 def sap_script_date(date):
 
     date = str(datetime.fromtimestamp(date, ))[0:-3]
@@ -58,6 +97,16 @@ def sap_script_date(date):
         CURSOR.execute(query)
         CURSOR.commit()
     print(f'SAP_Skrypt in DataBase updated to {date[0:-3]}')
+
+
+def item_script_date(date):
+
+    date = str(datetime.fromtimestamp(date, ))[0:-3]
+    query = f"UPDATE Sap_data SET Item_Data = '{date}';"
+    with CURSOR:
+        CURSOR.execute(query)
+        CURSOR.commit()
+    print(f'Item_data in DataBase updated to {date[0:-3]}')
 
 
 def files_permitted(files):
@@ -71,6 +120,19 @@ def files_permitted(files):
         except FileNotFoundError:
             print(f'{name}  file not found.')
             return False
+    return True
+
+
+def file_permitted(file):
+    try:
+        file = os.path.join(RAPORT_CATALOG, file + '.xlsx')
+        os.rename(file, file)
+    except PermissionError:
+        print(f'{file} report is opened!')
+        return False
+    except FileNotFoundError:
+        print(f'{file}  file not found.')
+        return False
     return True
 
 
