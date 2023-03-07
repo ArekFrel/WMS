@@ -23,7 +23,7 @@ def upload_new_data():
 
 
 def upload_new_items():
-    print('Uploadin new Items')
+    print('Uploading new Items')
     item_insert_file = os.path.join(RAPORT_CATALOG, "ITEM_INSERT.csv")
     with open(item_insert_file) as file:
         changed_records = csv.reader(file)
