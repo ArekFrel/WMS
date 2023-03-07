@@ -22,6 +22,21 @@ def upload_new_data():
         print('\n', end='\r')
 
 
+def upload_new_items():
+    print('Uploadin new Items')
+    item_insert_file = os.path.join(RAPORT_CATALOG, "ITEM_INSERT.csv")
+    with open(item_insert_file) as file:
+        changed_records = csv.reader(file)
+        i = 0
+        for record in changed_records:
+            if send_item_to_db(record=record):
+                i += 1
+                print(f'Items sent to database: {i}', end="\r")
+            else:
+                break
+        print('\n', end='\r')
+
+
 def redate(date):
     if not len(date):
         return 'Null'
@@ -93,12 +108,38 @@ def send_record_to_db(record):
             return True
 
 
+def send_item_to_db(record):
+
+    table = 'Items'
+    if len(record) < 2:
+        for i in range(0, (2 - len(record))):
+            record.append('')
+
+    if record[1] != '':
+        if record[0] == '0':
+            item = 'NULL'
+        else:
+            item = record[0]
+        prod_order = int(record[1])
+        query = f"DELETE FROM {table} WHERE Prod_Order = {prod_order}; "\
+                f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
+                f"VALUES({prod_order},{item})"
+        with CURSOR:
+            try:
+                CURSOR.execute(query)
+                CURSOR.commit()
+            except DatabaseError:
+                print('Time exceeded')
+                return False
+            return True
+
+
 def uploader_checker():
     sap_insert_path = os.path.join(RAPORT_CATALOG, 'SAP_INSERT.csv')
     if os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
 
-        query = 'Select SAP_Skrypt_Zmiana From SAP_data;'
+        query = 'SELECT SAP_Skrypt_Zmiana FROM SAP_data;'
         result = CURSOR.execute(query)
 
         for date_time in result:
@@ -109,6 +150,21 @@ def uploader_checker():
     return False
 
 
+def uploader_item_checker():
+    item_insert_path = os.path.join(RAPORT_CATALOG, 'ITEM_INSERT.csv')
+    if os.path.exists(item_insert_path):
+        item_insert_date = os.path.getmtime(item_insert_path)
+
+        query = 'SELECT Item_Data FROM SAP_data;'
+        result = CURSOR.execute(query)
+
+        for date_time in result:
+            item_db_date = date_time[0].timestamp()
+            if item_insert_date > item_db_date:
+                return True
+    return False
+
+
 def main():
     if uploader_checker():
         upload_new_data()
@@ -116,6 +172,11 @@ def main():
         confirmation_deleter.delete_confirmation()
     else:
         print('No new data uploaded.')
+
+    if uploader_item_checker():
+        upload_new_items()
+        sap_date.update(column='Item_Data')
+        print('New Items uploaded')
 
 
 if __name__ == '__main__':
