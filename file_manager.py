@@ -3,12 +3,12 @@ from const import CURSOR
 from const import RAPORT_CATALOG
 from datetime import datetime
 
-s_ins = 'SAP_INSERT.csv'
-s3 = 'SAP3.xlsx'
-s3old = 'SAP3_old.xlsx'
-s7 = 'SAP7_ALL.xlsx'
-s7old = 'SAP7_ALL_old.xlsx'
-i_ins = 'ITEM_INSERT.csv'
+s_ins = 'sap_insert.csv'
+s3 = 'sap3.xlsx'
+s3old = 'sap3_old.xlsx'
+s7 = 'sap7_all.xlsx'
+s7old = 'sap7_all_old.xlsx'
+i_ins = 'item_insert.csv'
 
 
 def manage_files():
@@ -42,7 +42,7 @@ def manage_files():
             if remove_item_old():
                 rename_new_item()
 
-    if s_ins not in cat_con and s3old not in cat_con or s3old not in cat_con:
+    if i_ins.lower() not in cat_con and s7old.lower() not in cat_con or s7old.lower() not in cat_con:
         rename_new_item()
 
 
