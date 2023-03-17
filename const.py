@@ -25,11 +25,16 @@ RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
 '''Text file, arhivising files added the old way.'''
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 
-'''Permission for adding loose files to START_CATALOG'''
+'''Permission to adding loose files to START_CATALOG'''
 LOOSE_FILE_PERMISSION = True
 
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
+
+'''Permission to adding files uploaded directly into PRODUCTION catalog once per day
+GCP_OCLOCK is time when all files are checked if they're new'''
+GENERAL_CHECK_PERMISSION = True
+GCP_OCLOCK = 16
 
 
 '''

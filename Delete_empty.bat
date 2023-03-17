@@ -40,4 +40,4 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 python delete_empty_files.py
 
-PAUSE
+@REM PAUSE

@@ -3,11 +3,10 @@ import time
 import shutil
 import re
 from class_file import File, Catalog
-from datetime import datetime
+from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
-import timeit
 
 
 catalogs_to_remove = []
@@ -55,14 +54,30 @@ def list_new_files():
 
     print('\n', end='\r')
 
-    # for new_file in new_files:
-    #     new_rec(new_pdf=new_file)
-    #     archive(file_name=new_file)
+    for new_file in new_files:
+        new_rec(new_pdf=new_file)
+        archive(file_name=new_file)
 
     if len(new_files) == 0:
         print('No new files.')
 
     new_files.clear()
+
+
+def general_checker():
+
+    """Function providing other function runs once per day after a certain hour the day."""
+    query = 'SELECT General_check FROM SAP_data;'
+    result = CURSOR.execute(query)
+
+    for date_time in result:
+        gen_checker_date = date_time[0]
+        today = date.today()
+        if gen_checker_date < today and datetime.now().hour > (GCP_OCLOCK - 1):
+            query = f"UPDATE SAP_Data SET General_check = '{today}'"
+            CURSOR.execute(query)
+            return True
+    return False
 
 
 def list_new_files_new_way_class():
@@ -301,7 +316,11 @@ def new_files_to_db():
 def main():
     new_files_to_db()
     truncate_bad_files()
-    list_new_files()
+    if GENERAL_CHECK_PERMISSION:
+        if general_checker():
+            list_new_files()
+    else:
+        list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 

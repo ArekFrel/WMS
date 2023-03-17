@@ -40,6 +40,6 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\open_module.py
 
-pause
+@REM pause
 
 
