@@ -82,6 +82,8 @@ def general_checker():
 
 def list_new_files_new_way_class():
 
+    list_new_files_new_way_class.catalogs_to_remove = []
+
     for any_file in os.listdir(START_CATALOG):
         if any_file == REFILL_CAT:
             refill_doc()
@@ -120,7 +122,7 @@ def list_new_files_new_way_class():
                         File.add_bad_file()
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
-            catalogs_to_remove.append(catalog.name)
+            list_new_files_new_way_class.catalogs_to_remove.append(catalog.name)
 
     File.print_counter_status()
     File.set_counter_zero()
