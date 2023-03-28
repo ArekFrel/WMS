@@ -113,7 +113,6 @@ def list_new_files_new_way_class():
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
                         File.add_moved_file()
-
                 else:
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name}')
@@ -268,7 +267,7 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if not (re.search(r"\d{7} .*[.]pdf", file.name.lower())):
+    if re.search(r"\d{7} .*[.]pdf", file.name.lower()) is None:
         return False
 
     if not file.loose:
