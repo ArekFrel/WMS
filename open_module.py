@@ -3,7 +3,7 @@ import os
 import pyodbc
 
 
-def countdown(t=3):
+def countdown(t=1):
     while t >= 0:
         secs = t
         timer = f'The window closes in {secs:02d}s'
@@ -19,8 +19,8 @@ def main():
     database = 'PRODUKCJAWORKFLOW'
     conn = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Server=" + server + ";"
-                                               "Database=" + database + ";"
-                                                                        "Trusted_Connection=yes;")
+                          "Database=" + database + ";"
+                          "Trusted_Connection=yes;")
     QUERY = f"Select Plik From Technologia Where [PO] = {str(po)} AND Status_Op = 6 Order by Rysunek DESC;"
     cursor = conn.cursor()
     result = cursor.execute(QUERY)
@@ -54,5 +54,5 @@ if __name__ == '__main__':
     close_app = "Y"
     while close_app == "Y":
         main()
-        close_app = input("Keep working? If yes type 'Y'       ")
+        # close_app = input("Keep working? If yes type 'Y'       ")
     countdown()

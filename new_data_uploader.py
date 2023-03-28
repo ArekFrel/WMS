@@ -108,6 +108,23 @@ def send_record_to_db(record):
             return True
 
 
+def update_status(record):
+
+    table = 'SAP'
+    confirmation = record[0]
+    system_status = record[1].split(' ')[-1]
+
+    query = f"UPDATE {table} SET [System Status] = '{system_status}' WHERE Confirmation = '{confirmation}';"
+    with CURSOR:
+        try:
+            CURSOR.execute(query)
+            CURSOR.commit()
+        except DatabaseError:
+            print('Time exceeded')
+            return False
+        return True
+
+
 def send_item_to_db(record):
 
     table = 'Items'
@@ -163,6 +180,21 @@ def uploader_item_checker():
             if item_insert_date > item_db_date:
                 return True
     return False
+
+
+def update_system_status():
+    print('Uploading System status')
+    status_file = os.path.join(RAPORT_CATALOG, "Status_Update.csv")
+    with open(status_file) as file:
+        changed_records = csv.reader(file)
+        i = 0
+        for record in changed_records:
+            if update_status(record=record):
+                i += 1
+                print(f'Records sent to database: {i}', end="\r")
+            else:
+                break
+        print('\n', end='\r')
 
 
 def main():

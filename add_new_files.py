@@ -82,8 +82,6 @@ def general_checker():
 
 def list_new_files_new_way_class():
 
-    list_new_files_new_way_class.catalogs_to_remove = []
-
     for any_file in os.listdir(START_CATALOG):
         if any_file == REFILL_CAT:
             refill_doc()
@@ -122,7 +120,7 @@ def list_new_files_new_way_class():
                         File.add_bad_file()
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
-            list_new_files_new_way_class.catalogs_to_remove.append(catalog.name)
+            catalogs_to_remove.append(catalog.name)
 
     File.print_counter_status()
     File.set_counter_zero()
@@ -219,7 +217,7 @@ def new_bad_file(new_pdf, catalog):
             new_pdf = new_pdf.replace('--', '-')
         table = "Złe_Pliki"
         query = f"Begin " \
-                f"If Not Exists (Select * From {table} Where u_Folder = {catalog} And u_Plik = '{new_pdf}') " \
+                f"If Not Exists (Select * From {table} Where u_Folder = '{catalog}' And u_Plik = '{new_pdf}') " \
                 f"Begin " \
                 f"Insert Into {table} (u_Folder, u_Plik) " \
                 f" VALUES ('{catalog}', '{new_pdf}') " \
