@@ -1,5 +1,6 @@
 import functools
 from datetime import datetime
+from const import FROM_OCLOCK, TO_OCLOCK
 import time
 
 
@@ -18,6 +19,8 @@ def time_break(from_=1, to_=6):
         def wrapper():
             if not from_ <= datetime.now().hour < to_:
                 func()
+            else:
+                print(f'Break from {FROM_OCLOCK} to {TO_OCLOCK}.')
         return wrapper
     return dec
 

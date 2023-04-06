@@ -14,8 +14,7 @@ catalogs_to_remove = []
 
 @timer
 def list_new_files():
-    """ Adding to database drawing uploaded
-    directly to PRODUCTION catalog."""
+    """ Adding to database drawing uploaded directly to PRODUCTION catalog."""
     source_cat = PRODUCTION
     query = 'Select Plik From Technologia;'
     try:
@@ -66,7 +65,7 @@ def list_new_files():
 
 def general_checker():
 
-    """Function providing other function runs once per day after a certain hour the day."""
+    """Function providing other function runs once per day after a certain hour of the day."""
     query = 'SELECT General_check FROM SAP_data;'
     result = CURSOR.execute(query)
 
@@ -186,7 +185,8 @@ def new_rec(new_pdf):
 def del_empty_catalogs():
     for folder in catalogs_to_remove:
         catalog_to_remove = os.path.join(START_CATALOG, folder)
-        shutil.rmtree(catalog_to_remove, ignore_errors=True)
+        os.chmod(catalog_to_remove, S_IWRITE)
+        shutil.rmtree(catalog_to_remove, ignore_errors=True, )
     catalogs_to_remove.clear()
 
 

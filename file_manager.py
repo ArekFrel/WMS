@@ -27,10 +27,10 @@ def manage_files():
             if remove_old():
                 rename_new()
 
-    if s_ins.lower() not in cat_con and s3old.lower() not in cat_con or s3old.lower() not in cat_con:
+    if s_ins not in cat_con and s3old not in cat_con or s3old not in cat_con:
         rename_new()
 
-    if i_ins.lower() in cat_con and s7.lower() in cat_con and s7old.lower() in cat_con:
+    if i_ins in cat_con and s7 in cat_con and s7old in cat_con:
 
         item_insert_path = os.path.join(RAPORT_CATALOG, i_ins)
         item_path = os.path.join(RAPORT_CATALOG, s7)

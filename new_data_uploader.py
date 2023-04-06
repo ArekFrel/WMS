@@ -9,7 +9,7 @@ from pyodbc import DatabaseError
 
 def upload_new_data():
     print('Refreshing SAP DataBase.')
-    sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT.csv")
+    sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT_.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
         i = 0
@@ -18,7 +18,8 @@ def upload_new_data():
                 i += 1
                 print(f'Records sent to database: {i}', end="\r")
             else:
-                break
+                print('Unexpected error occurs during updating SAP.')
+                return False
         print('\n', end='\r')
 
 
@@ -198,17 +199,17 @@ def update_system_status():
 
 
 def main():
-    if uploader_checker():
-        upload_new_data()
-        sap_date.update(column='SAP_Skrypt_zmiana')
+    if True:
+        if upload_new_data():
+            sap_date.update(column='SAP_Skrypt_zmiana')
         confirmation_deleter.delete_confirmation()
-    else:
-        print('No new data uploaded.')
+    # else:
+    #     print('No new data uploaded.')
 
-    if uploader_item_checker():
-        upload_new_items()
-        sap_date.update(column='Item_Data')
-        print('New Items uploaded')
+    # if uploader_item_checker():
+    #     upload_new_items()
+    #     sap_date.update(column='Item_Data')
+    #     print('New Items uploaded')
 
 
 if __name__ == '__main__':
