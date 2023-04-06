@@ -9,7 +9,7 @@ from pyodbc import DatabaseError
 
 def upload_new_data():
     print('Refreshing SAP DataBase.')
-    sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT_.csv")
+    sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
         i = 0
@@ -21,6 +21,7 @@ def upload_new_data():
                 print('Unexpected error occurs during updating SAP.')
                 return False
         print('\n', end='\r')
+    return True
 
 
 def upload_new_items():
@@ -85,7 +86,7 @@ def send_record_to_db(record):
         finish_po_aktualny = redate(record[25])
         start_op_aktualny = redate(record[26])
         finish_op_aktualny = redate(record[27])
-        urzadzenie_główne = record[28]
+        urzadzenie_glowne = record[28]
 
         query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
                 f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
@@ -97,7 +98,7 @@ def send_record_to_db(record):
                 f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
                 f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_główne}')"
+                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}')"
 
         with CURSOR:
             try:
@@ -199,17 +200,17 @@ def update_system_status():
 
 
 def main():
-    if True:
+    if uploader_checker():
         if upload_new_data():
             sap_date.update(column='SAP_Skrypt_zmiana')
         confirmation_deleter.delete_confirmation()
-    # else:
-    #     print('No new data uploaded.')
+    else:
+        print('No new data uploaded.')
 
-    # if uploader_item_checker():
-    #     upload_new_items()
-    #     sap_date.update(column='Item_Data')
-    #     print('New Items uploaded')
+    if uploader_item_checker():
+        upload_new_items()
+        sap_date.update(column='Item_Data')
+        print('New Items uploaded')
 
 
 if __name__ == '__main__':
