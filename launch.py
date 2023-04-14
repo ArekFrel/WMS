@@ -17,6 +17,10 @@ def wait(period):
         print(' ' * len(text), end="\r")
 
 
+def print_now():
+    print(f'{str(datetime.fromtimestamp(time.time(), ))[0:-7]}')
+
+
 def print_introduction():
     start = 'launched at : ' + str(datetime.fromtimestamp(time.time(), ))[0:-7]
     line_1 = 'AUTOMAT'
@@ -30,6 +34,7 @@ def print_introduction():
 
 @time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)
 def main():
+    print_now()
     sap_date.update(column='Automat')
     add_new_files.main()
     sap_date.update(column='Automat_Start')
