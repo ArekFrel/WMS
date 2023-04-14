@@ -5,6 +5,8 @@ import add_new_files
 import new_data_uploader
 import file_manager
 import sap_date
+import self_update
+import subprocess
 from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK
 
 
@@ -45,6 +47,10 @@ def main():
 if __name__ == '__main__':
     print_introduction()
     while True:
-        main()
+        # main()
+        if self_update.check_for_update():
+            self_update.update()
+            subprocess.call('C:\\Users\\PLFRELA\\OneDrive\\PythonProjects\\WMS\\AUTOMAT.bat')
+            break
         wait(TIME_OF_BREAK)
         print(' ')

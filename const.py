@@ -2,7 +2,7 @@ import pyodbc
 
 
 """Number of second to wait before new refreshing"""
-TIME_OF_BREAK = 300
+TIME_OF_BREAK = 5
 
 """Number of second after which the catalog is moved."""
 TIMEOUT_FOR_PLANERS = 1800
@@ -35,6 +35,10 @@ REFILL_CAT = 'X'
 GCP_OCLOCK is time when all files are checked if they're new'''
 GENERAL_CHECK_PERMISSION = True
 GCP_OCLOCK = 16
+
+'''Name of catalogue in TEMP, where nwe version is updated'''
+UPDATE_CAT = 'T:/__wms_update__'
+AUTOMAT_FILES_STORED = 'C:/Dokumenty/gen_cat/temp'
 
 
 '''
