@@ -7,6 +7,7 @@ import file_manager
 import sap_date
 import self_update
 import subprocess
+import os
 from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
 
 
@@ -20,20 +21,25 @@ def wait(period):
 
 
 def print_now():
-    print(f'{str(datetime.fromtimestamp(time.time(), ))[0:-7]}')
+    os.system('')
+    COL_START = '\33[93m'
+    COL_END = '\033[0m'
+    print(f'{COL_START}{str(datetime.fromtimestamp(time.time(), ))[0:-7]} {COL_END}')
 
 
 def print_introduction():
+    os.system('')
     start = 'Launched at : ' + str(datetime.fromtimestamp(time.time(), ))[0:-7]
     line_1 = 'AUTOMAT'
-    COL_START = '\33[34m'
+    COL_START = '\33[33m'
     COL_END = '\033[0m'
-    print(COL_START + 50 * '-' + COL_END)
+    print(COL_START + ' ' + 48 * '_' + ' ' + COL_END)
+    print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
     print(COL_START + f'|{line_1: ^48}|' + COL_END)
     print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
     print(COL_START + f'|{start: ^48}|' + COL_END)
-    print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
-    print(COL_START + 50 * '-' + COL_END)
+    print(COL_START + '|' + 48 * '_' + '|' + COL_END)
+    print('')
 
 
 @time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)

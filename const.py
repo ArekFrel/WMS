@@ -2,7 +2,7 @@ import pyodbc
 
 
 """Number of second to wait before new refreshing"""
-TIME_OF_BREAK = 5
+TIME_OF_BREAK = 300
 
 """Number of second after which the catalog is moved."""
 TIMEOUT_FOR_PLANERS = 1800
