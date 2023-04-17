@@ -7,7 +7,7 @@ import file_manager
 import sap_date
 import self_update
 import subprocess
-from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK
+from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
 
 
 def wait(period):
@@ -24,14 +24,16 @@ def print_now():
 
 
 def print_introduction():
-    start = 'launched at : ' + str(datetime.fromtimestamp(time.time(), ))[0:-7]
+    start = 'Launched at : ' + str(datetime.fromtimestamp(time.time(), ))[0:-7]
     line_1 = 'AUTOMAT'
-    print(50 * '-')
-    print(f'|{line_1: ^48}|')
-    print('|' + 48 * ' ' + '|')
-    print(f'|{start: ^48}|')
-    print('|' + 48 * ' ' + '|')
-    print(50 * '-')
+    COL_START = '\33[34m'
+    COL_END = '\033[0m'
+    print(COL_START + 50 * '-' + COL_END)
+    print(COL_START + f'|{line_1: ^48}|' + COL_END)
+    print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
+    print(COL_START + f'|{start: ^48}|' + COL_END)
+    print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
+    print(COL_START + 50 * '-' + COL_END)
 
 
 @time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)
@@ -47,10 +49,10 @@ def main():
 if __name__ == '__main__':
     print_introduction()
     while True:
-        # main()
+        main()
         if self_update.check_for_update():
             self_update.update()
-            subprocess.call('C:\\Users\\PLFRELA\\OneDrive\\PythonProjects\\WMS\\AUTOMAT.bat')
+            subprocess.call(AUTOMAT_BAT)
             break
         wait(TIME_OF_BREAK)
         print(' ')

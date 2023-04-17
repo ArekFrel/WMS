@@ -38,7 +38,11 @@ GCP_OCLOCK = 16
 
 '''Name of catalogue in TEMP, where nwe version is updated'''
 UPDATE_CAT = 'T:/__wms_update__'
-AUTOMAT_FILES_STORED = 'C:/Dokumenty/gen_cat/temp'
+
+AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+"""Path of AUTOMAT file"""
+AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+
 
 
 '''
