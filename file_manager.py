@@ -110,15 +110,17 @@ def item_script_date(date):
 
 
 def files_permitted(files):
+    COL_START = '\33[91m'
+    COL_END = '\033[0m'
     for name in files:
         try:
             file = os.path.join(RAPORT_CATALOG, name + '.xlsx')
             os.rename(file, file)
         except PermissionError:
-            print(f'{name} report is opened!')
+            print(COL_START + f'{name} report is opened!' + COL_END)
             return False
         except FileNotFoundError:
-            print(f'{name}  file not found.')
+            print(COL_START + f'{name}  file not found.' + COL_END)
             return False
     return True
 
