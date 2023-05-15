@@ -47,6 +47,7 @@ def list_new_files():
                 new_files.append(file_name)
             elif not file_name and file.lower().endswith('.pdf'):
                 new_bad_file(new_pdf=file, catalog=catalog)
+                print(f'bad file: {file} in catalog:"1__Rysunki/{catalog}"')
 
             files_counter += 1
             print(f'{files_counter} files has been analyzed.', end="\r")
@@ -114,7 +115,7 @@ def list_new_files_new_way_class():
                         File.add_moved_file()
                 else:
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
-                        print(f'bad file: {file.file_name}')
+                        print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:

@@ -31,7 +31,7 @@ def print_introduction():
     os.system('')
     start = 'Launched at : ' + str(datetime.fromtimestamp(time.time(), ))[0:-7]
     line_1 = 'AUTOMAT'
-    COL_START = '\33[94m'
+    COL_START = '\33[33m'
     COL_END = '\033[0m'
     print(COL_START + ' ' + 48 * '_' + ' ' + COL_END)
     print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
