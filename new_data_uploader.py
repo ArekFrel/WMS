@@ -12,11 +12,13 @@ def upload_new_data():
     sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
-        i = 0
-        for record in changed_records:
+        for index, record in enumerate(changed_records):
+            if index == 0:
+                if ''.join(record) == '':
+                    print(f'SAP_Insert file is empty.')
+                    break
             if send_record_to_db(record=record):
-                i += 1
-                print(f'Records sent to database: {i}', end="\r")
+                print(f'Records sent to database: {index}', end="\r")
             else:
                 print('Unexpected error occurs during updating SAP.')
                 return False
@@ -108,6 +110,8 @@ def send_record_to_db(record):
                 print('Time exceeded')
                 return False
             return True
+    else:
+        return False
 
 
 def update_status(record):
