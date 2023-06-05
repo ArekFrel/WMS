@@ -48,8 +48,8 @@ def main():
     sap_date.update(column='Automat')
     add_new_files.main()
     sap_date.update(column='Automat_Start')
-    new_data_uploader.main()
-    file_manager.main()
+    if new_data_uploader.main():
+        file_manager.main()
 
 
 if __name__ == '__main__':
