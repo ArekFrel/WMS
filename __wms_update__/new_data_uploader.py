@@ -224,6 +224,8 @@ def main():
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
 
+    return True
+
 
 if __name__ == '__main__':
     main()
