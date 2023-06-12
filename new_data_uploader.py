@@ -18,7 +18,7 @@ def upload_new_data():
                     print(f'SAP_Insert file is empty.')
                     break
             if send_record_to_db(record=record):
-                print(f'Records sent to database: {index}', end="\r")
+                print(f'Records sent to database: {index + 1}', end="\r")
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
