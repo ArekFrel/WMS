@@ -268,7 +268,10 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if re.search(r"\d{7} .*[.]pdf", file.name.lower()) is None:
+    if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
+        return False
+
+    if file.extension not in ACC_EXT:
         return False
 
     if not file.loose:

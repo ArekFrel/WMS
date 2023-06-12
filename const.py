@@ -1,15 +1,22 @@
 import pyodbc
 
 
+"""Extensions of the files, that are allowed to go."""
+ACC_EXT = [
+    'pdf',
+    'xlsx'  # to add another extensions add coma here
+            # and type another extension between '' in this line
+]
+
 """Number of second to wait before new refreshing"""
-TIME_OF_BREAK = 300
+TIME_OF_BREAK = 120
 
 """Number of second after which the catalog is moved."""
 TIMEOUT_FOR_PLANERS = 1800
 
 """ Time between the script is not running"""
 # time when script stops running
-FROM_OCLOCK = 2
+FROM_OCLOCK = 1
 # time when script starts running
 TO_OCLOCK = 6
 
