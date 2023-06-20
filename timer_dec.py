@@ -20,7 +20,7 @@ def time_break(from_=1, to_=6):
             if not from_ <= datetime.now().hour < to_:
                 func()
             else:
-                print(f'Break from {FROM_OCLOCK} to {TO_OCLOCK} \n.')
+                print(f'Break from {FROM_OCLOCK} to {TO_OCLOCK}\n.')
         return wrapper
     return dec
 
