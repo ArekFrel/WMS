@@ -1,6 +1,7 @@
 from datetime import datetime
 import time
 from const import CURSOR
+from pyodbc import DatabaseError, OperationalError
 
 
 def update(column):
@@ -8,8 +9,17 @@ def update(column):
     query = f"Update SAP_Data SET {column} = '{now}';"
 
     with CURSOR:
-        CURSOR.execute(query)
-        CURSOR.commit()
+        try:
+            CURSOR.execute(query)
+            CURSOR.commit()
+
+        except OperationalError:
+            print('Unknown Error')
+            return False
+
+        except DatabaseError:
+            print('Time exceeded')
+            return False
 
 
 def main():
