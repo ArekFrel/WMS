@@ -1,5 +1,8 @@
 from datetime import datetime
 import time
+
+import pyodbc
+
 from const import CURSOR
 from pyodbc import DatabaseError, OperationalError
 
@@ -14,11 +17,15 @@ def update(column):
             CURSOR.commit()
 
         except OperationalError:
-            print('Unknown Error')
+            print('Operational Error Error')
             return False
 
         except DatabaseError:
             print('Time exceeded')
+            return False
+
+        except pyodbc.Error:
+            print('Database Error')
             return False
 
 
