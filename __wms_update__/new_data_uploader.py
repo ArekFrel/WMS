@@ -3,8 +3,8 @@ import os
 import os.path
 import sap_date
 import confirmation_deleter
-from const import CURSOR, RAPORT_CATALOG
-from pyodbc import DatabaseError, OperationalError
+from const import CURSOR, RAPORT_CATALOG, db_commit
+from pyodbc import DatabaseError, OperationalError, Error
 
 
 def upload_new_data():
@@ -18,7 +18,7 @@ def upload_new_data():
                     print(f'SAP_Insert file is empty.')
                     break
             if send_record_to_db(record=record):
-                print(f'Records sent to database: {index}', end="\r")
+                print(f'Records sent to database: {index + 1}', end="\r")
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
@@ -102,22 +102,7 @@ def send_record_to_db(record):
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
                 f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}')"
 
-        with CURSOR:
-            try:
-                CURSOR.execute(query)
-                CURSOR.commit()
-
-            except OperationalError:
-                print('Unknown Error')
-                return False
-
-            except DatabaseError:
-                print('Time exceeded')
-                return False
-
-            return True
-    else:
-        return False
+        return db_commit(query=query, func_name=send_item_to_db.__name__)
 
 
 def update_status(record):
@@ -127,14 +112,7 @@ def update_status(record):
     system_status = record[1].split(' ')[-1]
 
     query = f"UPDATE {table} SET [System Status] = '{system_status}' WHERE Confirmation = '{confirmation}';"
-    with CURSOR:
-        try:
-            CURSOR.execute(query)
-            CURSOR.commit()
-        except DatabaseError:
-            print('Time exceeded')
-            return False
-        return True
+    db_commit(query=query, func_name=update_status.__name__)
 
 
 def send_item_to_db(record):
@@ -153,22 +131,21 @@ def send_item_to_db(record):
         query = f"DELETE FROM {table} WHERE Prod_Order = {prod_order}; "\
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
-        with CURSOR:
-            try:
-                CURSOR.execute(query)
-                CURSOR.commit()
-            except DatabaseError:
-                print('Time exceeded')
-                return False
-            return True
+        return db_commit(query=query, func_name=send_item_to_db.__name__)
 
 
 def uploader_checker():
     sap_insert_path = os.path.join(RAPORT_CATALOG, 'SAP_INSERT.csv')
     if os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
-
         query = 'SELECT SAP_Skrypt_Zmiana FROM SAP_data;'
+        with CURSOR:
+            try:
+                result = CURSOR.execute(query)
+            except Error:
+                print(f'Database Error {uploader_checker.__name__}')
+                return False
+
         result = CURSOR.execute(query)
 
         for date_time in result:
@@ -185,6 +162,12 @@ def uploader_item_checker():
         item_insert_date = os.path.getmtime(item_insert_path)
 
         query = 'SELECT Item_Data FROM SAP_data;'
+        with CURSOR:
+            try:
+                result = CURSOR.execute(query)
+            except Error:
+                print(f'Database Error {uploader_item_checker.__name__}')
+                return False
         result = CURSOR.execute(query)
 
         for date_time in result:

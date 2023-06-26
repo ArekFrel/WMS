@@ -8,7 +8,7 @@ import sap_date
 import self_update
 import subprocess
 import os
-from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
+from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT, CURSOR
 
 
 def wait(period):

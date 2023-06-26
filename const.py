@@ -1,4 +1,5 @@
 import pyodbc
+from pyodbc import DatabaseError, OperationalError, Error
 
 
 """Extensions of the files, that are allowed to go."""
@@ -68,6 +69,27 @@ CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Trusted_Connection=yes;")
 CONN.timeout = 10
 CURSOR = CONN.cursor()
+
+
+def db_commit(query, func_name):
+    with CURSOR:
+        try:
+            CURSOR.execute(query)
+            CURSOR.commit()
+
+        except OperationalError:
+            print(f'Operational Error {func_name}')
+            return False
+
+        except DatabaseError:
+            print(f'Time exceeded {func_name}')
+            return False
+
+        except Error:
+            print(f'Database Error {func_name}')
+            return False
+
+    return True
 
 
 def main():

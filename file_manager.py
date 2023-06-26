@@ -1,6 +1,5 @@
 import os
-from const import CURSOR
-from const import RAPORT_CATALOG
+from const import CURSOR, RAPORT_CATALOG, db_commit
 from datetime import datetime
 
 s_ins = 'sap_insert.csv'
@@ -93,9 +92,7 @@ def sap_script_date(date):
 
     date = str(datetime.fromtimestamp(date, ))[0:-3]
     query = f"Update Sap_data Set SAP_Skrypt = '{date}';"
-    with CURSOR:
-        CURSOR.execute(query)
-        CURSOR.commit()
+    db_commit(query=query, func_name=sap_script_date.__name__)
     print(f'SAP_Skrypt in DataBase updated to {date[0:-3]}')
 
 
@@ -103,9 +100,7 @@ def item_script_date(date):
 
     date = str(datetime.fromtimestamp(date, ))[0:-3]
     query = f"UPDATE Sap_data SET Item_Data = '{date}';"
-    with CURSOR:
-        CURSOR.execute(query)
-        CURSOR.commit()
+    db_commit(query=query, func_name=item_script_date.__name__)
     print(f'Item_data in DataBase updated to {date[0:-3]}')
 
 
