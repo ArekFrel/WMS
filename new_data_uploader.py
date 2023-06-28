@@ -1,4 +1,5 @@
 import csv
+import inspect
 import os
 import os.path
 import sap_date
@@ -102,7 +103,7 @@ def send_record_to_db(record):
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
                 f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}')"
 
-        return db_commit(query=query, func_name=send_item_to_db.__name__)
+        return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
 
 def update_status(record):
@@ -112,7 +113,7 @@ def update_status(record):
     system_status = record[1].split(' ')[-1]
 
     query = f"UPDATE {table} SET [System Status] = '{system_status}' WHERE Confirmation = '{confirmation}';"
-    db_commit(query=query, func_name=update_status.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
 
 def send_item_to_db(record):
@@ -131,7 +132,7 @@ def send_item_to_db(record):
         query = f"DELETE FROM {table} WHERE Prod_Order = {prod_order}; "\
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
-        return db_commit(query=query, func_name=send_item_to_db.__name__)
+        return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
 
 def uploader_checker():
@@ -139,12 +140,8 @@ def uploader_checker():
     if os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
         query = 'SELECT SAP_Skrypt_Zmiana FROM SAP_data;'
-        with CURSOR:
-            try:
-                result = CURSOR.execute(query)
-            except Error:
-                print(f'Database Error {uploader_checker.__name__}')
-                return False
+        if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+            return False
 
         result = CURSOR.execute(query)
 
@@ -162,12 +159,8 @@ def uploader_item_checker():
         item_insert_date = os.path.getmtime(item_insert_path)
 
         query = 'SELECT Item_Data FROM SAP_data;'
-        with CURSOR:
-            try:
-                result = CURSOR.execute(query)
-            except Error:
-                print(f'Database Error {uploader_item_checker.__name__}')
-                return False
+        if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+            return False
         result = CURSOR.execute(query)
 
         for date_time in result:

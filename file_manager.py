@@ -1,3 +1,4 @@
+import inspect
 import os
 from const import CURSOR, RAPORT_CATALOG, db_commit
 from datetime import datetime
@@ -92,7 +93,7 @@ def sap_script_date(date):
 
     date = str(datetime.fromtimestamp(date, ))[0:-3]
     query = f"Update Sap_data Set SAP_Skrypt = '{date}';"
-    db_commit(query=query, func_name=sap_script_date.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     print(f'SAP_Skrypt in DataBase updated to {date[0:-3]}')
 
 
@@ -100,7 +101,7 @@ def item_script_date(date):
 
     date = str(datetime.fromtimestamp(date, ))[0:-3]
     query = f"UPDATE Sap_data SET Item_Data = '{date}';"
-    db_commit(query=query, func_name=item_script_date.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     print(f'Item_data in DataBase updated to {date[0:-3]}')
 
 

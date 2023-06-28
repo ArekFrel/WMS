@@ -1,3 +1,4 @@
+import inspect
 import os
 import time
 import shutil
@@ -85,7 +86,7 @@ def general_checker():
         today = date.today()
         if gen_checker_date < today and datetime.now().hour > (GCP_OCLOCK - 1):
             query = f"UPDATE SAP_Data SET General_check = '{today}'"
-            db_commit(query=query, func_name=general_checker.__name__)
+            db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
             return True
     return False
 
@@ -187,7 +188,7 @@ def new_rec(new_pdf):
             f"'{new_pdf}', 6, 0, 11, '{now}'" \
             f");"
 
-    db_commit(query=query, func_name=new_rec.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     return None
 
 
@@ -231,7 +232,7 @@ def new_bad_file(new_pdf, catalog):
                 f" VALUES ('{catalog}', '{new_pdf}') " \
                 f"End " \
                 f"End"
-        db_commit(query=query, func_name=new_bad_file.__name__)
+        db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
         return True
     return False
 
@@ -306,7 +307,7 @@ def name_if_exist(file: str, number: int):
 def truncate_bad_files():
     table = "Złe_Pliki"
     query = f"Delete From {table}"
-    db_commit(query=query, func_name=truncate_bad_files.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
     return None
 
@@ -315,7 +316,7 @@ def new_files_to_db():
     table = "SAP_data"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-7]
     query = f"Update {table} SET Automat = '{now}';"
-    db_commit(query=query, func_name=new_files_to_db.__name__)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
 
 def main():

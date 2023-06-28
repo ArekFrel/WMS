@@ -1,3 +1,4 @@
+import functools
 import pyodbc
 from pyodbc import DatabaseError, OperationalError, Error
 
@@ -78,15 +79,15 @@ def db_commit(query, func_name):
             CURSOR.commit()
 
         except OperationalError:
-            print(f'Operational Error {func_name}')
+            print(f'Operational Error in "{func_name}"')
             return False
 
         except DatabaseError:
-            print(f'Time exceeded {func_name}')
+            print(f'Time exceeded in "{func_name}"')
             return False
 
         except Error:
-            print(f'Database Error {func_name}')
+            print(f'Database Error in "{func_name}"')
             return False
 
     return True
