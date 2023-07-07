@@ -16,12 +16,14 @@ class File:
         self.file_name, self.extension = name.rsplit('.', 1)
         self.catalog_path = os.path.join(START_CATALOG, catalog)
         self.start_path = os.path.join(START_CATALOG, catalog, name)
+        self.po = name[:7]
         if catalog == '':
             self.loose = True
+            self.catalog = name[0:7]
         else:
             self.loose = False
             self.proper_name = (catalog == name[0:7])
-        self.catalog = name[0:7]
+            self.catalog = catalog
         self.dest_catalog = os.path.join(PRODUCTION, self.catalog)
         self.dest_path = os.path.join(PRODUCTION, self.catalog, name)
         self.new_name = self.file_name

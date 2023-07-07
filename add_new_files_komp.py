@@ -105,7 +105,7 @@ def list_new_files_new_way_class():
             if validate_file_class(file=file):
                 os.chmod(file.start_path, S_IWRITE)
                 if cut_file_class(file=file):
-                    File.add_moved_file()
+                    File.add_moved_file(text='norm')
             continue
         elif not os.path.isdir(deep_path):
             continue
@@ -123,7 +123,7 @@ def list_new_files_new_way_class():
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
-                        File.add_moved_file()
+                        File.add_moved_file(text='val')
                 else:
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')

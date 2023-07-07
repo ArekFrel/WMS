@@ -1,4 +1,3 @@
-import functools
 import pyodbc
 from pyodbc import DatabaseError, OperationalError, Error
 

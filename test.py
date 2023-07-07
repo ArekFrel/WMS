@@ -1,4 +1,5 @@
 import os
+import pyodbc
 import time
 import shutil
 from datetime import datetime
@@ -9,16 +10,24 @@ from timer_dec import timer
 from const import PRODUCTION, START_CATALOG, CURSOR, TRANSFER_FILE
 
 
-@timer
 def list_new_files():
+    """ Adding to database drawing uploaded directly to PRODUCTION catalog."""
     source_cat = PRODUCTION
+    query = 'Select Plik From Technologia;'
+    try:
+        result = CURSOR.execute(query)
+    except pyodbc.Error:
+        print('Connection to database failed.')
+        return None
 
-    current_db_files = []
-    for file in range(0, 32):
-        current_db_files.append(file)
-    files_counter = 0
+    new_files, current_db_files = [], []
 
     print('Data Base refreshed.')
+
+    current_db_files = [file[0] for file in result]
+    files_counter = 0
+    pdf_list = ''
+
     for catalog in os.listdir(source_cat):
         if catalog in ['desktop.ini', 'Thumbs.db']:
             continue
@@ -29,17 +38,21 @@ def list_new_files():
             continue
 
         current_files = os.listdir(deep_path)
-        new_files = []
 
         for file in current_files:
-            file_name = validate_file(file, catalog)
-            if file_name and file_name not in current_db_files:
-                new_files.append(file_name)
-            elif not file_name and file.lower().endswith('.pdf'):
-                pass
+            if file.lower().endswith('pdf'):
+                files_counter += 1
+                pdf_list = f'{pdf_list}\n{file}'
+                print(f'{files_counter} files has been analyzed.', end="\r")
 
-            files_counter += 1
-            print(f'{files_counter} files has been analyzed.', end="\r")
+    archive(pdf_list)
+
+    print('\n', end='\r')
+
+
+def archive(file_name):
+    with open('W:/!!__PRODUKCJA__!!/2__Baza_Danych/pdf_list.txt', 'a', encoding='utf-8') as history_file:
+        history_file.write(file_name)
 
 
 def main():

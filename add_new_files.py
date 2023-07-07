@@ -8,7 +8,7 @@ from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
-from pyodbc import DatabaseError, OperationalError, Error
+from pyodbc import Error
 
 
 catalogs_to_remove = []
@@ -76,7 +76,7 @@ def general_checker():
             result = CURSOR.execute(query)
 
         except Error:
-            print(f'Database Error {general_checker.__name__}')
+            print(f'Database Error {inspect.currentframe().f_code.co_name}')
             return False
 
     result = CURSOR.execute(query)
@@ -204,14 +204,14 @@ def cut_file_class(file):
 
     if not os.path.exists(file.dest_catalog) and not file.loose:
         os.mkdir(file.dest_catalog)
-    elif not os.path.exists(file.dest_catalog) and file.loose:
-        print(f'{file} --  not moved, catalog does not exist.')
-        return False
+    elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
+        os.mkdir(file.dest_catalog)
 
     while os.path.exists(file.dest_path):
         file.name_if_exist_class()
     try:
         file.move_file()
+
     except PermissionError:
         print(f'{file.name} -- not moved, permission error.')
         return False
@@ -319,6 +319,20 @@ def new_files_to_db():
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
 
+def check_po_in_sap(po_num):
+    query = f"SELECT COUNT(Confirmation) FROM Sap WHERE [P.O.] = {po_num};"
+    with CURSOR:
+        try:
+            CURSOR.execute(query)
+            result = CURSOR.fetchone()
+
+        except Error:
+            print(f'Database Error in "check_po_in_sap"')
+            return False
+
+    return result > 0
+
+
 def main():
     new_files_to_db()
     truncate_bad_files()
@@ -332,4 +346,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    check_po_in_sap('1595586')
