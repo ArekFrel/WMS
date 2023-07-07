@@ -22,7 +22,7 @@ class File:
             self.catalog = name[0:7]
         else:
             self.loose = False
-            self.proper_name = (catalog == name[0:7])
+            self.proper_name = (catalog == self.po)
             self.catalog = catalog
         self.dest_catalog = os.path.join(PRODUCTION, self.catalog)
         self.dest_path = os.path.join(PRODUCTION, self.catalog, name)
