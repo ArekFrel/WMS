@@ -19,7 +19,7 @@ class File:
         self.po = name[:7]
         if catalog == '':
             self.loose = True
-            self.catalog = name[0:7]
+            self.catalog = self.po
         else:
             self.loose = False
             self.proper_name = (catalog == self.po)
