@@ -1,5 +1,6 @@
 import pyodbc
 from pyodbc import DatabaseError, OperationalError, Error
+from confidential import DATABASE_conf, SERVER_conf
 
 
 """Extensions of the files, that are allowed to go."""
