@@ -2,7 +2,6 @@ import pyodbc
 from pyodbc import DatabaseError, OperationalError, Error
 
 
-
 """Extensions of the files, that are allowed to go."""
 ACC_EXT = [
     'pdf',
