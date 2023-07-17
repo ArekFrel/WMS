@@ -25,7 +25,7 @@ class File:
             self.proper_name = (catalog == self.po)
             self.catalog = catalog
         self.dest_catalog = os.path.join(PRODUCTION, self.catalog)
-        self.dest_path = os.path.join(PRODUCTION, self.catalog, name)
+        self.dest_path = os.path.join(self.dest_catalog, name)
         self.new_name = self.file_name
 
     def __str__(self):
