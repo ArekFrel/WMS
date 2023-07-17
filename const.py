@@ -2,6 +2,7 @@ import pyodbc
 from pyodbc import DatabaseError, OperationalError, Error
 
 
+
 """Extensions of the files, that are allowed to go."""
 ACC_EXT = [
     'pdf',
@@ -61,8 +62,8 @@ AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 **********************************
 '''
 
-SERVER = 'SELUSQL16'
-DATABASE = 'PRODUKCJAWORKFLOW'
+SERVER = SERVER_conf
+DATABASE = DATABASE_conf
 CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                           "Server="+SERVER+";"
                           "Database="+DATABASE+";"
