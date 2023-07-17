@@ -2,6 +2,7 @@
 /__pycache__
 /venv
 /BT_OPEN.bat
+/__wms_update__
 new_func.py
 *.txt
 *.xlsx
