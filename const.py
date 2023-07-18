@@ -73,24 +73,28 @@ CURSOR = CONN.cursor()
 
 
 def db_commit(query, func_name):
-    with CURSOR:
-        try:
+
+    try:
+        with CURSOR:
             CURSOR.execute(query)
             CURSOR.commit()
+        return True
 
-        except OperationalError:
-            print(f'Operational Error in "{func_name}"')
-            return False
+    except pyodbc.OperationalError:
+        print(f'Operational Error in "{func_name}"')
+        return False
 
-        except DatabaseError:
-            print(f'Time exceeded in "{func_name}"')
-            return False
+    except pyodbc.DatabaseError:
+        print(f'Time exceeded in "{func_name}"')
+        return False
 
-        except Error:
-            print(f'Database Error in "{func_name}"')
-            return False
+    except pyodbc.Error:
+        print(f'Database Error in "{func_name}"')
+        return False
 
-    return True
+    except Exception:
+        print(f'Something else during "{func_name}" gone wrong!')
+        return False
 
 
 def main():
