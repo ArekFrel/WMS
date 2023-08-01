@@ -17,7 +17,7 @@ class File:
         self.catalog_path = os.path.join(START_CATALOG, catalog)
         self.start_path = os.path.join(START_CATALOG, catalog, name)
         self.po = name[:7]
-        if catalog == '':
+        if catalog in ('', 'X', 'x'):
             self.loose = True
             self.catalog = self.po
         else:
