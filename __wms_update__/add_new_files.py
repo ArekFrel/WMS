@@ -94,7 +94,7 @@ def general_checker():
 def list_new_files_new_way_class():
 
     for any_file in os.listdir(START_CATALOG):
-        if any_file == REFILL_CAT:
+        if any_file.upper() == REFILL_CAT:
             refill_doc()
             continue
         deep_path = os.path.join(START_CATALOG, any_file)
@@ -351,5 +351,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    check_po_in_sap('1595586')
+    main()
+

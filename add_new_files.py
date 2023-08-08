@@ -73,16 +73,14 @@ def general_checker():
 
     with CURSOR:
         try:
-            result = CURSOR.execute(query)
+            CURSOR.execute(query)
+            gen_checker_date = CURSOR.fetchone()[0]
 
         except Error:
             print(f'Database Error {inspect.currentframe().f_code.co_name}')
             return False
 
-    result = CURSOR.execute(query)
-
-    for date_time in result:
-        gen_checker_date = date_time[0]
+    if gen_checker_date:
         today = date.today()
         if gen_checker_date < today and datetime.now().hour > (GCP_OCLOCK - 1):
             query = f"UPDATE SAP_Data SET General_check = '{today}'"
@@ -94,7 +92,7 @@ def general_checker():
 def list_new_files_new_way_class():
 
     for any_file in os.listdir(START_CATALOG):
-        if any_file == REFILL_CAT:
+        if any_file.upper() == REFILL_CAT:
             refill_doc()
             continue
         deep_path = os.path.join(START_CATALOG, any_file)
@@ -351,5 +349,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    check_po_in_sap('1595586')
+    main()
+

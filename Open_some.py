@@ -3,7 +3,6 @@ import os
 import pyodbc
 
 
-
 def countdown(t=3):
     while t >= 0:
         secs = t

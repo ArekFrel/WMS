@@ -38,4 +38,4 @@ if defined _OLD_VIRTUAL_PATH goto ENDIFVPATH2
 
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
-python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\Open_some.py
+python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\get_drawing.py
