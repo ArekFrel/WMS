@@ -13,8 +13,9 @@ def countdown(t=3):
 
 
 def main():
-    query = input('Podaj kwerendę: ')
-    QUERY = f"{query}"
+    table, value = f"{input('Podaj kwerendę: ')}".split(', ')
+    BASE_QUERY = "SELECT * FROM Technologia WHERE "
+    QUERY = f"{BASE_QUERY} {table} LIKE '%{value}%'"
 
     source_cat = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
     server = 'SELUSQL16'

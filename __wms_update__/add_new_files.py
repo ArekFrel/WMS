@@ -71,18 +71,16 @@ def general_checker():
     """Function providing other function runs once per day after a certain hour of the day."""
     query = 'SELECT General_check FROM SAP_data;'
 
-    with CURSOR:
-        try:
-            result = CURSOR.execute(query)
+    try:
+        with CURSOR:
+            CURSOR.execute(query)
+            gen_checker_date = CURSOR.fetchone()[0]
 
-        except Error:
-            print(f'Database Error {inspect.currentframe().f_code.co_name}')
-            return False
+    except Error:
+        print(f'Database Error {inspect.currentframe().f_code.co_name}')
+        return False
 
-    result = CURSOR.execute(query)
-
-    for date_time in result:
-        gen_checker_date = date_time[0]
+    if gen_checker_date:
         today = date.today()
         if gen_checker_date < today and datetime.now().hour > (GCP_OCLOCK - 1):
             query = f"UPDATE SAP_Data SET General_check = '{today}'"

@@ -1,6 +1,5 @@
 import pyodbc
-from pyodbc import DatabaseError, OperationalError, Error
-from confidential import DATABASE_conf, SERVER_conf
+from confidential import *
 
 
 """Extensions of the files, that are allowed to go."""
@@ -31,7 +30,7 @@ START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
 
-'''Text file, arhivising files added the old way.'''
+'''Text file, archiving files added the old way.'''
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
 
 '''Permission to adding loose files to START_CATALOG'''
@@ -45,13 +44,12 @@ GCP_OCLOCK is time when all files are checked if they're new'''
 GENERAL_CHECK_PERMISSION = True
 GCP_OCLOCK = 15
 
-'''Name of catalogue in TEMP, where nwe version is updated'''
+'''Name of catalogue in TEMP, where new version is updated'''
 UPDATE_CAT = 'T:/__wms_update__'
 
 AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
 """Path of AUTOMAT file"""
 AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
-
 
 
 '''
@@ -64,10 +62,12 @@ AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
 SERVER = SERVER_conf
 DATABASE = DATABASE_conf
-CONN = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
-                          "Server="+SERVER+";"
-                          "Database="+DATABASE+";"
-                          "Trusted_Connection=yes;")
+CONN = pyodbc.connect(
+    "Driver={SQL Server Native Client 11.0};"
+    "Server="+SERVER+";"
+    "Database="+DATABASE+";"
+    "Trusted_Connection=yes;"
+)
 CONN.timeout = 10
 CURSOR = CONN.cursor()
 

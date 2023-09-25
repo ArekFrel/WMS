@@ -4,6 +4,7 @@ from const import *
 
 def files_in_db():
     order_number = input('Podaj PO: ')
+    # order_number = '1603864'
     print('')
     source_cat = PRODUCTION
     query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
@@ -51,8 +52,8 @@ def rem(order):
             deleting_query += query
     with open('result.txt', 'a', encoding='UTF-8') as rf:
         rf.write(f'{deleting_query}')
-    # CURSOR.execute(deleting_query)
-    # CURSOR.commit()
+    CURSOR.execute(deleting_query)
+    CURSOR.commit()
     print(deleting_query)
 
 

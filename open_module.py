@@ -12,8 +12,9 @@ def countdown(t=1):
         t -= 1
 
 
-def main():
-    po = input('Podaj numer zlecenia: ')
+def main(po=None, num=1000):
+    if po is None:
+        po = input('Podaj numer zlecenia: ')
     source_cat = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
     server = 'SELUSQL16'
     database = 'PRODUKCJAWORKFLOW'
@@ -21,7 +22,8 @@ def main():
                           "Server=" + server + ";"
                           "Database=" + database + ";"
                           "Trusted_Connection=yes;")
-    QUERY = f"Select Plik From Technologia Where [PO] = {str(po)} AND Status_Op = 6 Order by Rysunek DESC;"
+    QUERY = f"Select TOP ({num}) Plik From Technologia Where [PO] = {str(po)} AND Status_Op = 6 Order by Rysunek DESC;"
+    print(QUERY)
     cursor = conn.cursor()
     result = cursor.execute(QUERY)
 
