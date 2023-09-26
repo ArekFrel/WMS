@@ -90,18 +90,19 @@ def send_record_to_db(record):
         start_op_aktualny = redate(record[26])
         finish_op_aktualny = redate(record[27])
         urzadzenie_glowne = record[28]
+        system_status_full = record[22]
 
         query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
                 f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
                 f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
                 f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
                 f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
-                f"[Urządzenie Główne]) " \
+                f"[Urządzenie Główne]), [System_Status_Full] " \
                 f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
                 f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
                 f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}')"
+                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}, {system_status_full}')"
 
         return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
@@ -110,10 +111,13 @@ def update_status(record):
 
     table = 'SAP'
     confirmation = record[0]
-    system_status = record[1].split(' ')[-1]
+    system_status_full = record[1]
+    query = f"UPDATE {table} SET [System Status Full] = '{system_status_full}' WHERE Confirmation = '{confirmation}';"
 
-    query = f"UPDATE {table} SET [System Status] = '{system_status}' WHERE Confirmation = '{confirmation}';"
-    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+        return True
+    else:
+        return False
 
 
 def send_item_to_db(record):
@@ -172,11 +176,11 @@ def uploader_item_checker():
 
 def update_system_status():
     print('Uploading System status')
-    status_file = os.path.join(RAPORT_CATALOG, "Status_Update.csv")
+    status_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT_SSC.csv")
     with open(status_file) as file:
-        changed_records = csv.reader(file)
+        records = csv.reader(file)
         i = 0
-        for record in changed_records:
+        for record in records:
             if update_status(record=record):
                 i += 1
                 print(f'Records sent to database: {i}', end="\r")
@@ -199,6 +203,9 @@ def main():
         upload_new_items()
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
+
+    """UNREM if you need too update system Status"""
+    # update_system_status()
 
     return True
 
