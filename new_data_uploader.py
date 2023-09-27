@@ -5,7 +5,6 @@ import os.path
 import sap_date
 import confirmation_deleter
 from const import CURSOR, RAPORT_CATALOG, db_commit
-from pyodbc import DatabaseError, OperationalError, Error
 
 
 def upload_new_data():
@@ -97,12 +96,12 @@ def send_record_to_db(record):
                 f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
                 f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
                 f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
-                f"[Urządzenie Główne]), [System_Status_Full] " \
+                f"[Urządzenie Główne], [System Status Full]) " \
                 f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
                 f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
                 f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}, {system_status_full}')"
+                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
 
         return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
