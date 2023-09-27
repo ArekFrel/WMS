@@ -68,7 +68,7 @@ CONN = pyodbc.connect(
     "Database="+DATABASE+";"
     "Trusted_Connection=yes;"
 )
-CONN.timeout = 10
+CONN.timeout = 20
 CURSOR = CONN.cursor()
 
 

@@ -185,6 +185,7 @@ def update_system_status():
                 i += 1
                 print(f'Records sent to database: {i}', end="\r")
             else:
+                print(f'sent {i}')
                 break
         print('\n', end='\r')
 
