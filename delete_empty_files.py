@@ -2,9 +2,7 @@ import os
 from const import *
 
 
-def files_in_db():
-    order_number = input('Podaj PO: ')
-    # order_number = '1603864'
+def files_in_db(order_number):
     print('')
     source_cat = PRODUCTION
     query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'

@@ -103,7 +103,7 @@ class Application(tk.Frame):
         self.label_entry.grid(row=2, column=0)
 
     def create_button_1(self):
-        self.button = tk.Button(text='Usuń puste', command=self.info_print, width=12)
+        self.button = tk.Button(text='Usuń puste', command=self.files_in_db, width=12)
         self.button.grid(row=5, column=1, sticky=tk.NS)
 
     def create_button_2(self):
@@ -150,6 +150,37 @@ class Application(tk.Frame):
         self.check_button.toggle()
         # print(Application.FILES_TO_OPEN.pop(0))
 
+    def files_in_db(self):
+        print('')
+        source_cat = PRODUCTION
+        order_number = self.listbox.selection_get()
+        query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
+        result = CURSOR.execute(query)
+        table_files = [(t[0], t[1]) for t in result]
+        po_cat = os.path.join(source_cat, order_number)
+        try:
+            cat_content = [file[0:-4] for file in os.listdir(po_cat) if file.lower().endswith('.pdf')]
+        except FileNotFoundError:
+            self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
+            cat_content = []
+
+        deleting_query = ''
+        num = 0
+        while table_files:
+            db_id, drawing = table_files.pop()
+            if drawing not in cat_content:
+                query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
+                deleting_query += query
+                num += 1
+        with open('result.txt', 'w', encoding='UTF-8') as rf:
+            rf.write(f'{deleting_query}')
+        if len(deleting_query) > 1:
+            CURSOR.execute(deleting_query)
+            CURSOR.commit()
+
+        self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
+        print(deleting_query)
+
     def item_selected(self, event):
         selected_item = self.listbox.selection_get()
         if selected_item:
@@ -169,7 +200,7 @@ class Application(tk.Frame):
             except FileNotFoundError:
                 print(f'nie otwarto pliku: {the_file}')
                 if not warn:
-                    self.message_box(msg=f'Nie odnaleziono ścieżki pliku!:\n {the_file}')
+                    self.message_box()
                     warn = True
                 continue
 
@@ -179,11 +210,17 @@ class Application(tk.Frame):
     def message_box(self, msg):
         self.msgbox = messagebox.showwarning(title='Brak ścieżki', message=msg)
 
+    def message_box_del_error(self, msg):
+        self.msgbox = messagebox.showwarning(title='Brak ścieżki', message=msg)
+
+    def message_box_del_succes(self, msg):
+        self.msgbox = messagebox.showwarning(title='Usunięto pliki', message=msg)
+
 
 def main():
     root = tk.Tk()
     root.title("WMS")
-    root.geometry("500x300")
+    root.geometry("350x300")
     Application(root)
     root.mainloop()
 
