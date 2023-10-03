@@ -33,6 +33,11 @@ class Application(tk.Frame):
         result = CURSOR.fetchall()
         return [str(x[0]) for x in result]
 
+    def reset_data(self):
+        Application.BTD = Application.get_orders('bt')
+        Application.ALLPOS = Application.get_orders('allpos')
+        self.cb_func()
+
     def delete_files(self):
         pass
 
@@ -62,6 +67,7 @@ class Application(tk.Frame):
         self.button = None
         self.button_2 = None
         self.button_3 = None
+        self.button_4 = None
         self.button_3_text = None
         self.check_button = None
         self.msgbox = None
@@ -73,6 +79,7 @@ class Application(tk.Frame):
         self.create_scrollbar()
         self.create_label()
         self.create_button_1()
+        self.create_button_4()
         self.create_check_button()
 
     def create_entry(self):
@@ -118,6 +125,13 @@ class Application(tk.Frame):
                                   height=1,
                                   width=12)
         self.button_3.grid(row=4, column=0, sticky=tk.NS)
+
+    def create_button_4(self):
+        self.button_3 = tk.Button(text=f'RESET',
+                                  command=self.reset_data,
+                                  height=1,
+                                  width=12)
+        self.button_3.grid(row=6, column=2, sticky=tk.NS)
 
     def lb_data_update(self):
         if len(self.text_entered) > 0:
