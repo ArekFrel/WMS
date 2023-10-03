@@ -281,7 +281,7 @@ def validate_file_class(file: File):
     if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
         return False
 
-    if file.extension not in ACC_EXT:
+    if file.extension.lower() not in ACC_EXT:
         return False
 
     if not file.loose:
