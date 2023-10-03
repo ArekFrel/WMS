@@ -337,13 +337,13 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    # new_files_to_db()
-    # truncate_bad_files()
-    # if GENERAL_CHECK_PERMISSION:
-    #     if general_checker():
-    #         list_new_files()
-    # else:
-    #     list_new_files()
+    new_files_to_db()
+    truncate_bad_files()
+    if GENERAL_CHECK_PERMISSION:
+        if general_checker():
+            list_new_files()
+    else:
+        list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 
