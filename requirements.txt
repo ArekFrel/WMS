@@ -1,1 +1,5 @@
 pyodbc==4.0.34
+
+fitz~=0.0.1.dev2
+pathlib~=1.0.1
+future~=0.18.3

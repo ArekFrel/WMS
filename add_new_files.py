@@ -281,7 +281,7 @@ def validate_file_class(file: File):
     if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
         return False
 
-    if file.extension not in ACC_EXT:
+    if file.extension.lower() not in ACC_EXT:
         return False
 
     if not file.loose:
@@ -337,13 +337,13 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    new_files_to_db()
-    truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
-        list_new_files()
+    # new_files_to_db()
+    # truncate_bad_files()
+    # if GENERAL_CHECK_PERMISSION:
+    #     if general_checker():
+    #         list_new_files()
+    # else:
+    #     list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 
