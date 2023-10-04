@@ -131,7 +131,7 @@ class Application(tk.Frame):
                                   command=self.reset_data,
                                   height=1,
                                   width=12)
-        self.button_3.grid(row=6, column=2, sticky=tk.NS)
+        self.button_3.grid(row=6, column=3, sticky=tk.NS)
 
     def lb_data_update(self):
         if len(self.text_entered) > 0:
