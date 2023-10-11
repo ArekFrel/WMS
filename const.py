@@ -2,6 +2,15 @@ import pyodbc
 from confidential import *
 
 
+"""Names of catalogs to be considered to be bought."""
+BOUGHT_NAMES = [
+    'kup',
+    'buy',
+    'bought',
+    'zakupowy',
+    'bought_script'
+    ]
+
 """Extensions of the files, that are allowed to go."""
 ACC_EXT = [
     'pdf',
@@ -13,7 +22,7 @@ ACC_EXT = [
 TIME_OF_BREAK = 120
 
 """Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 1800
+TIMEOUT_FOR_PLANERS = 1
 
 """ Time between the script is not running"""
 # time when script stops running
@@ -48,8 +57,13 @@ GCP_OCLOCK = 15
 UPDATE_CAT = 'T:/__wms_update__'
 
 AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+
 """Path of AUTOMAT file"""
 AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+
+"""Path of watermarks"""
+WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
+
 
 
 '''

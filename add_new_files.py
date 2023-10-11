@@ -114,7 +114,7 @@ def list_new_files_new_way_class():
 
         for file in catalog.catalog_content():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
-                file = File(name=file, catalog=catalog.name)
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
                 if file.name in ['Thumbs.db', '_v']:
                     continue
 
@@ -126,6 +126,10 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
+            elif file in BOUGHT_NAMES:
+                init_path = os.path.join(START_CATALOG, catalog.name, file)
+                end_path = os.path.join(START_CATALOG, 'bought_script')
+                shutil.move(init_path, end_path)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
             catalogs_to_remove.append(catalog.name)
@@ -219,7 +223,8 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.new_name)
+    '''unrem after tests'''
+    # new_rec(new_pdf=file.new_name)
     return True
 
 
@@ -337,13 +342,13 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    new_files_to_db()
-    truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
-        list_new_files()
+    # new_files_to_db()
+    # truncate_bad_files()
+    # if GENERAL_CHECK_PERMISSION:
+    #     if general_checker():
+    #         list_new_files()
+    # else:
+    #     list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 

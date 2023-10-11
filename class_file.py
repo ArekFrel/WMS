@@ -1,7 +1,10 @@
 import os
 import time
 import shutil
-from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION
+
+import stamps_adder
+from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION, BOUGHT_NAMES
+
 
 
 class File:
@@ -11,36 +14,42 @@ class File:
     refilled_files = 0
     replaced_files = 0
 
-    def __init__(self, name, catalog=''):
+    def __init__(self, name, bought_cat=False, catalog=None):
         self.name = name
         self.file_name, self.extension = name.rsplit('.', 1)
+        self.bought_cat = bought_cat
+        self.catalog = catalog
+        self.loose = self.catalog is None
+
+        if 'buy' in self.name.lower():
+            self.bought_name = True
+            self.new_name = ''.join(self.name.lower().split('buy'))
+        else:
+            self.bought_name = False
+            self.new_name = self.name
+        self.start_path_new_name = os.path.join(START_CATALOG, catalog, self.new_name)
+        self.po = self.new_name[:7]
         self.catalog_path = os.path.join(START_CATALOG, catalog)
         self.start_path = os.path.join(START_CATALOG, catalog, name)
-        self.po = name[:7]
-        if catalog in ('', 'X', 'x'):
-            self.loose = True
-            self.catalog = self.po
-        else:
-            self.loose = False
+
+        if not self.bought_cat:
             self.proper_name = (catalog == self.po)
-            self.catalog = catalog
-        self.dest_catalog = os.path.join(PRODUCTION, self.catalog)
-        self.dest_path = os.path.join(self.dest_catalog, name)
-        self.new_name = self.file_name
+
+        self.dest_catalog = os.path.join(PRODUCTION, self.po)
+        self.dest_path = os.path.join(self.dest_catalog, self.new_name)
+
+        if self.bought_name or self.bought_cat:
+            stamps_adder.stamper(self)
 
     def __str__(self):
         return f'{self.start_path}'
 
     def base_and_number(self):
-
         """Return base name and order number if file in destination already exist"""
-
         return self.new_name.rsplit(sep='_', maxsplit=1)
 
     def move_file(self):
-
         """Moving file to a new location."""
-
         os.rename(self.start_path, self.start_path)
         shutil.move(self.start_path, self.dest_path)
 
@@ -132,12 +141,22 @@ class Catalog:
         self.catalog_path = os.path.join(START_CATALOG, name)
         self.age = time.time() - os.path.getctime(self.catalog_path)
         self.ready = (self.age > TIMEOUT_FOR_PLANERS)
+        self.bought = False
+
+        self.is_bought()
 
     def __str__(self):
         return f'{self.name}'
 
     def catalog_content(self):
         return os.listdir(self.catalog_path)
+
+    def is_bought(self):
+        for word in BOUGHT_NAMES:
+            if word in self.name:
+                self.bought = True
+                break
+
 
 
 def main():
