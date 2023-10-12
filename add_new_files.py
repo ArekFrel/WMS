@@ -150,7 +150,6 @@ def refill_doc():
             os.chmod(file.dest_path, S_IWRITE)
             try:
                 os.rename(file.start_path, file.start_path)
-                # os.rename(file.dest_path, file.dest_path)
                 os.remove(file.dest_path)
                 shutil.move(file.start_path, file.dest_path)
                 File.add_replaced_file()
@@ -194,7 +193,7 @@ def new_rec(new_pdf, buy=False):
             f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
-    # db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     print(query)
     return None
 
@@ -212,8 +211,7 @@ def cut_file_class(file):
     if not os.path.exists(file.dest_catalog) and not file.loose:
         os.mkdir(file.dest_catalog)
 
-    # elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
-    elif not os.path.exists(file.dest_catalog) and True:
+    elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
         os.mkdir(file.dest_catalog)
 
     while os.path.exists(file.dest_path):
@@ -232,7 +230,6 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    '''unrem after tests'''
     new_rec(new_pdf=file.new_name, buy=(file.bought_name or file.bought_cat))
     return True
 
@@ -351,13 +348,13 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    # new_files_to_db()
-    # truncate_bad_files()
-    # if GENERAL_CHECK_PERMISSION:
-    #     if general_checker():
-    #         list_new_files()
-    # else:
-    #     list_new_files()
+    new_files_to_db()
+    truncate_bad_files()
+    if GENERAL_CHECK_PERMISSION:
+        if general_checker():
+            list_new_files()
+    else:
+        list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 

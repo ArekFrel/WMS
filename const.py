@@ -24,8 +24,8 @@ ACC_EXT = [
 """Number of second to wait before new refreshing"""
 TIME_OF_BREAK = 120
 
-"""Number of second after which the catalog is ready to be moved."""
-TIMEOUT_FOR_PLANERS = 1
+"""Number of second after which the catalog is moved."""
+TIMEOUT_FOR_PLANERS = 1800
 
 """ Time between the script is not running"""
 # time when script stops running
@@ -34,11 +34,10 @@ FROM_OCLOCK = 1
 TO_OCLOCK = 6
 
 """ PRODUCTION - catalogs where drawings are stored. """
-# PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
+PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
 
 """ START_CATALOG - catalog where new drawing are uploaded by planners."""
-START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
@@ -61,12 +60,8 @@ GCP_OCLOCK = 15
 UPDATE_CAT = 'T:/__wms_update__'
 
 AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
-
 """Path of AUTOMAT file"""
 AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
-
-"""Path of watermarks"""
-WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
 
 
 

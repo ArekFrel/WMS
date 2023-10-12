@@ -2,7 +2,6 @@ import os
 import time
 import shutil
 
-# import stamps_adder
 from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION, BOUGHT_NAMES
 
 
@@ -41,7 +40,6 @@ class File:
 
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
-
 
     def __str__(self):
         return f'{self.start_path}'
