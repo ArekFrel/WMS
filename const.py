@@ -8,6 +8,9 @@ BOUGHT_NAMES = [
     'buy',
     'bought',
     'zakupowy',
+    'zakupowe',
+    'kupne',
+    'kupowane'
     'bought_script'
     ]
 

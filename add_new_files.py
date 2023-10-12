@@ -3,12 +3,15 @@ import os
 import time
 import shutil
 import re
+
+import stamps_adder
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
+# import stamps_adder
 
 
 catalogs_to_remove = []
@@ -114,9 +117,9 @@ def list_new_files_new_way_class():
 
         for file in catalog.catalog_content():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
-                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
-                if file.name in ['Thumbs.db', '_v']:
+                if file in ['Thumbs.db', '_v']:
                     continue
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
 
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
@@ -181,16 +184,18 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(new_pdf):
+def new_rec(new_pdf, buy=False):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
+    komentarz = 'kupowany' if buy else ''
     query = f"Insert Into {table} (" \
-            f"Plik,Status_Op, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', 6, 0, 11, '{now}'" \
+            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
-    db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    # db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    print(query)
     return None
 
 
@@ -207,24 +212,28 @@ def cut_file_class(file):
     if not os.path.exists(file.dest_catalog) and not file.loose:
         os.mkdir(file.dest_catalog)
 
-    elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
+    # elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
+    elif not os.path.exists(file.dest_catalog) and True:
         os.mkdir(file.dest_catalog)
 
     while os.path.exists(file.dest_path):
         file.name_if_exist_class()
 
     if os.path.exists(file.dest_catalog):
-        try:
-            file.move_file()
-        except PermissionError:
-            print(f'{file.name} -- not moved, permission error.')
-            return False
+        if file.bought_cat or file.bought_name:
+            stamps_adder.stamper(file=file)
+        else:
+            try:
+                file.move_file()
+            except PermissionError:
+                print(f'{file.name} -- not moved, permission error.')
+                return False
     else:
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
     '''unrem after tests'''
-    # new_rec(new_pdf=file.new_name)
+    new_rec(new_pdf=file.new_name, buy=(file.bought_name or file.bought_cat))
     return True
 
 
@@ -283,7 +292,7 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
+    if re.search(r"\d{7} .*[.]*", file.new_name.lower()) is None:
         return False
 
     if file.extension.lower() not in ACC_EXT:
