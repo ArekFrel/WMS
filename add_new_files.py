@@ -194,7 +194,6 @@ def new_rec(new_pdf, buy=False):
             f");"
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
-    print(query)
     return None
 
 
