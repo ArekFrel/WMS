@@ -5,7 +5,6 @@ from const import WATERMARK_BOUGHT
 
 
 def stamper(file):
-    # temp_file = os.path.join(file.catalog_path, 'temp_draw.pdf')
     with fitz.open(file.start_path) as pdf_document:
         pdf_document[0].insert_image(
             pdf_document[0].bound(),
