@@ -66,6 +66,9 @@ AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 """Path of watermarks"""
 WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
 
+"""Name of merged drawings to be ignored by script 'list_new-files'"""
+MERGED_NAME = 'merged.pdf'
+
 
 
 '''

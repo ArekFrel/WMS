@@ -47,6 +47,8 @@ def list_new_files():
         current_files = os.listdir(deep_path)
 
         for file in current_files:
+            if file.endswith(MERGED_NAME):
+                continue
             file_name = validate_file(file, catalog)
             if file_name and file_name not in current_db_files:
                 new_files.append(file_name)
@@ -60,7 +62,7 @@ def list_new_files():
     print('\n', end='\r')
 
     for new_file in new_files:
-        new_rec(new_pdf=new_file)
+        new_rec(file=new_file)
         archive(file_name=new_file)
 
     if len(new_files) == 0:
@@ -183,12 +185,12 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(file):
+def new_rec(name, b_name=False, b_cat=False):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-    if file.bought_cat or file.bought_name:
+    if b_name or b_cat:
         komentarz = 'kupowany'
-    elif file.file_name.lower().endswith('h'):
+    elif name.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
     else:
         komentarz = ''
@@ -196,7 +198,7 @@ def new_rec(file):
     query = f"Insert Into {table} (" \
             f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{file.file_name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
@@ -235,7 +237,7 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(file=file)
+    new_rec(name=file.file_name, b_name=file.bought_name, b_cat=file.bought_cat)
     return True
 
 

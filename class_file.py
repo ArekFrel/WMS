@@ -1,6 +1,7 @@
 import os
 import time
 import shutil
+from stat import S_IWRITE
 
 from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION, BOUGHT_NAMES
 
@@ -63,6 +64,27 @@ class File:
             self.new_name = f'{self.file_name}_1.{self.extension}'
         self.file_name = self.new_name.rsplit('.', 1)[0]
         self.dest_path = os.path.join(PRODUCTION, self.po, self.new_name)
+
+    def merge_file(self):
+        if 'sap' not in self.file_name and self.extension.lower() == 'pdf':
+            doc_path = self.dest_path
+            merged_name = f'{self.po} merged.pdf'
+            merged_doc = os.path.join( merged_name)
+            save_doc = os.path.join(self.dest_path, 'merged_temp.pdf')
+            with fitz.open(doc_path) as doc:
+                try:
+                    if 'merged.pdf' not in os.listdir(self.dest_catalog):
+                        doc.save(merged_doc)
+                        os.chmod(merged_doc, S_IWRITE)
+                    else:
+                        with fitz.open(merged_doc) as doc_merged:
+                            doc_merged.insert_file(doc)
+                            doc_merged.save(save_doc)
+                            os.chmod(save_doc, S_IWRITE)
+                        os.remove(merged_doc)
+                        os.rename(save_doc, merged_doc)
+                except PermissionError:
+                    print(f'Brak dostępu do pliku {merged_doc}')
 
     @staticmethod
     def moved_files_counter():
