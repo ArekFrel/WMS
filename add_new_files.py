@@ -183,14 +183,20 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(new_pdf, buy=False):
+def new_rec(file):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-    komentarz = 'kupowany' if buy else ''
+    if file.bought_cat or file.bought_name:
+        komentarz = 'kupowany'
+    elif file.file_name.lower().endswith('h'):
+        komentarz = 'częściowa kooperacja'
+    else:
+        komentarz = ''
+
     query = f"Insert Into {table} (" \
             f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{file.file_name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
@@ -229,7 +235,7 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.new_name, buy=(file.bought_name or file.bought_cat))
+    new_rec(file=file)
     return True
 
 
