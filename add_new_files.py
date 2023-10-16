@@ -4,14 +4,13 @@ import time
 import shutil
 import re
 
-import stamps_adder
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
-# import stamps_adder
+import stamps_adder
 
 
 catalogs_to_remove = []
@@ -229,7 +228,7 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.new_name, buy=(file.bought_name or file.bought_cat))
+    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat))
     return True
 
 
