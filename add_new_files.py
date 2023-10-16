@@ -185,7 +185,7 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(name, b_name=False, b_cat=False):
+def new_rec(name, order='', b_name=False, b_cat=False):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
     if b_name or b_cat:
@@ -195,13 +195,24 @@ def new_rec(name, b_name=False, b_cat=False):
     else:
         komentarz = ''
 
-    query = f"Insert Into {table} (" \
-            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
-            f") VALUES (" \
-            f"'{name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
-            f");"
+    query_1 = f"IF NOT EXISTS (SELECT PO FROM OTM WHERE PO = {order}) " \
+        f"BEGIN " \
+        f"INSERT INTO OTM (PO, QUANTITY) VALUES ({order}, 1) " \
+        f"END " \
+        f"ELSE " \
+        f"BEGIN " \
+        f"UPDATE OTM " \
+        f"SET quantity = quantity + 1 WHERE PO = {order} " \
+        f"END; "
+    query_2 = f"Insert Into {table} (" \
+        f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+        f") VALUES (" \
+        f"'{name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+        f");"
+    query = query_1
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    print(query)
     return None
 
 
@@ -237,7 +248,10 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(name=file.file_name, b_name=file.bought_name, b_cat=file.bought_cat)
+    new_rec(name=file.file_name,
+            order=file.po,
+            b_name=file.bought_name,
+            b_cat=file.bought_cat)
     return True
 
 
@@ -355,13 +369,13 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    new_files_to_db()
-    truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
-        list_new_files()
+    # new_files_to_db()
+    # truncate_bad_files()
+    # if GENERAL_CHECK_PERMISSION:
+    #     if general_checker():
+    #         list_new_files()
+    # else:
+    #     list_new_files()
     list_new_files_new_way_class()
     del_empty_catalogs()
 
