@@ -178,22 +178,23 @@ class Application(tk.Frame):
             self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
             cat_content = []
 
-        deleting_query = ''
-        num = 0
-        while table_files:
-            db_id, drawing = table_files.pop()
-            if drawing not in cat_content:
-                query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
-                deleting_query += query
-                num += 1
-        with open('result.txt', 'w', encoding='UTF-8') as rf:
-            rf.write(f'{deleting_query}')
-        if len(deleting_query) > 1:
-            CURSOR.execute(deleting_query)
-            CURSOR.commit()
+        if len(cat_content) > 0:
+            deleting_query = ''
+            num = 0
+            while table_files:
+                db_id, drawing = table_files.pop()
+                if drawing not in cat_content:
+                    query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
+                    deleting_query += query
+                    num += 1
+            with open('result.txt', 'w', encoding='UTF-8') as rf:
+                rf.write(f'{deleting_query}')
+            if len(deleting_query) > 1:
+                CURSOR.execute(deleting_query)
+                CURSOR.commit()
 
-        self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
-        print(deleting_query)
+            self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
+            print(deleting_query)
 
     def item_selected(self, event):
         selected_item = self.listbox.selection_get()
