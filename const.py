@@ -2,6 +2,18 @@ import pyodbc
 from confidential import *
 
 
+"""Names of catalogs to be considered to be bought."""
+BOUGHT_NAMES = [
+    'kup',
+    'buy',
+    'bought',
+    'zakupowy',
+    'zakupowe',
+    'kupne',
+    'kupowane',
+    'bought_script'
+    ]
+
 """Extensions of the files, that are allowed to go."""
 ACC_EXT = [
     'pdf',
@@ -50,6 +62,10 @@ UPDATE_CAT = 'T:/__wms_update__'
 AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
 """Path of AUTOMAT file"""
 AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+
+"""Path of watermarks"""
+WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
+
 
 
 '''

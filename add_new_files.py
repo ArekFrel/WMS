@@ -3,12 +3,14 @@ import os
 import time
 import shutil
 import re
+
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
+import stamps_adder
 
 
 catalogs_to_remove = []
@@ -114,9 +116,9 @@ def list_new_files_new_way_class():
 
         for file in catalog.catalog_content():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
-                file = File(name=file, catalog=catalog.name)
-                if file.name in ['Thumbs.db', '_v']:
+                if file in ['Thumbs.db', '_v']:
                     continue
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
 
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
@@ -126,6 +128,10 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
+            elif file in BOUGHT_NAMES or catalog.bought :
+                init_path = os.path.join(START_CATALOG, catalog.name, file)
+                end_path = os.path.join(START_CATALOG, 'bought_script')
+                shutil.move(init_path, end_path)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
             catalogs_to_remove.append(catalog.name)
@@ -143,7 +149,6 @@ def refill_doc():
             os.chmod(file.dest_path, S_IWRITE)
             try:
                 os.rename(file.start_path, file.start_path)
-                # os.rename(file.dest_path, file.dest_path)
                 os.remove(file.dest_path)
                 shutil.move(file.start_path, file.dest_path)
                 File.add_replaced_file()
@@ -177,13 +182,14 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(new_pdf):
+def new_rec(new_pdf, buy=False):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
+    komentarz = 'kupowany' if buy else ''
     query = f"Insert Into {table} (" \
-            f"Plik,Status_Op, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', 6, 0, 11, '{now}'" \
+            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
@@ -210,16 +216,19 @@ def cut_file_class(file):
         file.name_if_exist_class()
 
     if os.path.exists(file.dest_catalog):
-        try:
-            file.move_file()
-        except PermissionError:
-            print(f'{file.name} -- not moved, permission error.')
-            return False
+        if file.bought_cat or file.bought_name:
+            stamps_adder.stamper(file=file)
+        else:
+            try:
+                file.move_file()
+            except PermissionError:
+                print(f'{file.name} -- not moved, permission error.')
+                return False
     else:
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.new_name)
+    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat))
     return True
 
 
@@ -278,7 +287,7 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
+    if re.search(r"\d{7} .*[.]*", file.new_name.lower()) is None:
         return False
 
     if file.extension.lower() not in ACC_EXT:
