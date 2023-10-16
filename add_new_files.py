@@ -62,7 +62,7 @@ def list_new_files():
     print('\n', end='\r')
 
     for new_file in new_files:
-        new_rec(file=new_file)
+        new_rec(new_pdf=new_file, order=new_file[0:7])
         archive(file_name=new_file)
 
     if len(new_files) == 0:
@@ -185,12 +185,12 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(name, order='', b_name=False, b_cat=False):
+def new_rec(new_pdf, buy=False, order=''):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-    if b_name or b_cat:
+    if buy:
         komentarz = 'kupowany'
-    elif name.lower().endswith('h'):
+    elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
     else:
         komentarz = ''
@@ -248,10 +248,7 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(name=file.file_name,
-            order=file.po,
-            b_name=file.bought_name,
-            b_cat=file.bought_cat)
+    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat), order=file.po)
     return True
 
 
