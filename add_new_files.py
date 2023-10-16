@@ -209,7 +209,7 @@ def new_rec(name, order='', b_name=False, b_cat=False):
         f") VALUES (" \
         f"'{name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
         f");"
-    query = query_1
+    query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     print(query)

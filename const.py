@@ -71,6 +71,10 @@ WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bough
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
 
+"""Minimal number of drawings to be merged in order"""
+
+MERGED_MIN = 3
+
 
 
 '''
