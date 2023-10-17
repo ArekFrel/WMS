@@ -74,7 +74,7 @@ MERGED_NAME = 'merged.pdf'
 """Minimal number of drawings to be merged in order"""
 
 MERGED_MIN = 5 # should be low value, f.e. 5
-MERGED_TIME_PERIOD = 5 # should be low value, f.e. 5
+MERGED_TIME_PERIOD = 10 # should be low value, f.e. 5
 
 
 
