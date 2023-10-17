@@ -207,9 +207,9 @@ def new_rec(new_pdf, buy=False, order=''):
     query_2 = f"Insert Into {table} (" \
         f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
         f") VALUES (" \
-        f"'{name}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+        f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
         f");"
-    query = query_1 + query_2
+    query = query_1
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     print(query)

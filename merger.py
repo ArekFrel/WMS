@@ -69,8 +69,8 @@ def main():
     a = get_orders_to_merge()
     for x in a:
         b = get_drawings_to_merge(x)
-        for x in b:
-            print(x)
+        for y in b:
+            print(x, y)
 
 
 if __name__ == '__main__':
