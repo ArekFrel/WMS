@@ -9,6 +9,8 @@ from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
+import stamps_adder
+from merger import merging
 
 
 catalogs_to_remove = []
@@ -44,6 +46,8 @@ def list_new_files():
         current_files = os.listdir(deep_path)
 
         for file in current_files:
+            if file.endswith(MERGED_NAME):
+                continue
             file_name = validate_file(file, catalog)
             if file_name and file_name not in current_db_files:
                 new_files.append(file_name)
@@ -57,7 +61,7 @@ def list_new_files():
     print('\n', end='\r')
 
     for new_file in new_files:
-        new_rec(new_pdf=new_file)
+        new_rec(new_pdf=new_file, order=new_file[0:7])
         archive(file_name=new_file)
 
     if len(new_files) == 0:
@@ -114,9 +118,9 @@ def list_new_files_new_way_class():
 
         for file in catalog.catalog_content():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
-                file = File(name=file, catalog=catalog.name)
-                if file.name in ['Thumbs.db', '_v']:
+                if file in ['Thumbs.db', '_v']:
                     continue
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
 
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
@@ -126,6 +130,10 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
+            elif file in BOUGHT_NAMES or catalog.bought :
+                init_path = os.path.join(START_CATALOG, catalog.name, file)
+                end_path = os.path.join(START_CATALOG, 'bought_script')
+                shutil.move(init_path, end_path)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
             catalogs_to_remove.append(catalog.name)
@@ -143,7 +151,6 @@ def refill_doc():
             os.chmod(file.dest_path, S_IWRITE)
             try:
                 os.rename(file.start_path, file.start_path)
-                # os.rename(file.dest_path, file.dest_path)
                 os.remove(file.dest_path)
                 shutil.move(file.start_path, file.dest_path)
                 File.add_replaced_file()
@@ -177,16 +184,34 @@ def contains_pdfs(catalog):
     return False
 
 
-def new_rec(new_pdf):
+def new_rec(new_pdf, buy=False, order=''):
     table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-    query = f"Insert Into {table} (" \
-            f"Plik,Status_Op, Stat, Liczba_Operacji, Kiedy" \
-            f") VALUES (" \
-            f"'{new_pdf}', 6, 0, 11, '{now}'" \
-            f");"
+    if buy:
+        komentarz = 'kupowany'
+    elif new_pdf.lower().endswith('h'):
+        komentarz = 'częściowa kooperacja'
+    else:
+        komentarz = ''
+
+    query_1 = f"IF NOT EXISTS (SELECT PO FROM OTM WHERE PO = {order}) " \
+        f"BEGIN " \
+        f"INSERT INTO OTM (PO, QUANTITY) VALUES ({order}, 1) " \
+        f"END " \
+        f"ELSE " \
+        f"BEGIN " \
+        f"UPDATE OTM " \
+        f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
+        f"END; "
+    query_2 = f"Insert Into {table} (" \
+        f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+        f") VALUES (" \
+        f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+        f");"
+    query = query_1
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    # print(query)
     return None
 
 
@@ -210,16 +235,19 @@ def cut_file_class(file):
         file.name_if_exist_class()
 
     if os.path.exists(file.dest_catalog):
-        try:
-            file.move_file()
-        except PermissionError:
-            print(f'{file.name} -- not moved, permission error.')
-            return False
+        if file.bought_cat or file.bought_name:
+            stamps_adder.stamper(file=file)
+        else:
+            try:
+                file.move_file()
+            except PermissionError:
+                print(f'{file.name} -- not moved, permission error.')
+                return False
     else:
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.new_name)
+    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat), order=file.po)
     return True
 
 
@@ -271,6 +299,9 @@ def validate_file(name, catalog=''):
     if '--' in name:
         return False
 
+    if MERGED_NAME in name:
+        return False
+
     return base_name
 
 
@@ -278,7 +309,7 @@ def validate_file_class(file: File):
 
     """ If name is proper, returns True"""
 
-    if re.search(r"\d{7} .*[.]*", file.name.lower()) is None:
+    if re.search(r"\d{7} .*[.]*", file.new_name.lower()) is None:
         return False
 
     if file.extension.lower() not in ACC_EXT:
@@ -292,6 +323,9 @@ def validate_file_class(file: File):
         return False
 
     if '--' in file.file_name:
+        return False
+
+    if MERGED_NAME in file.file_name:
         return False
 
     return True
@@ -345,6 +379,7 @@ def main():
     else:
         list_new_files()
     list_new_files_new_way_class()
+    merging()
     del_empty_catalogs()
 
 
