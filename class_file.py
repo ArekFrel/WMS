@@ -22,7 +22,8 @@ class File:
 
         if 'buy' in self.name.lower():
             self.bought_name = True
-            self.new_name = ''.join(self.name.lower().split('buy')).strip()
+            beg, end = self.name.lower().split('buy')
+            self.new_name = ''.join([beg.strip(), end.strip()])
             while '  ' in self.new_name:
                 self.new_name = self.new_name.replace('  ', ' ')
             self.file_name = self.new_name.rsplit('.', 1)[0]
@@ -181,7 +182,8 @@ class Catalog:
 
 
 def main():
-    pass
+    file =File(name='1999999 17400 BUY.pdf')
+    t=0
 
 
 if __name__ == '__main__':

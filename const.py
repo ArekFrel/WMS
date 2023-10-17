@@ -55,7 +55,7 @@ REFILL_CAT = 'X'
 
 '''Permission to adding files uploaded directly into PRODUCTION catalog once per day
 GCP_OCLOCK is time when all files are checked if they're new'''
-GENERAL_CHECK_PERMISSION = False
+GENERAL_CHECK_PERMISSION = True
 GCP_OCLOCK = 15
 
 '''Name of catalogue in TEMP, where new version is updated'''
@@ -74,7 +74,7 @@ MERGED_NAME = 'merged.pdf'
 """Minimal number of drawings to be merged in order"""
 
 MERGED_MIN = 5 # should be low value, f.e. 5
-MERGED_TIME_PERIOD = 10 # should be low value, f.e. 5
+MERGED_TIME_PERIOD = 300 # should be low value, f.e. 5
 
 
 
