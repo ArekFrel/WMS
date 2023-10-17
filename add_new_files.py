@@ -3,15 +3,14 @@ import os
 import time
 import shutil
 import re
-
-import stamps_adder
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
-# import stamps_adder
+import stamps_adder
+from merger import merging
 
 
 catalogs_to_remove = []
@@ -202,7 +201,7 @@ def new_rec(new_pdf, buy=False, order=''):
         f"ELSE " \
         f"BEGIN " \
         f"UPDATE OTM " \
-        f"SET quantity = quantity + 1 WHERE PO = {order} " \
+        f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
         f"END; "
     query_2 = f"Insert Into {table} (" \
         f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
@@ -212,7 +211,7 @@ def new_rec(new_pdf, buy=False, order=''):
     query = query_1
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
-    print(query)
+    # print(query)
     return None
 
 
@@ -300,6 +299,9 @@ def validate_file(name, catalog=''):
     if '--' in name:
         return False
 
+    if MERGED_NAME in name:
+        return False
+
     return base_name
 
 
@@ -321,6 +323,9 @@ def validate_file_class(file: File):
         return False
 
     if '--' in file.file_name:
+        return False
+
+    if MERGED_NAME in file.file_name:
         return False
 
     return True
@@ -374,6 +379,7 @@ def main():
     # else:
     #     list_new_files()
     list_new_files_new_way_class()
+    merging()
     del_empty_catalogs()
 
 
