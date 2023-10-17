@@ -17,7 +17,7 @@ def get_drawings_to_merge(order):
             f"AND (datediff(minute, kiedy, getdate())) < {MERGED_TIME_PERIOD} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%';"
     print(query)
-    return [x[0:-4] for x in os.listdir(os.join.path(PRODUCTION, order)) if 'merged' not in x]
+    return [x[0:-4] for x in os.listdir(os.path.join(PRODUCTION, order)) if 'merged' not in x]
     # return get_data(query)
 
 

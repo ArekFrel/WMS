@@ -176,9 +176,9 @@ class Application(tk.Frame):
             cat_content = [file[0:-4] for file in os.listdir(po_cat) if file.lower().endswith('.pdf')]
         except FileNotFoundError:
             self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
-            cat_content = []
+            cat_content = None
 
-        if len(cat_content) > 0:
+        if len(cat_content) is not None:
             deleting_query = ''
             num = 0
             while table_files:
@@ -195,6 +195,8 @@ class Application(tk.Frame):
 
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
             print(deleting_query)
+        else:
+            print('essa')
 
     def item_selected(self, event):
         selected_item = self.listbox.selection_get()

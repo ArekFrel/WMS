@@ -55,7 +55,7 @@ REFILL_CAT = 'X'
 
 '''Permission to adding files uploaded directly into PRODUCTION catalog once per day
 GCP_OCLOCK is time when all files are checked if they're new'''
-GENERAL_CHECK_PERMISSION = True
+GENERAL_CHECK_PERMISSION = False
 GCP_OCLOCK = 15
 
 '''Name of catalogue in TEMP, where new version is updated'''
