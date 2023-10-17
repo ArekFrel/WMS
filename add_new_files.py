@@ -208,7 +208,7 @@ def new_rec(new_pdf, buy=False, order=''):
         f") VALUES (" \
         f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
         f");"
-    query = query_1
+    query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
     # print(query)

@@ -34,12 +34,12 @@ FROM_OCLOCK = 1
 TO_OCLOCK = 6
 
 """ PRODUCTION - catalogs where drawings are stored. """
-# PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
+PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+# PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
 
 """ START_CATALOG - catalog where new drawing are uploaded by planners."""
-# START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
-START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+# START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
 
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
