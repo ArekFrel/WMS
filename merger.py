@@ -7,7 +7,7 @@ from const import PRODUCTION
 
 
 def get_orders_to_merge():
-    query = f"SELECT po FROM OTM WHERE quantity > {MERGED_MIN} AND merged = 0;"
+    query = f"SELECT po FROM OTM WHERE quantity >= {MERGED_MIN} AND merged = 0;"
     return get_data(query)
 
 
@@ -16,7 +16,7 @@ def get_drawings_to_merge(order):
             f"where PO = {order} " \
             f"AND (datediff(minute, kiedy, getdate())) < {MERGED_TIME_PERIOD} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%';"
-    print(query)
+    # print(query)
     # return [x[0:-4] for x in os.listdir(os.path.join(PRODUCTION, order)) if 'merged' not in x]
     return get_data(query)
 
@@ -51,11 +51,11 @@ def merging():
     for order in orders:
         count = 0
         drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
-        print(order, " -------- order")
+        # print(order, " -------- order")
         order_path = os.path.join(PRODUCTION, order)
-        print(order_path, " -------- order")
+        # print(order_path, " -------- order")
         merge_name = merged_name_available(order_path)
-        print(f'{merge_name} ------------ merge_name')
+        # print(f'{merge_name} ------------ merge_name')
 
         for drawing in drawings:
             drawing_path = os.path.join(order_path, drawing)
