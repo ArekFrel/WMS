@@ -55,8 +55,19 @@ def archive(file_name):
         history_file.write(file_name)
 
 
+def query_maker(new_pdf, komentarz):
+    now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
+    query_2 = f"Insert Into Technologia (" \
+        f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+        f") VALUES (" \
+        f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+        f");"
+    print(query_2)
+
+
 def main():
-    list_new_files()
+    # list_new_files()
+    query_maker(new_pdf='1999999 1740-00-0000', komentarz='testowy',)
 
 
 if __name__ == '__main__':

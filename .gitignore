@@ -4,12 +4,12 @@
 /BT_OPEN.bat
 /__wms_update__
 new_func.py
+workpiece.py
 *.txt
 *.xlsx
 *.csv
 confidential.py
 dlugowiecznosc.bat
 regex.py
-test.py
 
 

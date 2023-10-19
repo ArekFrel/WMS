@@ -173,10 +173,15 @@ class Application(tk.Frame):
         table_files = [(t[0], t[1]) for t in result]
         po_cat = os.path.join(source_cat, order_number)
         try:
-            cat_content = [file[0:-4] for file in os.listdir(po_cat) if file.lower().endswith('.pdf')]
+            cat_content = os.listdir(po_cat)
+            if len(cat_content) > 0:
+                cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
         except FileNotFoundError:
-            self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
-            cat_content = None
+            if os.path.exists(PRODUCTION):
+                cat_content = []
+            else:
+                self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
+                cat_content = None
 
         if len(cat_content) is not None:
             deleting_query = ''
@@ -190,8 +195,9 @@ class Application(tk.Frame):
             with open('result.txt', 'w', encoding='UTF-8') as rf:
                 rf.write(f'{deleting_query}')
             if len(deleting_query) > 1:
-                CURSOR.execute(deleting_query)
-                CURSOR.commit()
+                # CURSOR.execute(deleting_query)
+                # CURSOR.commit()
+                pass
 
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
             print(deleting_query)
@@ -233,6 +239,45 @@ class Application(tk.Frame):
     def message_box_del_succes(self, msg):
         self.msgbox = messagebox.showwarning(title='Usunięto pliki', message=msg)
 
+def files_in_db(order):
+    print('')
+    source_cat = PRODUCTION
+    order_number = order
+    query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
+    result = CURSOR.execute(query)
+    table_files = [(t[0], t[1]) for t in result]
+    po_cat = os.path.join(source_cat, order_number)
+    try:
+        cat_content = os.listdir(po_cat)
+        if len(cat_content) > 0:
+            cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
+    except FileNotFoundError:
+        if os.path.exists('W:/!!__PRODUKCJA__!!/1__Rysunki/'):
+            cat_content = []
+        else:
+            cat_content = None
+
+    if cat_content is not None:
+        deleting_query = ''
+        num = 0
+        while table_files:
+            db_id, drawing = table_files.pop()
+            if drawing not in cat_content:
+                query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
+                deleting_query += query
+                num += 1
+        with open('result.txt', 'w', encoding='UTF-8') as rf:
+            rf.write(f'{deleting_query}')
+        if len(deleting_query) > 1:
+            CURSOR.execute(deleting_query)
+            CURSOR.commit()
+
+
+        # self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
+        print(deleting_query)
+    else:
+        print('a')
+
 
 def main():
     root = tk.Tk()
@@ -240,6 +285,7 @@ def main():
     root.geometry("350x300")
     Application(root)
     root.mainloop()
+
 
 
 if __name__ == '__main__':

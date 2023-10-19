@@ -185,7 +185,6 @@ def contains_pdfs(catalog):
 
 
 def new_rec(new_pdf, buy=False, order=''):
-    table = "Technologia"
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
     if buy:
         komentarz = 'kupowany'
@@ -203,7 +202,7 @@ def new_rec(new_pdf, buy=False, order=''):
         f"UPDATE OTM " \
         f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
         f"END; "
-    query_2 = f"Insert Into {table} (" \
+    query_2 = f"Insert Into Technologia (" \
         f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
         f") VALUES (" \
         f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
@@ -211,7 +210,6 @@ def new_rec(new_pdf, buy=False, order=''):
     query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
-    # print(query)
     return None
 
 
