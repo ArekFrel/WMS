@@ -7,9 +7,9 @@ new_func.py
 workpiece.py
 confidential.py
 dlugowiecznosc.bat
+regex.py
 *.txt
 *.xlsx
 *.csv
-regex.py
 
 

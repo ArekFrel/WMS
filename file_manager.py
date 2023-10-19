@@ -1,6 +1,6 @@
 import inspect
 import os
-from const import CURSOR, RAPORT_CATALOG, db_commit
+from const import RAPORT_CATALOG, db_commit
 from datetime import datetime
 
 s_ins = 'sap_insert.csv'

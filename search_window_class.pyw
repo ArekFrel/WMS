@@ -239,6 +239,7 @@ class Application(tk.Frame):
     def message_box_del_succes(self, msg):
         self.msgbox = messagebox.showwarning(title='Usunięto pliki', message=msg)
 
+
 def files_in_db(order):
     print('')
     source_cat = PRODUCTION

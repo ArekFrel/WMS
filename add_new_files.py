@@ -178,10 +178,10 @@ def archive(file_name):
 
 def contains_pdfs(catalog):
     catalog_path = os.path.join(START_CATALOG, catalog)
-    for file in os.listdir(catalog_path):
-        if file.lower().endswith('pdf'):
-            return True
-    return False
+    if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
+        return True
+    else:
+        return False
 
 
 def new_rec(new_pdf, buy=False, order=''):
