@@ -5,11 +5,11 @@
 /__wms_update__
 new_func.py
 workpiece.py
+confidential.py
+dlugowiecznosc.bat
 *.txt
 *.xlsx
 *.csv
-confidential.py
-dlugowiecznosc.bat
 regex.py
 
 

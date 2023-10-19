@@ -195,8 +195,8 @@ class Application(tk.Frame):
             with open('result.txt', 'w', encoding='UTF-8') as rf:
                 rf.write(f'{deleting_query}')
             if len(deleting_query) > 1:
-                # CURSOR.execute(deleting_query)
-                # CURSOR.commit()
+                CURSOR.execute(deleting_query)
+                CURSOR.commit()
                 pass
 
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
