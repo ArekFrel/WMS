@@ -166,24 +166,19 @@ class Application(tk.Frame):
 
     def files_in_db(self):
         print('')
-        source_cat = PRODUCTION
         order_number = self.listbox.selection_get()
-        query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
-        result = CURSOR.execute(query)
-        table_files = [(t[0], t[1]) for t in result]
-        po_cat = os.path.join(source_cat, order_number)
-        try:
-            cat_content = os.listdir(po_cat)
-            if len(cat_content) > 0:
-                cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
-        except FileNotFoundError:
-            if os.path.exists(PRODUCTION):
+        if os.path.exists(PRODUCTION):
+            query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
+            result = CURSOR.execute(query)
+            table_files = [(t[0], t[1]) for t in result]
+            po_cat = os.path.join(PRODUCTION, order_number)
+            try:
+                cat_content = os.listdir(po_cat)
+                if len(cat_content) > 0:
+                    cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
+            except FileNotFoundError:
                 cat_content = []
-            else:
-                self.message_box_del_error(msg=f'Nie odnaleziono takiego folderu!')
-                cat_content = None
 
-        if len(cat_content) is not None:
             deleting_query = ''
             num = 0
             while table_files:
@@ -197,12 +192,11 @@ class Application(tk.Frame):
             if len(deleting_query) > 1:
                 CURSOR.execute(deleting_query)
                 CURSOR.commit()
-                pass
 
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
-            print(deleting_query)
+
         else:
-            print('essa')
+            self.message_box_del_succes(msg=f'Brak Ścieżki Production')
 
     def item_selected(self, event):
         selected_item = self.listbox.selection_get()
@@ -240,44 +234,41 @@ class Application(tk.Frame):
         self.msgbox = messagebox.showwarning(title='Usunięto pliki', message=msg)
 
 
-def files_in_db(order):
-    print('')
-    source_cat = PRODUCTION
-    order_number = order
-    query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
-    result = CURSOR.execute(query)
-    table_files = [(t[0], t[1]) for t in result]
-    po_cat = os.path.join(source_cat, order_number)
-    try:
-        cat_content = os.listdir(po_cat)
-        if len(cat_content) > 0:
-            cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
-    except FileNotFoundError:
-        if os.path.exists('W:/!!__PRODUKCJA__!!/1__Rysunki/'):
-            cat_content = []
-        else:
-            cat_content = None
-
-    if cat_content is not None:
-        deleting_query = ''
-        num = 0
-        while table_files:
-            db_id, drawing = table_files.pop()
-            if drawing not in cat_content:
-                query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
-                deleting_query += query
-                num += 1
-        with open('result.txt', 'w', encoding='UTF-8') as rf:
-            rf.write(f'{deleting_query}')
-        if len(deleting_query) > 1:
-            CURSOR.execute(deleting_query)
-            CURSOR.commit()
-
-
-        # self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
-        print(deleting_query)
-    else:
-        print('a')
+# def files_in_db():
+#     print('')
+#     source_cat = 'W:/!!__PRODUKCJA__!!/1__Rysunkij/'
+#     # order_number = self.listbox.selection_get()
+#     order_number = '1503248'
+#     if os.path.exists(source_cat):
+#         query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
+#         result = CURSOR.execute(query)
+#         table_files = [(t[0], t[1]) for t in result]
+#         po_cat = os.path.join(source_cat, order_number)
+#         try:
+#             cat_content = os.listdir(po_cat)
+#             if len(cat_content) > 0:
+#                 cat_content = [file[0:-4] for file in cat_content if file.lower().endswith('.pdf')]
+#         except FileNotFoundError:
+#             cat_content = []
+#
+#         deleting_query = ''
+#         num = 0
+#         while table_files:
+#             db_id, drawing = table_files.pop()
+#             if drawing not in cat_content:
+#                 query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
+#                 deleting_query += query
+#                 num += 1
+#         with open('result.txt', 'w', encoding='UTF-8') as rf:
+#             rf.write(f'{deleting_query}')
+#         if len(deleting_query) > 1:
+#             CURSOR.execute(deleting_query)
+#             CURSOR.commit()
+#
+#         # self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
+#         print(deleting_query)
+#     else:
+#         self.message_box_del_succes(msg=f'Brak Ścieżki Production')
 
 
 def main():
@@ -286,7 +277,7 @@ def main():
     root.geometry("350x300")
     Application(root)
     root.mainloop()
-
+    # files_in_db()
 
 
 if __name__ == '__main__':
