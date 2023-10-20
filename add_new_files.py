@@ -1,8 +1,3 @@
-import inspect
-import os
-import time
-import shutil
-import re
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
@@ -11,6 +6,7 @@ from const import *
 from pyodbc import Error
 import stamps_adder
 from merger import merging
+
 
 
 catalogs_to_remove = []
@@ -246,6 +242,7 @@ def cut_file_class(file):
         return False
 
     new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat), order=file.po)
+
     return True
 
 
