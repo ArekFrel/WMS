@@ -130,7 +130,7 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
-            elif file in BOUGHT_NAMES or catalog.bought :
+            elif file in BOUGHT_NAMES or catalog.bought:
                 init_path = os.path.join(START_CATALOG, catalog.name, file)
                 end_path = os.path.join(START_CATALOG, 'bought_script')
                 shutil.move(init_path, end_path)
@@ -178,7 +178,7 @@ def archive(file_name):
 
 def contains_pdfs(catalog):
     catalog_path = os.path.join(START_CATALOG, catalog)
-    if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
+    if [file for file in os.listdir(catalog_path) if file.lower().endswith("pdf")]:
         return True
     else:
         return False
@@ -383,4 +383,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
