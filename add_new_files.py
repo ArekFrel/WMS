@@ -194,15 +194,19 @@ def new_rec(new_pdf, buy=False, order=''):
     else:
         komentarz = ''
 
-    query_1 = f"IF NOT EXISTS (SELECT PO FROM OTM WHERE PO = {order}) " \
-        f"BEGIN " \
-        f"INSERT INTO OTM (PO, QUANTITY) VALUES ({order}, 1) " \
-        f"END " \
-        f"ELSE " \
-        f"BEGIN " \
-        f"UPDATE OTM " \
-        f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
-        f"END; "
+    if 'info' in new_pdf.lower() or 'sap' in new_pdf.lower():
+        query_1 = ""
+    else:
+        query_1 = f"IF NOT EXISTS (SELECT PO FROM OTM WHERE PO = {order}) " \
+                  f"BEGIN " \
+                  f"INSERT INTO OTM (PO, QUANTITY) VALUES ({order}, 1) " \
+                  f"END " \
+                  f"ELSE " \
+                  f"BEGIN " \
+                  f"UPDATE OTM " \
+                  f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
+                  f"END; "
+
     query_2 = f"Insert Into Technologia (" \
         f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
         f") VALUES (" \
