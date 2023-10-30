@@ -303,7 +303,7 @@ def validate_file(name, catalog=''):
     if '--' in name:
         return False
 
-    if MERGED_NAME in name:
+    if 'merged' in name:
         return False
 
     return base_name
