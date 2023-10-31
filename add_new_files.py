@@ -50,7 +50,7 @@ def list_new_files():
             if file.endswith(MERGED_NAME):
                 continue
             file_name = validate_file(file, catalog)
-            if file_name and file_name not in current_db_files:
+            if file_name and file_name not in current_db_files + ['merged']:
                 new_files.append(file_name)
             elif not file_name and file.lower().endswith('.pdf'):
                 new_bad_file(new_pdf=file, catalog=catalog)
@@ -304,7 +304,7 @@ def validate_file(name, catalog=''):
         return False
 
     if 'merged' in name:
-        return False
+        return 'merged'
 
     return base_name
 
