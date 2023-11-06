@@ -42,9 +42,13 @@ class File:
 
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
+        self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'
+
+    def un_read_only(self):
+        os.chmod(self.start_path, S_IWRITE)
 
     def base_and_number(self):
         """Return base name and order number if file in destination already exist"""
@@ -182,9 +186,7 @@ class Catalog:
 
 
 def main():
-    file =File(name='1999999 17400 BUY.pdf')
-    t=0
-
+    pass
 
 if __name__ == '__main__':
     main()
