@@ -50,7 +50,7 @@ def list_new_files():
             if file.endswith(MERGED_NAME):
                 continue
             file_name = validate_file(file, catalog)
-            if file_name and file_name not in current_db_files:
+            if file_name and file_name not in current_db_files + ['merged']:
                 new_files.append(file_name)
             elif not file_name and file.lower().endswith('.pdf'):
                 new_bad_file(new_pdf=file, catalog=catalog)
@@ -185,14 +185,16 @@ def contains_pdfs(catalog):
         return False
 
 
-def new_rec(new_pdf, buy=False, order=''):
-    now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
+def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
     if buy:
         komentarz = 'kupowany'
+    elif sub_buy:
+        komentarz = 'Część złożenia kupowanego'
     elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
     else:
         komentarz = ''
+    now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
 
     if 'info' in new_pdf.lower() or 'sap' in new_pdf.lower():
         query_1 = ""
@@ -206,12 +208,18 @@ def new_rec(new_pdf, buy=False, order=''):
                   f"UPDATE OTM " \
                   f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
                   f"END; "
-
-    query_2 = f"Insert Into Technologia (" \
-        f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
-        f") VALUES (" \
-        f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
-        f");"
+    if buy | sub_buy:
+        query_2 = f"Insert Into Technologia (" \
+            f"Plik, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f") VALUES (" \
+            f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f");"
+    else:
+        query_2 = f"Insert Into Technologia (" \
+            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f") VALUES (" \
+            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f");"
     query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
@@ -238,7 +246,7 @@ def cut_file_class(file):
         file.name_if_exist_class()
 
     if os.path.exists(file.dest_catalog):
-        if file.bought_cat or file.bought_name:
+        if file.bought_cat | file.bought_name | file.sub_bought:
             stamps_adder.stamper(file=file)
         else:
             try:
@@ -250,7 +258,10 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat), order=file.po)
+    new_rec(new_pdf=file.file_name,
+            buy=(file.bought_name or file.bought_cat),
+            sub_buy=file.sub_bought,
+            order=file.po)
 
     return True
 
@@ -304,7 +315,7 @@ def validate_file(name, catalog=''):
         return False
 
     if 'merged' in name:
-        return False
+        return 'merged'
 
     return base_name
 

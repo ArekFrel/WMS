@@ -67,6 +67,7 @@ AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
 """Path of watermarks"""
 WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
+WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
@@ -88,8 +89,9 @@ MERGED_TIME_PERIOD = 30# should be low value, f.e. 5
 
 SERVER = SERVER_conf
 DATABASE = DATABASE_conf
+DRIVER = DRIVER_conf
 CONN = pyodbc.connect(
-    "Driver={SQL Server Native Client 11.0};"
+    "Driver="+DRIVER+";"
     "Server="+SERVER+";"
     "Database="+DATABASE+";"
     "Trusted_Connection=yes;"
