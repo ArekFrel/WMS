@@ -21,7 +21,7 @@ def files_in_db(order_number):
         if drawing not in cat_content:
             query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
             deleting_query += query
-    with open('result.txt', 'w', encoding='UTF-8') as rf:
+    with open('../result.txt', 'w', encoding='UTF-8') as rf:
         rf.write(f'{deleting_query}')
     if len(deleting_query) > 1:
         CURSOR.execute(deleting_query)
@@ -48,7 +48,7 @@ def rem(order):
         if drawing not in cat_content:
             query = f'DELETE FROM TECHNOLOGIA WHERE id = {db_id}; \n'
             deleting_query += query
-    with open('result.txt', 'a', encoding='UTF-8') as rf:
+    with open('../result.txt', 'a', encoding='UTF-8') as rf:
         rf.write(f'{deleting_query}')
     CURSOR.execute(deleting_query)
     CURSOR.commit()

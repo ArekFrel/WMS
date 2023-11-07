@@ -1,14 +1,10 @@
 import time
 from datetime import datetime
-from timer_dec import time_break
-import add_new_files
-import new_data_uploader
-import file_manager
-import sap_date
-import self_update
+from utils.timer_dec import time_break
+from utils import add_new_files, self_update, sap_date, new_data_uploader, file_manager
 import subprocess
 import os
-from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
+from utils.const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
 
 
 def wait(period):
