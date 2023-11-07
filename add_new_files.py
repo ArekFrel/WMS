@@ -186,7 +186,7 @@ def contains_pdfs(catalog):
 
 
 def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
-    if buy and not sub_buy:
+    if buy:
         komentarz = 'kupowany'
     elif sub_buy:
         komentarz = 'Część złożenia kupowanego'
@@ -208,12 +208,18 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
                   f"UPDATE OTM " \
                   f"SET quantity = quantity + 1, merged = 0 WHERE PO = {order} " \
                   f"END; "
-
-    query_2 = f"Insert Into Technologia (" \
-        f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
-        f") VALUES (" \
-        f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
-        f");"
+    if buy | sub_buy:
+        query_2 = f"Insert Into Technologia (" \
+            f"Plik, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f") VALUES (" \
+            f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f");"
+    else:
+        query_2 = f"Insert Into Technologia (" \
+            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f") VALUES (" \
+            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f");"
     query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
