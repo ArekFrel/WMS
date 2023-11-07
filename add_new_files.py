@@ -185,14 +185,16 @@ def contains_pdfs(catalog):
         return False
 
 
-def new_rec(new_pdf, buy=False, order=''):
-    now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-    if buy:
+def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
+    if buy and not sub_buy:
         komentarz = 'kupowany'
+    elif sub_buy:
+        komentarz = 'Część złożenia kupowanego'
     elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
     else:
         komentarz = ''
+    now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
 
     if 'info' in new_pdf.lower() or 'sap' in new_pdf.lower():
         query_1 = ""
@@ -238,7 +240,7 @@ def cut_file_class(file):
         file.name_if_exist_class()
 
     if os.path.exists(file.dest_catalog):
-        if file.bought_cat or file.bought_name:
+        if file.bought_cat | file.bought_name | file.sub_bought:
             stamps_adder.stamper(file=file)
         else:
             try:
@@ -250,7 +252,10 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.file_name, buy=(file.bought_name or file.bought_cat), order=file.po)
+    new_rec(new_pdf=file.file_name,
+            buy=(file.bought_name or file.bought_cat),
+            sub_buy=file.sub_bought,
+            order=file.po)
 
     return True
 

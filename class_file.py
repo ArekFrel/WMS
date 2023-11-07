@@ -21,8 +21,18 @@ class File:
         self.catalog = '' if bought_cat else catalog
         self.loose = not bool(self.catalog)
 
-        if 'buy' in self.name.lower():
+        if 'bu' in self.name.lower() and 'buy' not in self.name.lower():
+            self.bought_name = False
+            self.sub_bought = True
+            self.bought_cat = False
+            beg, end = self.name.lower().split('bu')
+            self.new_name = ''.join([beg.strip(), end.strip()])
+            while '  ' in self.new_name:
+                self.new_name = self.new_name.replace('  ', ' ')
+            self.file_name = self.new_name.rsplit('.', 1)[0]
+        elif 'buy' in self.name.lower():
             self.bought_name = True
+            self.sub_bought = False
             beg, end = self.name.lower().split('buy')
             self.new_name = ''.join([beg.strip(), end.strip()])
             while '  ' in self.new_name:
@@ -30,7 +40,9 @@ class File:
             self.file_name = self.new_name.rsplit('.', 1)[0]
         else:
             self.bought_name = False
+            self.sub_bought = False
             self.new_name = self.name
+
         self.start_path_new_name = os.path.join(START_CATALOG, catalog, self.new_name)
         self.po = self.new_name[:7]
         self.catalog_path = os.path.join(START_CATALOG, catalog)
@@ -43,7 +55,7 @@ class File:
 
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
-        self.un_read_only()
+        # self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'
@@ -189,7 +201,7 @@ class Catalog:
 def main():
     pass
 
+
 if __name__ == '__main__':
     main()
-
 
