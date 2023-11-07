@@ -1,4 +1,5 @@
 import os
+import fitz
 import time
 import shutil
 from stat import S_IWRITE
