@@ -55,7 +55,7 @@ class File:
 
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
-        # self.un_read_only()
+        self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'

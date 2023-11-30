@@ -9,7 +9,8 @@ from const import PRODUCTION
 def get_orders_to_merge():
     """Orders that should be merged are stored in table OTM in data base."""
     query = f"SELECT po FROM OTM WHERE quantity >= {MERGED_MIN} AND merged = 0;"
-    return get_data(query)
+    a = get_data(query)
+    return a
 
 
 def get_drawings_to_merge(order):
@@ -28,7 +29,7 @@ def get_data(query):
 
         except Error:
             print(f'Database Error in "merging"')
-            return False
+            return []
 
     return [str(_[0]) for _ in result]
 
@@ -48,29 +49,30 @@ def merging():
     orders = get_orders_to_merge()
     for order in orders:
         count = 0
-        drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
         order_path = os.path.join(PRODUCTION, order)
+        drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
+        first_drawing = drawings[0]
+        first_drawing_path = os.path.join(order_path, first_drawing)
+        drawings = enumerate(drawings)
         merge_name = merged_name_available(order_path)
+        merged_doc = os.path.join(order_path, f'{merge_name}')
 
-        for drawing in drawings:
-            drawing_path = os.path.join(order_path, drawing)
-            merged_doc = os.path.join(order_path, f'{order} {merge_name}')
-            save_doc = os.path.join(order_path, 'merged_temp.pdf')
-            with fitz.open(drawing_path) as doc:
-                if f'{order} {merge_name}' not in os.listdir(order_path):
-                    doc.save(merged_doc)
-                    os.chmod(merged_doc, S_IWRITE)
+        with fitz.open(first_drawing_path) as doc:
+            count += 1
+            for id, drawing in drawings:
+                if id == 0:
+                    continue
+                drawing_path = os.path.join(order_path, drawing)
+                if not os.path.isfile(drawing_path):
+                    continue
+                with fitz.open(drawing_path) as added_doc:
+                    doc.insert_file(added_doc)
                     count += 1
-                else:
-                    with fitz.open(merged_doc) as doc_merged:
-                        doc_merged.insert_file(doc)
-                        doc_merged.save(save_doc)
-                        os.chmod(save_doc, S_IWRITE)
-                    os.remove(merged_doc)
-                    os.rename(save_doc, merged_doc)
-                    count += 1
+            doc.save(merged_doc)
+            os.chmod(merged_doc, S_IWRITE)
+
         set_merged_true(order=order)
-        print(f'{order} order drawings has been merged ')
+        print(f'{count} drawings of {order} order drawings has been merged.')
 
 
 def main():
