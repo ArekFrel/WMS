@@ -47,6 +47,7 @@ def set_merged_true(order):
 def merging():
 
     orders = get_orders_to_merge()
+
     for order in orders:
         count = 0
         order_path = os.path.join(PRODUCTION, order)
