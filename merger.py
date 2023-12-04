@@ -17,7 +17,8 @@ def get_drawings_to_merge(order):
     query = f"Select Plik from Technologia " \
             f"where PO = {order} " \
             f"AND (datediff(minute, kiedy, getdate())) < {MERGED_TIME_PERIOD} " \
-            f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%';"
+            f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
+            f"ORDER BY Rysunek ASC;"
     return get_data(query)
 
 
