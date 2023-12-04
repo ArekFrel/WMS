@@ -56,7 +56,7 @@ def merging():
         first_drawing_path = os.path.join(order_path, first_drawing)
         drawings = enumerate(drawings)
         merge_name = merged_name_available(order_path)
-        merged_doc = os.path.join(order_path, f'{merge_name}')
+        merged_doc = os.path.join(order_path, f'{order} {merge_name}')
 
         with fitz.open(first_drawing_path) as doc:
             count += 1

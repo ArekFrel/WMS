@@ -17,7 +17,7 @@ class Application(tk.Frame):
             case 'bt':
                 query = f'SELECT DISTINCT PO FROM [dbo].[Brak_technologii]();'
             case 'allpos':
-                query = f'SELECT DISTINCT [P.O.] FROM Sap Order By [P.O.];'
+                query = f'SELECT DISTINCT PO FROM Technologia Order By PO;'
             case _:
                 return []
 
