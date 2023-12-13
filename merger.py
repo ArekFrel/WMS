@@ -2,15 +2,14 @@ import os
 import fitz
 from stat import S_IWRITE
 from const import CURSOR, MERGED_MIN, MERGED_TIME_PERIOD, PRODUCTION, db_commit
-from pyodbc import Error
+from pyodbc import Error, OperationalError
 from const import PRODUCTION
 
 
 def get_orders_to_merge():
     """Orders that should be merged are stored in table OTM in data base."""
     query = f"SELECT po FROM OTM WHERE quantity >= {MERGED_MIN} AND merged = 0;"
-    a = get_data(query)
-    return a
+    return get_data(query)
 
 
 def get_drawings_to_merge(order):
@@ -30,6 +29,10 @@ def get_data(query):
 
         except Error:
             print(f'Database Error in "merging"')
+            return []
+
+        except OperationalError:
+            print(f'Operational Error in merging')
             return []
 
     return [str(_[0]) for _ in result]
