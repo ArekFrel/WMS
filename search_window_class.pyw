@@ -27,7 +27,7 @@ class Application(tk.Frame):
 
     @staticmethod
     def get_to_open(po):
-        QUERY = f"Select Plik From Technologia Where [PO] = {str(po)} AND Status_Op = 6 Order by Rysunek DESC;"
+        QUERY = f"Select Plik From Technologia Where [PO] = {str(po)} AND Status_Op = 6 Order by ID DESC;"
         print(QUERY)
         CURSOR.execute(QUERY)
         result = CURSOR.fetchall()
@@ -217,7 +217,7 @@ class Application(tk.Frame):
             except FileNotFoundError:
                 print(f'nie otwarto pliku: {the_file}')
                 if not warn:
-                    self.message_box()
+                    self.message_box('nie otwarto rysunku bo nie')
                     warn = True
                 continue
 

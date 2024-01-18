@@ -25,7 +25,7 @@ ACC_EXT = [
 TIME_OF_BREAK = 120
 
 """Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 1800
+TIMEOUT_FOR_PLANERS = 18
 
 """ Time between the script is not running"""
 # time when script stops running
@@ -104,8 +104,9 @@ def db_commit(query, func_name):
 
     try:
         with CURSOR:
-            CURSOR.execute(query)
-            CURSOR.commit()
+            print(query)
+            # CURSOR.execute(query)
+            # CURSOR.commit()
         return True
 
     except pyodbc.OperationalError:
