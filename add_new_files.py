@@ -3,7 +3,6 @@ import os
 import time
 import shutil
 import re
-
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE

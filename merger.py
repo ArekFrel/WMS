@@ -26,15 +26,12 @@ def get_data(query):
         try:
             CURSOR.execute(query)
             result = CURSOR.fetchall()
-
         except Error:
             print(f'Database Error in "merging"')
             return []
-
         except OperationalError:
             print(f'Operational Error in merging')
             return []
-
     return [str(_[0]) for _ in result]
 
 
@@ -51,7 +48,6 @@ def set_merged_true(order):
 def merging():
 
     orders = get_orders_to_merge()
-
     for order in orders:
         count = 0
         order_path = os.path.join(PRODUCTION, order)
@@ -61,7 +57,6 @@ def merging():
         drawings = enumerate(drawings)
         merge_name = merged_name_available(order_path)
         merged_doc = os.path.join(order_path, f'{order} {merge_name}')
-
         with fitz.open(first_drawing_path) as doc:
             count += 1
             for id, drawing in drawings:

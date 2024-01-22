@@ -191,7 +191,7 @@ class Catalog:
 
     def is_bought(self):
         for word in BOUGHT_NAMES:
-            if word in self.name:
+            if word == self.name.lower():
                 return True
         return False
 
