@@ -1,6 +1,7 @@
 import pyodbc
 from confidential import *
 
+IS_IT_TEST = True
 
 """Names of catalogs to be considered to be bought."""
 BOUGHT_NAMES = [
@@ -25,7 +26,6 @@ ACC_EXT = [
 TIME_OF_BREAK = 120
 
 """Number of second after which the catalog is moved."""
-TIMEOUT_FOR_PLANERS = 1800
 
 """ Time between the script is not running"""
 # time when script stops running
@@ -33,13 +33,17 @@ FROM_OCLOCK = 1
 # time when script starts running
 TO_OCLOCK = 6
 
-""" PRODUCTION - catalogs where drawings are stored. """
-PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-# PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
-
-""" START_CATALOG - catalog where new drawing are uploaded by planners."""
-START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
-# START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+if IS_IT_TEST:
+    PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
+    START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+    TIMEOUT_FOR_PLANERS = 0.1
+else:
+    """ PRODUCTION - catalogs where drawings are stored. """
+    PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+    """ START_CATALOG - catalog where new drawing are uploaded by planners."""
+    START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+    """Number of second after which the catalog is moved."""
+    TIMEOUT_FOR_PLANERS = 1800
 
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
@@ -101,6 +105,8 @@ CURSOR = CONN.cursor()
 
 
 def db_commit(query, func_name):
+    if IS_IT_TEST:
+        pass
 
     try:
         with CURSOR:
@@ -124,6 +130,10 @@ def db_commit(query, func_name):
     except Exception:
         print(f'Something else during "{func_name}" gone wrong!')
         return False
+
+
+def generate_timeout_for_planners(is_it_test):
+    return 0.1 if IS_IT_TEST else 1800
 
 
 def main():
