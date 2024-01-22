@@ -22,16 +22,16 @@ def get_drawings_to_merge(order):
 
 
 def get_data(query):
-    with CURSOR:
-        try:
+    try:
+        with CURSOR:
             CURSOR.execute(query)
             result = CURSOR.fetchall()
-        except Error:
-            print(f'Database Error in "merging"')
-            return []
-        except OperationalError:
-            print(f'Operational Error in merging')
-            return []
+    except Error:
+        print(f'Database Error in "merging"')
+        return []
+    except OperationalError:
+        print(f'Operational Error in merging')
+        return []
     return [str(_[0]) for _ in result]
 
 
@@ -59,8 +59,8 @@ def merging():
         merged_doc = os.path.join(order_path, f'{order} {merge_name}')
         with fitz.open(first_drawing_path) as doc:
             count += 1
-            for id, drawing in drawings:
-                if id == 0:
+            for index, drawing in drawings:
+                if index == 0:
                     continue
                 drawing_path = os.path.join(order_path, drawing)
                 if not os.path.isfile(drawing_path):
