@@ -12,5 +12,7 @@ regex.py
 *.xlsx
 *.csv
 *.docx
+*deep_copy
+
 
 

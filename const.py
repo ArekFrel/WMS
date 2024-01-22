@@ -110,7 +110,6 @@ def db_commit(query, func_name):
 
     try:
         with CURSOR:
-            print(query)
             CURSOR.execute(query)
             CURSOR.commit()
         return True
