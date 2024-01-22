@@ -3,6 +3,7 @@ import os
 import time
 import shutil
 import re
+
 from class_file import File, Catalog
 from datetime import datetime, date
 from stat import S_IWRITE
@@ -120,8 +121,8 @@ def list_new_files_new_way_class():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
                 if file in ['Thumbs.db', '_v']:
                     continue
-                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
 
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
@@ -130,9 +131,10 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
-            elif file in BOUGHT_NAMES or catalog.bought:
+
+            elif file.lower() in BOUGHT_NAMES:
                 init_path = os.path.join(START_CATALOG, catalog.name, file)
-                end_path = os.path.join(START_CATALOG, 'bought_script')
+                end_path = generate_end_path()
                 shutil.move(init_path, end_path)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
@@ -261,8 +263,16 @@ def cut_file_class(file):
             buy=(file.bought_name or file.bought_cat),
             sub_buy=file.sub_bought,
             order=file.po)
-
     return True
+
+
+def generate_end_path():
+    number = 1
+    path_to_check = os.path.join(START_CATALOG, f'bought_script')
+    while os.path.isdir(path_to_check):
+        path_to_check = os.path.join(START_CATALOG, f'bought_script_{number}')
+        number += 1
+    return path_to_check
 
 
 def new_bad_file(new_pdf, catalog):
@@ -385,15 +395,15 @@ def check_po_in_sap(po_num):
 
 
 def main():
-    new_files_to_db()
-    truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
-        list_new_files()
+    # new_files_to_db()
+    # truncate_bad_files()
+    # if GENERAL_CHECK_PERMISSION:
+    #     if general_checker():
+    #         list_new_files()
+    # else:
+    #     list_new_files()
     list_new_files_new_way_class()
-    merging()
+    # merging()
     del_empty_catalogs()
 
 

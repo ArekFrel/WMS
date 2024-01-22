@@ -193,6 +193,8 @@ class Catalog:
         for word in BOUGHT_NAMES:
             if word == self.name.lower():
                 return True
+        if self.name.startswith('bought_script_'):
+            return True
         return False
 
 
