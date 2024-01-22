@@ -1,7 +1,7 @@
 import os
 import fitz
 from stat import S_IWRITE
-from const import CURSOR, MERGED_MIN, MERGED_TIME_PERIOD, PRODUCTION, db_commit
+from const import CURSOR, MERGED_MIN, db_commit
 from pyodbc import Error, OperationalError
 from const import PRODUCTION
 
@@ -13,12 +13,17 @@ def get_orders_to_merge():
 
 
 def get_drawings_to_merge(order):
-    query = f"Select Plik from Technologia " \
+    num = how_many_drawings_to_merge(order)
+    query = f"Select TOP ({num}) Plik from Technologia " \
             f"where PO = {order} " \
-            f"AND (datediff(minute, kiedy, getdate())) < {MERGED_TIME_PERIOD} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
-            f"ORDER BY Rysunek ASC;"
+            f"ORDER BY Kiedy DESC;"
     return get_data(query)
+
+
+def how_many_drawings_to_merge(order):
+    query = f"SELECT quantity FROM OTM WHERE PO = {order}"
+    return int(get_data(query)[0])
 
 
 def get_data(query):
@@ -81,5 +86,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

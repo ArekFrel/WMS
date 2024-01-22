@@ -75,7 +75,6 @@ def general_checker():
 
     """Function providing other function runs once per day after a certain hour of the day."""
     query = 'SELECT General_check FROM SAP_data;'
-
     try:
         with CURSOR:
             CURSOR.execute(query)
@@ -100,8 +99,8 @@ def list_new_files_new_way_class():
         if any_file.upper() == REFILL_CAT:
             refill_doc()
             continue
-        deep_path = os.path.join(START_CATALOG, any_file)
 
+        deep_path = os.path.join(START_CATALOG, any_file)
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
             file = File(name=any_file)
