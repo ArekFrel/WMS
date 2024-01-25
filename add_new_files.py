@@ -135,6 +135,9 @@ def list_new_files_new_way_class():
                 init_path = os.path.join(START_CATALOG, catalog.name, file)
                 end_path = generate_end_path()
                 shutil.move(init_path, end_path)
+                '''Below turns off this order to merge'''
+                query = f'UPDATE Otm SET merged = 1 WHERE PO = {catalog.name};'
+                db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
             catalogs_to_remove.append(catalog.name)
@@ -179,7 +182,7 @@ def archive(file_name):
 
 def contains_pdfs(catalog):
     catalog_path = os.path.join(START_CATALOG, catalog)
-    if [file for file in os.listdir(catalog_path) if file.lower().endswith("pdf")]:
+    if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
         return True
     else:
         return False
