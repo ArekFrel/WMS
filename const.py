@@ -44,7 +44,8 @@ else:
     """ START_CATALOG - catalog where new drawing are uploaded by planners."""
     START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
     """Number of second after which the catalog is moved."""
-    TIMEOUT_FOR_PLANERS = 1800
+    TIMEOUT_FOR_PLANERS = 1
+
 
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'

@@ -399,10 +399,9 @@ def check_po_in_sap(po_num):
 def main():
     new_files_to_db()
     truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
+    if GENERAL_CHECK_PERMISSION and general_checker():
+        list_new_files()
+    elif not GENERAL_CHECK_PERMISSION:
         list_new_files()
     list_new_files_new_way_class()
     merging()
