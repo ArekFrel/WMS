@@ -18,9 +18,7 @@ def get_drawings_to_merge(order):
             f"where PO = {order} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
             f"ORDER BY Kiedy DESC;"
-    drawings = get_data(query)
-    drawings.sort()
-    return drawings
+    return get_data(query).sort()
 
 
 def how_many_drawings_to_merge(order):
