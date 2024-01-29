@@ -1,8 +1,8 @@
 import os
 import fitz
 from stat import S_IWRITE
-from const import CURSOR, MERGED_MIN, MERGED_TIME_PERIOD, PRODUCTION, db_commit
-from pyodbc import Error
+from const import CURSOR, MERGED_MIN, db_commit
+from pyodbc import Error, OperationalError
 from const import PRODUCTION
 
 
@@ -13,23 +13,30 @@ def get_orders_to_merge():
 
 
 def get_drawings_to_merge(order):
-    query = f"Select Plik from Technologia " \
+    num = how_many_drawings_to_merge(order)
+    query = f"Select TOP ({num}) Plik from Technologia " \
             f"where PO = {order} " \
-            f"AND (datediff(minute, kiedy, getdate())) < {MERGED_TIME_PERIOD} " \
-            f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%';"
-    return get_data(query)
+            f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
+            f"ORDER BY Kiedy DESC;"
+    return get_data(query).sort()
+
+
+def how_many_drawings_to_merge(order):
+    query = f"SELECT quantity FROM OTM WHERE PO = {order}"
+    return int(get_data(query)[0])
 
 
 def get_data(query):
-    with CURSOR:
-        try:
+    try:
+        with CURSOR:
             CURSOR.execute(query)
             result = CURSOR.fetchall()
-
-        except Error:
-            print(f'Database Error in "merging"')
-            return False
-
+    except Error:
+        print(f'Database Error in "merging"')
+        return []
+    except OperationalError:
+        print(f'Operational Error in merging')
+        return []
     return [str(_[0]) for _ in result]
 
 
@@ -48,29 +55,29 @@ def merging():
     orders = get_orders_to_merge()
     for order in orders:
         count = 0
-        drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
         order_path = os.path.join(PRODUCTION, order)
+        drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
+        first_drawing = drawings[0]
+        first_drawing_path = os.path.join(order_path, first_drawing)
+        drawings = enumerate(drawings)
         merge_name = merged_name_available(order_path)
+        merged_doc = os.path.join(order_path, f'{order} {merge_name}')
+        with fitz.open(first_drawing_path) as doc:
+            count += 1
+            for index, drawing in drawings:
+                if index == 0:
+                    continue
+                drawing_path = os.path.join(order_path, drawing)
+                if not os.path.isfile(drawing_path):
+                    continue
+                with fitz.open(drawing_path) as added_doc:
+                    doc.insert_file(added_doc)
+                    count += 1
+            doc.save(merged_doc)
+            os.chmod(merged_doc, S_IWRITE)
 
-        for drawing in drawings:
-            drawing_path = os.path.join(order_path, drawing)
-            merged_doc = os.path.join(order_path, f'{order} {merge_name}')
-            save_doc = os.path.join(order_path, 'merged_temp.pdf')
-            with fitz.open(drawing_path) as doc:
-                if f'{order} {merge_name}' not in os.listdir(order_path):
-                    doc.save(merged_doc)
-                    os.chmod(merged_doc, S_IWRITE)
-                    count += 1
-                else:
-                    with fitz.open(merged_doc) as doc_merged:
-                        doc_merged.insert_file(doc)
-                        doc_merged.save(save_doc)
-                        os.chmod(save_doc, S_IWRITE)
-                    os.remove(merged_doc)
-                    os.rename(save_doc, merged_doc)
-                    count += 1
         set_merged_true(order=order)
-        print(f'{order} order drawings has been merged ')
+        print(f'{count} drawings of {order} order drawings has been merged.')
 
 
 def main():
@@ -79,5 +86,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

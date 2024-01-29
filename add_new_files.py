@@ -75,7 +75,6 @@ def general_checker():
 
     """Function providing other function runs once per day after a certain hour of the day."""
     query = 'SELECT General_check FROM SAP_data;'
-
     try:
         with CURSOR:
             CURSOR.execute(query)
@@ -100,8 +99,8 @@ def list_new_files_new_way_class():
         if any_file.upper() == REFILL_CAT:
             refill_doc()
             continue
-        deep_path = os.path.join(START_CATALOG, any_file)
 
+        deep_path = os.path.join(START_CATALOG, any_file)
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
             file = File(name=any_file)
@@ -121,8 +120,8 @@ def list_new_files_new_way_class():
             if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
                 if file in ['Thumbs.db', '_v']:
                     continue
-                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
 
+                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
@@ -131,10 +130,14 @@ def list_new_files_new_way_class():
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
-            elif file in BOUGHT_NAMES or catalog.bought:
+
+            elif file.lower() in BOUGHT_NAMES:
                 init_path = os.path.join(START_CATALOG, catalog.name, file)
-                end_path = os.path.join(START_CATALOG, 'bought_script')
+                end_path = generate_end_path()
                 shutil.move(init_path, end_path)
+                '''Below turns off this order to merge'''
+                query = f'UPDATE Otm SET merged = 1 WHERE PO = {catalog.name};'
+                db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
             catalogs_to_remove.append(catalog.name)
@@ -179,7 +182,7 @@ def archive(file_name):
 
 def contains_pdfs(catalog):
     catalog_path = os.path.join(START_CATALOG, catalog)
-    if [file for file in os.listdir(catalog_path) if file.lower().endswith("pdf")]:
+    if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
         return True
     else:
         return False
@@ -262,8 +265,16 @@ def cut_file_class(file):
             buy=(file.bought_name or file.bought_cat),
             sub_buy=file.sub_bought,
             order=file.po)
-
     return True
+
+
+def generate_end_path():
+    number = 1
+    path_to_check = os.path.join(START_CATALOG, f'bought_script')
+    while os.path.isdir(path_to_check):
+        path_to_check = os.path.join(START_CATALOG, f'bought_script_{number}')
+        number += 1
+    return path_to_check
 
 
 def new_bad_file(new_pdf, catalog):
@@ -388,10 +399,9 @@ def check_po_in_sap(po_num):
 def main():
     new_files_to_db()
     truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION:
-        if general_checker():
-            list_new_files()
-    else:
+    if GENERAL_CHECK_PERMISSION and general_checker():
+        list_new_files()
+    elif not GENERAL_CHECK_PERMISSION:
         list_new_files()
     list_new_files_new_way_class()
     merging()

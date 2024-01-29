@@ -55,7 +55,7 @@ class File:
 
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
-        # self.un_read_only()
+        self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'
@@ -74,7 +74,6 @@ class File:
 
     def name_if_exist_class(self):
         """Changes a new name of the file in new location, if current already exists."""
-
         if '_' in self.new_name[-8:-1]:
             base_name, ord_num = self.base_and_number()
             self.new_name = f'{base_name}_{int(ord_num) + 1}.{self.extension}'
@@ -182,8 +181,7 @@ class Catalog:
         self.catalog_path = os.path.join(START_CATALOG, name)
         self.age = time.time() - os.path.getctime(self.catalog_path)
         self.ready = (self.age > TIMEOUT_FOR_PLANERS)
-        self.bought = False
-        self.is_bought()
+        self.bought = self.is_bought()
 
     def __str__(self):
         return f'{self.name}'
@@ -193,9 +191,11 @@ class Catalog:
 
     def is_bought(self):
         for word in BOUGHT_NAMES:
-            if word in self.name:
-                self.bought = True
-                break
+            if word == self.name.lower():
+                return True
+        if self.name.startswith('bought_script_'):
+            return True
+        return False
 
 
 def main():
