@@ -2,7 +2,7 @@ import pyodbc
 from confidential import *
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 """Names of catalogs to be considered to be bought."""
 BOUGHT_NAMES = [
@@ -111,7 +111,7 @@ def db_commit(query, func_name):
     def print_red(text):
         COL_START = '\33[91m'
         COL_END = '\033[0m'
-        print(f'{COL_START}{text}{COL_END}')
+        print(COL_START + f'{text}' + COL_END)
 
     if IS_IT_TEST:
         print(query)
@@ -145,7 +145,7 @@ def generate_timeout_for_planners(is_it_test):
 
 
 def main():
-    pass
+    db_commit('query', 'func_name')
 
 
 if __name__ == '__main__':
