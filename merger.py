@@ -14,13 +14,13 @@ def get_orders_to_merge():
 
 def get_drawings_to_merge(order):
     num = how_many_drawings_to_merge(order)
-    query = f"Select TOP ({num}) Plik from Technologia " \
+    query = f"SELECT * FROM ("\
+            f"Select TOP ({num}) Plik from Technologia " \
             f"where PO = {order} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
-            f"ORDER BY Kiedy DESC;"
+            f"ORDER BY Kiedy DESC) AS subquery;" \
+            f"ORDER BY Plik;"
     result = get_data(query)
-    result.sort()
-    print(result)
     return result
 
 
