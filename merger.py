@@ -18,7 +18,7 @@ def get_drawings_to_merge(order):
             f"Select TOP ({num}) Plik from Technologia " \
             f"where PO = {order} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
-            f"ORDER BY Kiedy DESC) AS subquery;" \
+            f"ORDER BY Kiedy DESC) AS subquery " \
             f"ORDER BY Plik;"
     result = get_data(query)
     return result
