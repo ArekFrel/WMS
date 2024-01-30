@@ -18,7 +18,10 @@ def get_drawings_to_merge(order):
             f"where PO = {order} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
             f"ORDER BY Kiedy DESC;"
-    return get_data(query).sort()
+    result = get_data(query)
+    result.sort()
+    print(result)
+    return result
 
 
 def how_many_drawings_to_merge(order):
@@ -77,7 +80,7 @@ def merging():
             os.chmod(merged_doc, S_IWRITE)
 
         set_merged_true(order=order)
-        print(f'{count} drawings of {order} order drawings has been merged.')
+        print(f'{count} drawings of {order} order has been merged.')
 
 
 def main():
