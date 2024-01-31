@@ -15,6 +15,7 @@ regex.py
 *.docx
 *deep_copy
 const.py
+class_file.py
 
 
 
