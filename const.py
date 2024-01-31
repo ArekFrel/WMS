@@ -2,7 +2,7 @@ import pyodbc
 from confidential import *
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = True
+IS_IT_TEST = False
 
 """Names of catalogs to be considered to be bought."""
 BOUGHT_NAMES = [
