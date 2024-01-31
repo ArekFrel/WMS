@@ -107,8 +107,15 @@ CURSOR = CONN.cursor()
 
 
 def db_commit(query, func_name):
+
+    def print_red(text):
+        COL_START = '\33[91m'
+        COL_END = '\033[0m'
+        print(COL_START + f'{text}' + COL_END)
+
     if IS_IT_TEST:
         print(query)
+        return None
 
     try:
         with CURSOR:
@@ -117,19 +124,19 @@ def db_commit(query, func_name):
         return True
 
     except pyodbc.OperationalError:
-        print(f'Operational Error in "{func_name}"')
+        print_red(f'Operational Error in "{func_name}"')
         return False
 
     except pyodbc.DatabaseError:
-        print(f'Time exceeded in "{func_name}"')
+        print_red(f'Time exceeded in "{func_name}"')
         return False
 
     except pyodbc.Error:
-        print(f'Database Error in "{func_name}"')
+        print_red(f'Database Error in "{func_name}"')
         return False
 
     except Exception:
-        print(f'Something else during "{func_name}" gone wrong!')
+        print_red(f'Something else during "{func_name}" gone wrong!')
         return False
 
 
@@ -138,7 +145,7 @@ def generate_timeout_for_planners(is_it_test):
 
 
 def main():
-    pass
+    db_commit('query', 'func_name')
 
 
 if __name__ == '__main__':

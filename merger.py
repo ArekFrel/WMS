@@ -14,11 +14,14 @@ def get_orders_to_merge():
 
 def get_drawings_to_merge(order):
     num = how_many_drawings_to_merge(order)
-    query = f"Select TOP ({num}) Plik from Technologia " \
+    query = f"SELECT * FROM ("\
+            f"Select TOP ({num}) Plik from Technologia " \
             f"where PO = {order} " \
             f"AND Rysunek NOT LIKE '%SAP%' And Rysunek NOT LIKE '%INFO%' " \
-            f"ORDER BY Kiedy DESC;"
-    return get_data(query).sort()
+            f"ORDER BY Kiedy DESC) AS subquery " \
+            f"ORDER BY Plik;"
+    result = get_data(query)
+    return result
 
 
 def how_many_drawings_to_merge(order):
@@ -77,7 +80,7 @@ def merging():
             os.chmod(merged_doc, S_IWRITE)
 
         set_merged_true(order=order)
-        print(f'{count} drawings of {order} order drawings has been merged.')
+        print(f'{count} drawings of {order} order has been merged.')
 
 
 def main():
