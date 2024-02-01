@@ -126,10 +126,12 @@ def list_new_files_new_way_class():
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
                         File.add_moved_file()
+                        continue
                 else:
                     if new_bad_file(new_pdf=file.name, catalog=file.catalog):
                         print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
                         File.add_bad_file()
+                        continue
 
             elif file.lower() in BOUGHT_NAMES:
                 init_path = os.path.join(START_CATALOG, catalog.name, file)

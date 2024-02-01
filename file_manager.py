@@ -13,10 +13,9 @@ i_ins = 'item_insert.csv'
 
 def manage_files():
 
-    cat_con = [x.lower() for x in os.listdir(RAPORT_CATALOG)]
-
-    if s_ins in cat_con and s3 in cat_con and s3old in cat_con:
-
+    cat_con = {x.lower() for x in os.listdir(RAPORT_CATALOG)}
+    # if s_ins in cat_con and s3 in cat_con and s3old in cat_con:
+    if {s_ins, s3, s3old}.issubset(cat_con):
         sap_insert_path = os.path.join(RAPORT_CATALOG, s_ins)
         sap_path = os.path.join(RAPORT_CATALOG, s3)
         sap_insert_date = os.path.getmtime(sap_insert_path)

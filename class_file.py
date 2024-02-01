@@ -1,9 +1,8 @@
 import os
-import fitz
+import re
 import time
 import shutil
 from stat import S_IWRITE
-
 from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION, BOUGHT_NAMES
 
 
@@ -20,45 +19,35 @@ class File:
         self.bought_cat = bought_cat
         self.catalog = '' if bought_cat else catalog
         self.loose = not bool(self.catalog)
-
-        if 'bu' in self.name.lower() and 'buy' not in self.name.lower():
-            self.bought_name = False
-            self.sub_bought = True
-            self.bought_cat = False
-            beg, end = self.name.lower().split('bu')
-            self.new_name = ''.join([beg.strip(), end.strip()])
-            while '  ' in self.new_name:
-                self.new_name = self.new_name.replace('  ', ' ')
-            self.file_name = self.new_name.rsplit('.', 1)[0]
-        elif 'buy' in self.name.lower():
-            self.bought_name = True
-            self.sub_bought = False
-            beg, end = self.name.lower().split('buy')
-            self.new_name = ''.join([beg.strip(), end.strip()])
-            while '  ' in self.new_name:
-                self.new_name = self.new_name.replace('  ', ' ')
-            self.file_name = self.new_name.rsplit('.', 1)[0]
-        else:
-            self.bought_name = False
-            self.sub_bought = False
-            self.new_name = self.name
-
+        self.bought_name = False
+        self.sub_bought = False
+        self.new_name = self.name
+        self.check_for_watermarking()
+        self.new_name_create()
         self.start_path_new_name = os.path.join(START_CATALOG, catalog, self.new_name)
         self.po = self.new_name[:7]
         self.catalog_path = os.path.join(START_CATALOG, catalog)
         self.start_path = os.path.join(START_CATALOG, catalog, name)
-
-        if not self.bought_cat:
-            self.proper_name = (catalog == self.po)
-        else:
-            self.proper_name = True
-
+        self.proper_name = (catalog == self.po) if not self.bought_cat else True
         self.dest_catalog = os.path.join(PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
         self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'
+
+    def new_name_create(self):
+        annotate = 'bu' if self.sub_bought else 'buy'
+        self.new_name = self.file_name.lower().replace(annotate, '')
+        self.new_name = '.'.join([self.new_name.strip().rstrip(), self.extension])
+        self.new_name = File.delete_double_space(self.new_name)
+        self.file_name = self.new_name.rsplit('.', 1)[0]
+
+    def check_for_watermarking(self):
+        if re.search(r"bu[^y]", self.name.lower()) is not None:
+            self.sub_bought = True
+        elif 'buy' in self.name.lower():
+            self.bought_name = True
 
     def un_read_only(self):
         os.chmod(self.start_path, S_IWRITE)
@@ -82,26 +71,11 @@ class File:
         self.file_name = self.new_name.rsplit('.', 1)[0]
         self.dest_path = os.path.join(PRODUCTION, self.po, self.new_name)
 
-    def merge_file(self):
-        if 'sap' not in self.file_name and self.extension.lower() == 'pdf':
-            doc_path = self.dest_path
-            merged_name = f'{self.po} merged.pdf'
-            merged_doc = os.path.join( merged_name)
-            save_doc = os.path.join(self.dest_path, 'merged_temp.pdf')
-            with fitz.open(doc_path) as doc:
-                try:
-                    if 'merged.pdf' not in os.listdir(self.dest_catalog):
-                        doc.save(merged_doc)
-                        os.chmod(merged_doc, S_IWRITE)
-                    else:
-                        with fitz.open(merged_doc) as doc_merged:
-                            doc_merged.insert_file(doc)
-                            doc_merged.save(save_doc)
-                            os.chmod(save_doc, S_IWRITE)
-                        os.remove(merged_doc)
-                        os.rename(save_doc, merged_doc)
-                except PermissionError:
-                    print(f'Brak dostępu do pliku {merged_doc}')
+    @staticmethod
+    def delete_double_space(text):
+        while '  ' in text:
+            text = text.replace('  ', ' ')
+        return text
 
     @staticmethod
     def moved_files_counter():
