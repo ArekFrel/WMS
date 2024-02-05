@@ -27,7 +27,6 @@ ACC_EXT = [
 TIME_OF_BREAK = 120
 
 """Number of second after which the catalog is moved."""
-
 """ Time between the script is not running"""
 # time when script stops running
 FROM_OCLOCK = 1
