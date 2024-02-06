@@ -138,7 +138,6 @@ def db_commit(query, func_name):
         with CURSOR:
             CURSOR.execute(query)
             CURSOR.commit()
-            register(query)
         return True
 
     except pyodbc.OperationalError:
@@ -158,13 +157,12 @@ def db_commit(query, func_name):
         return False
 
 
-def generate_timeout_for_planners(is_it_test):
+def generate_timeout_for_planners():
     return 0.1 if IS_IT_TEST else 1800
 
 
 def main():
     pass
-
 
 if __name__ == '__main__':
     main()
