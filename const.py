@@ -1,5 +1,9 @@
 import pyodbc
 from confidential import *
+from datetime import datetime, date
+import time
+import os
+from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
@@ -51,6 +55,8 @@ TEST_RETURN_NUM = 5
 
 """ RAPORT_CATALOG - catalog where Sap report are stored."""
 RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
+
+REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
 
 '''Text file, archiving files added the old way.'''
 TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
@@ -108,12 +114,21 @@ CONN.timeout = 20
 CURSOR = CONN.cursor()
 
 
+def register(text):
+    os.chmod(REGISTER, S_IWRITE)
+    with open(REGISTER, 'a', encoding='utf-8') as history_file:
+        now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
+        history_file.write(f'{now}____{text} \n')
+    os.chmod(REGISTER, S_IREAD)
+
+
 def db_commit(query, func_name):
 
     def print_red(text):
         COL_START = '\33[91m'
         COL_END = '\033[0m'
         print(COL_START + f'{text}' + COL_END)
+        register(text)
 
     if IS_IT_TEST:
         print(query)
@@ -123,6 +138,7 @@ def db_commit(query, func_name):
         with CURSOR:
             CURSOR.execute(query)
             CURSOR.commit()
+            register(query)
         return True
 
     except pyodbc.OperationalError:
@@ -147,7 +163,7 @@ def generate_timeout_for_planners(is_it_test):
 
 
 def main():
-    db_commit('query', 'func_name')
+    pass
 
 
 if __name__ == '__main__':
