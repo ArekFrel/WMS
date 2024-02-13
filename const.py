@@ -1,6 +1,6 @@
 import pyodbc
 from confidential import *
-from datetime import datetime, date
+from datetime import datetime
 import time
 import os
 from stat import S_IWRITE, S_IREAD
@@ -115,6 +115,8 @@ CURSOR = CONN.cursor()
 
 
 def register(text):
+    if text.startswith('Delete from SAP WHERE Confirmation ='):
+        return None
     os.chmod(REGISTER, S_IWRITE)
     with open(REGISTER, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
@@ -129,6 +131,7 @@ def db_commit(query, func_name):
         COL_END = '\033[0m'
         print(COL_START + f'{text}' + COL_END)
         register(text)
+        register(query)
 
     if IS_IT_TEST:
         print(query)
@@ -164,5 +167,7 @@ def generate_timeout_for_planners():
 def main():
     pass
 
+
 if __name__ == '__main__':
     main()
+
