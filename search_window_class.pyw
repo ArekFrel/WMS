@@ -1,6 +1,4 @@
 import tkinter as tk
-import os
-import time
 from tkinter import ttk, messagebox
 from const import *
 
