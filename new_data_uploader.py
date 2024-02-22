@@ -4,12 +4,12 @@ import os
 import os.path
 import sap_date
 import confirmation_deleter
-from const import CURSOR, RAPORT_CATALOG, db_commit
+from const import CURSOR, Paths, db_commit
 
 
 def upload_new_data():
     print('Refreshing SAP DataBase.')
-    sap_insert_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT.csv")
+    sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
         for index, record in enumerate(changed_records):
@@ -28,7 +28,7 @@ def upload_new_data():
 
 def upload_new_items():
     print('Uploading new Items')
-    item_insert_file = os.path.join(RAPORT_CATALOG, "ITEM_INSERT.csv")
+    item_insert_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_INSERT.csv")
     with open(item_insert_file) as file:
         changed_records = csv.reader(file)
         i = 0
@@ -139,7 +139,7 @@ def send_item_to_db(record):
 
 
 def uploader_checker():
-    sap_insert_path = os.path.join(RAPORT_CATALOG, 'SAP_INSERT.csv')
+    sap_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'SAP_INSERT.csv')
     if os.path.exists(sap_insert_path):
         sap_insert_date = os.path.getmtime(sap_insert_path)
         query = 'SELECT SAP_Skrypt_Zmiana FROM SAP_data;'
@@ -157,7 +157,7 @@ def uploader_checker():
 
 
 def uploader_item_checker():
-    item_insert_path = os.path.join(RAPORT_CATALOG, 'ITEM_INSERT.csv')
+    item_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'ITEM_INSERT.csv')
     if os.path.exists(item_insert_path):
         item_insert_date = os.path.getmtime(item_insert_path)
 
@@ -175,7 +175,7 @@ def uploader_item_checker():
 
 def update_system_status():
     print('Uploading System status')
-    status_file = os.path.join(RAPORT_CATALOG, "SAP_INSERT_SSC.csv")
+    status_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT_SSC.csv")
     with open(status_file) as file:
         records = csv.reader(file)
         i = 0

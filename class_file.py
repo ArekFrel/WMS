@@ -3,7 +3,7 @@ import re
 import time
 import shutil
 from stat import S_IWRITE
-from const import TIMEOUT_FOR_PLANERS, START_CATALOG, PRODUCTION, BOUGHT_NAMES
+from const import TimeConsts, Paths, BOUGHT_NAMES
 
 
 class File:
@@ -24,12 +24,12 @@ class File:
         self.new_name = self.name
         self.check_for_watermarking()
         self.new_name_create()
-        self.start_path_new_name = os.path.join(START_CATALOG, catalog, self.new_name)
+        self.start_path_new_name = os.path.join(Paths.START_CATALOG, catalog, self.new_name)
         self.po = self.new_name[:7]
-        self.catalog_path = os.path.join(START_CATALOG, catalog)
-        self.start_path = os.path.join(START_CATALOG, catalog, name)
+        self.catalog_path = os.path.join(Paths.START_CATALOG, catalog)
+        self.start_path = os.path.join(Paths.START_CATALOG, catalog, name)
         self.proper_name = (catalog == self.po) if not self.bought_cat else True
-        self.dest_catalog = os.path.join(PRODUCTION, self.po)
+        self.dest_catalog = os.path.join(Paths.PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
         self.un_read_only()
 
@@ -69,7 +69,7 @@ class File:
         else:
             self.new_name = f'{self.file_name}_1.{self.extension}'
         self.file_name = self.new_name.rsplit('.', 1)[0]
-        self.dest_path = os.path.join(PRODUCTION, self.po, self.new_name)
+        self.dest_path = os.path.join(Paths.PRODUCTION, self.po, self.new_name)
 
     @staticmethod
     def delete_double_space(text):
@@ -105,9 +105,9 @@ class File:
     def print_good_files():
         if File.moved_files > 0:
             if File.moved_files == 1:
-                print(f'{File.moved_files} file moved to production and added to Database')
+                print(f'{File.moved_files} file moved to Paths.PRODUCTION and added to Database')
             else:
-                print(f'{File.moved_files} files moved to production and added to Database')
+                print(f'{File.moved_files} files moved to Paths.PRODUCTION and added to Database')
 
     @staticmethod
     def print_bad_files():
@@ -152,9 +152,9 @@ class Catalog:
 
     def __init__(self, name):
         self.name = name
-        self.catalog_path = os.path.join(START_CATALOG, name)
+        self.catalog_path = os.path.join(Paths.START_CATALOG, name)
         self.age = time.time() - os.path.getctime(self.catalog_path)
-        self.ready = (self.age > TIMEOUT_FOR_PLANERS)
+        self.ready = (self.age > TimeConsts.TIMEOUT_FOR_PLANERS)
         self.bought = self.is_bought()
 
     def __str__(self):

@@ -1,11 +1,11 @@
 import os
 import os.path
-from const import CURSOR, RAPORT_CATALOG
+from const import CURSOR, Paths
 
 
 def delete_item():
     print('Item Delete started.')
-    item_delete_file = os.path.join(RAPORT_CATALOG, "ITEM_DELETE.csv")
+    item_delete_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_DELETE.csv")
     with open(item_delete_file, encoding='utf-8-sig') as file:
         i = 0
         for record in file:

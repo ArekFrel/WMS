@@ -167,11 +167,11 @@ class Application(tk.Frame):
     def files_in_db(self):
         print('')
         order_number = self.listbox.selection_get()
-        if os.path.exists(PRODUCTION):
+        if os.path.exists(Paths.PRODUCTION):
             query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
             result = CURSOR.execute(query)
             table_files = [(t[0], t[1]) for t in result]
-            po_cat = os.path.join(PRODUCTION, order_number)
+            po_cat = os.path.join(Paths.PRODUCTION, order_number)
             try:
                 cat_content = os.listdir(po_cat)
                 if len(cat_content) > 0:
@@ -196,7 +196,7 @@ class Application(tk.Frame):
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
 
         else:
-            self.message_box_del_succes(msg=f'Brak Ścieżki Production')
+            self.message_box_del_succes(msg=f'Brak Ścieżki PRODUCTION')
 
     def item_selected(self, event):
         selected_item = self.listbox.selection_get()
@@ -209,7 +209,7 @@ class Application(tk.Frame):
         while Application.FILES_TO_OPEN and t <= 10:
             the_file = Application.FILES_TO_OPEN.pop(0) + '.pdf'
             space_index = the_file.find(' ')
-            the_file = PRODUCTION + the_file.strip()[0:space_index] + '/' + the_file.strip()
+            the_file = Paths.PRODUCTION + the_file.strip()[0:space_index] + '/' + the_file.strip()
             try:
                 os.startfile(the_file, 'open')
                 time.sleep(0.15)
@@ -268,7 +268,7 @@ class Application(tk.Frame):
 #         # self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
 #         print(deleting_query)
 #     else:
-#         self.message_box_del_succes(msg=f'Brak Ścieżki Production')
+#         self.message_box_del_succes(msg=f'Brak Ścieżki PRODUCTION')
 
 
 def main():

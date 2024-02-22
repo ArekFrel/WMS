@@ -1,12 +1,12 @@
 import csv
 import os
 import os.path
-from const import CURSOR, RAPORT_CATALOG
+from const import CURSOR, Paths
 
 
 def delete_confirmation():
     print('Confirmation Delete started.')
-    sap_delete_file = os.path.join(RAPORT_CATALOG, "SAP_DELETE.csv")
+    sap_delete_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_DELETE.csv")
     with open(sap_delete_file, encoding='utf-8-sig') as file:
         i = 0
         for record in file:

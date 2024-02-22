@@ -3,7 +3,7 @@ import fitz
 from stat import S_IWRITE
 from const import CURSOR, MERGED_MIN, db_commit, IS_IT_TEST, TEST_RETURN_ORDERS, TEST_RETURN_NUM, TEST_RETURN_DRAWINGS
 from pyodbc import Error, OperationalError
-from const import PRODUCTION
+from const import Paths
 
 
 def get_orders_to_merge():
@@ -63,7 +63,7 @@ def set_merged_true(order):
 def merging():
 
     for order in get_orders_to_merge():
-        order_path = os.path.join(PRODUCTION, order)
+        order_path = os.path.join(Paths.PRODUCTION, order)
         drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
         first_drawing_path = os.path.join(order_path, drawings[0])
         merge_name = merged_name_available(order_path)

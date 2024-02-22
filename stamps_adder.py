@@ -1,15 +1,15 @@
 import os
 import fitz
 from stat import S_IWRITE
-from const import WATERMARK_BOUGHT, WATERMARK_SUB_BOUGHT
+from const import Paths
 
 
 def stamper(file):
     with fitz.open(file.start_path) as pdf_document:
         if file.sub_bought:
-            watermark = WATERMARK_SUB_BOUGHT
+            watermark = Paths.WATERMARK_SUB_BOUGHT
         if (file.bought_name | file.bought_cat) and ~file.sub_bought:
-            watermark = WATERMARK_BOUGHT
+            watermark = Paths.WATERMARK_BOUGHT
         pdf_document[0].insert_image(
             pdf_document[0].bound(),
             filename=watermark,

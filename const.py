@@ -6,7 +6,47 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
+
+
+class TimeConsts:
+    """Script is stopped between:"""
+    FROM_OCLOCK = 1
+    TO_OCLOCK = 6
+    """Reset Options:"""
+    HOUR = 5
+    MINUTES = 56
+    '''GCP_OCLOCK is time when all files are checked if they're new'''
+    GCP = 15
+    """Number of second to wait before new refreshing"""
+    TIME_OF_BREAK = 10
+    if IS_IT_TEST:
+        TIMEOUT_FOR_PLANERS = 0.1
+    else:
+        TIMEOUT_FOR_PLANERS = 1800
+
+
+class Paths:
+    if IS_IT_TEST:
+        PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
+        START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+    else:
+        """PRODUCTION - catalogs where drawings are stored. """
+        PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+        """START_CATALOG - catalog where new drawing are uploaded by planners."""
+        START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+
+    RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
+    REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
+    TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
+    UPDATE_CAT = 'T:/__wms_update__'
+    """Path of AUTOMAT file"""
+    AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+    AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+    """Path of watermarks"""
+    WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
+    WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+
 
 """Names of catalogs to be considered to be bought."""
 BOUGHT_NAMES = [
@@ -38,50 +78,35 @@ FROM_OCLOCK = 1
 TO_OCLOCK = 6
 
 if IS_IT_TEST:
-    PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
-    START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
     TIMEOUT_FOR_PLANERS = 0.1
 else:
-    """ PRODUCTION - catalogs where drawings are stored. """
-    PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-    """ START_CATALOG - catalog where new drawing are uploaded by planners."""
-    START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
-    """Number of second after which the catalog is moved."""
     TIMEOUT_FOR_PLANERS = 1800
 
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
-""" RAPORT_CATALOG - catalog where Sap report are stored."""
-RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
-
-REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
-
-'''Text file, archiving files added the old way.'''
-TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
-
-'''Permission to adding loose files to START_CATALOG'''
+'''Permission to adding loose files to Paths.START_CATALOG'''
 LOOSE_FILE_PERMISSION = True
 
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
 
-'''Permission to adding files uploaded directly into PRODUCTION catalog once per day
+'''Permission to adding files uploaded directly into Paths.PRODUCTION catalog once per day
 GCP_OCLOCK is time when all files are checked if they're new'''
 GENERAL_CHECK_PERMISSION = True
 GCP_OCLOCK = 15
 
 '''Name of catalogue in TEMP, where new version is updated'''
-UPDATE_CAT = 'T:/__wms_update__'
+Paths.UPDATE_CAT = 'T:/__wms_update__'
 
-AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+Paths.AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
 """Path of AUTOMAT file"""
-AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+Paths.AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
 """Path of watermarks"""
-WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
-WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+Paths.WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
+Paths.WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
@@ -90,8 +115,6 @@ MERGED_NAME = 'merged.pdf'
 
 MERGED_MIN = 2# should be low value, f.e. 5
 # MERGED_TIME_PERIOD = 120# should be low value, f.e. 5
-
-
 
 '''
 **********************************
@@ -117,11 +140,11 @@ CURSOR = CONN.cursor()
 def register(text):
     if text.startswith('Delete from SAP WHERE Confirmation ='):
         return None
-    os.chmod(REGISTER, S_IWRITE)
-    with open(REGISTER, 'a', encoding='utf-8') as history_file:
+    os.chmod(Paths.REGISTER, S_IWRITE)
+    with open(Paths.REGISTER, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
         history_file.write(f'{now}____{text} \n')
-    os.chmod(REGISTER, S_IREAD)
+    os.chmod(Paths.REGISTER, S_IREAD)
 
 
 def db_commit(query, func_name):
@@ -158,10 +181,6 @@ def db_commit(query, func_name):
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
-
-
-def generate_timeout_for_planners():
-    return 0.1 if IS_IT_TEST else 1800
 
 
 def main():

@@ -5,7 +5,7 @@ import shutil
 import re
 
 from class_file import File, Catalog
-# from datetime import datetime, date
+from datetime import datetime, date
 # from stat import S_IWRITE
 from timer_dec import timer
 from const import *
@@ -20,7 +20,7 @@ catalogs_to_remove = []
 @timer
 def list_new_files():
     """ Adding to database drawing uploaded directly to PRODUCTION catalog."""
-    source_cat = PRODUCTION
+    source_cat = Paths.PRODUCTION
     query = 'Select Plik From Technologia;'
     try:
         result = CURSOR.execute(query)
@@ -86,7 +86,7 @@ def general_checker():
 
     if gen_checker_date:
         today = date.today()
-        if gen_checker_date < today and datetime.now().hour > (GCP_OCLOCK - 1):
+        if gen_checker_date < today and datetime.now().hour > (TimeConsts.GCP - 1):
             query = f"UPDATE SAP_Data SET General_check = '{today}'"
             db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
             return True
@@ -95,12 +95,12 @@ def general_checker():
 
 def list_new_files_new_way_class():
 
-    for any_file in os.listdir(START_CATALOG):
+    for any_file in os.listdir(Paths.START_CATALOG):
         if any_file.upper() == REFILL_CAT:
             refill_doc()
             continue
 
-        deep_path = os.path.join(START_CATALOG, any_file)
+        deep_path = os.path.join(Paths.START_CATALOG, any_file)
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
             file = File(name=any_file)
@@ -134,7 +134,7 @@ def list_new_files_new_way_class():
                         continue
 
             elif file.lower() in BOUGHT_NAMES:
-                init_path = os.path.join(START_CATALOG, catalog.name, file)
+                init_path = os.path.join(Paths.START_CATALOG, catalog.name, file)
                 end_path = generate_end_path()
                 shutil.move(init_path, end_path)
                 '''Below turns off this order to merge'''
@@ -149,7 +149,7 @@ def list_new_files_new_way_class():
 
 
 def refill_doc():
-    start_cat = os.path.join(START_CATALOG, REFILL_CAT)
+    start_cat = os.path.join(Paths.START_CATALOG, REFILL_CAT)
     for any_file in os.listdir(start_cat):
         file = File(name=any_file, catalog=REFILL_CAT)
 
@@ -177,13 +177,13 @@ def refill_doc():
 
 
 def archive(file_name):
-    with open(TRANSFER_FILE, 'a', encoding='utf-8') as history_file:
+    with open(Paths.TRANSFER_FILE, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
         history_file.write(f'{now}____{file_name} \n')
 
 
 def contains_pdfs(catalog):
-    catalog_path = os.path.join(START_CATALOG, catalog)
+    catalog_path = os.path.join(Paths.START_CATALOG, catalog)
     if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
         return True
     else:
@@ -233,7 +233,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
 def del_empty_catalogs():
     for folder in catalogs_to_remove:
-        catalog_to_remove = os.path.join(START_CATALOG, folder)
+        catalog_to_remove = os.path.join(Paths.START_CATALOG, folder)
         os.chmod(catalog_to_remove, S_IWRITE)
         shutil.rmtree(catalog_to_remove, ignore_errors=True, )
     catalogs_to_remove.clear()
@@ -272,9 +272,9 @@ def cut_file_class(file):
 
 def generate_end_path():
     number = 1
-    path_to_check = os.path.join(START_CATALOG, f'bought_script')
+    path_to_check = os.path.join(Paths.START_CATALOG, f'bought_script')
     while os.path.isdir(path_to_check):
-        path_to_check = os.path.join(START_CATALOG, f'bought_script_{number}')
+        path_to_check = os.path.join(Paths.START_CATALOG, f'bought_script_{number}')
         number += 1
     return path_to_check
 

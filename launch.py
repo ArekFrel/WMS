@@ -8,7 +8,18 @@ import sap_date
 import self_update
 import subprocess
 import os
-from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, AUTOMAT_BAT
+from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, Paths, TimeConsts
+
+
+def launch_able():
+    if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
+        return False
+    return True
+
+
+def print_reset_break():
+    os.system('')
+    print('\033[1;32m' + 'Please wait until Script will be launched by Microsoft Windows At 6:00' + '\033[0m')
 
 
 def wait(period):
@@ -44,21 +55,27 @@ def print_introduction():
 
 @time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)
 def main():
-    print_now()
-    sap_date.update(column='Automat')
-    add_new_files.main()
-    sap_date.update(column='Automat_Start')
-    if new_data_uploader.main():
-        file_manager.main()
+    while launch_able():
+        print_now()
+        sap_date.update(column='Automat')
+        add_new_files.main()
+        sap_date.update(column='Automat_Start')
+        if new_data_uploader.main():
+            file_manager.main()
+        if self_update.check_for_update():
+            self_update.update()
+            subprocess.call(Paths.AUTOMAT_BAT)
+            break
+        wait(TimeConsts.TIME_OF_BREAK)
+        print(' ')
+    print_reset_break()
 
 
 if __name__ == '__main__':
-    print_introduction()
-    while True:
+    if launch_able():
+        print_introduction()
         main()
-        if self_update.check_for_update():
-            self_update.update()
-            subprocess.call(AUTOMAT_BAT)
-            break
-        wait(TIME_OF_BREAK)
-        print(' ')
+    else:
+        print_reset_break()
+
+
