@@ -13,11 +13,14 @@ class TimeConsts:
     """Script is stopped between:"""
     FROM_OCLOCK = 1
     TO_OCLOCK = 6
+
     """Reset Options:"""
     HOUR = 5
     MINUTES = 56
+
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
+
     """Number of second to wait before new refreshing"""
     TIME_OF_BREAK = 10
     if IS_IT_TEST:
@@ -27,14 +30,6 @@ class TimeConsts:
 
 
 class Paths:
-    if IS_IT_TEST:
-        PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
-        START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
-    else:
-        """PRODUCTION - catalogs where drawings are stored. """
-        PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-        """START_CATALOG - catalog where new drawing are uploaded by planners."""
-        START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 
     RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
     REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
@@ -46,6 +41,14 @@ class Paths:
     """Path of watermarks"""
     WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
     WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+    if IS_IT_TEST:
+        PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
+        START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+    else:
+        """PRODUCTION - catalogs where drawings are stored. """
+        PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+        """START_CATALOG - catalog where new drawing are uploaded by planners."""
+        START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 
 
 """Names of catalogs to be considered to be bought."""
