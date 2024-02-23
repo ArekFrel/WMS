@@ -22,7 +22,7 @@ class TimeConsts:
     GCP = 15
 
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 10
+    TIME_OF_BREAK = 120
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
@@ -70,20 +70,6 @@ ACC_EXT = [
             # and type another extension between '' in this line
 ]
 
-"""Number of second to wait before new refreshing"""
-TIME_OF_BREAK = 120
-
-"""Number of second after which the catalog is moved."""
-""" Time between the script is not running"""
-# time when script stops running
-FROM_OCLOCK = 1
-# time when script starts running
-TO_OCLOCK = 6
-
-if IS_IT_TEST:
-    TIMEOUT_FOR_PLANERS = 0.1
-else:
-    TIMEOUT_FOR_PLANERS = 1800
 
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
@@ -100,23 +86,12 @@ GCP_OCLOCK is time when all files are checked if they're new'''
 GENERAL_CHECK_PERMISSION = True
 GCP_OCLOCK = 15
 
-'''Name of catalogue in TEMP, where new version is updated'''
-Paths.UPDATE_CAT = 'T:/__wms_update__'
-
-Paths.AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
-"""Path of AUTOMAT file"""
-Paths.AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
-
-"""Path of watermarks"""
-Paths.WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
-Paths.WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
-
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
 
 """Minimal number of drawings to be merged in order"""
 
-MERGED_MIN = 2# should be low value, f.e. 5
+MERGED_MIN = 2  # should be low value, f.e. 5
 # MERGED_TIME_PERIOD = 120# should be low value, f.e. 5
 
 '''

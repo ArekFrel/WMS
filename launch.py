@@ -55,26 +55,25 @@ def print_introduction():
 
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
 def main():
-    while launch_able():
-        print_now()
-        sap_date.update(column='Automat')
-        add_new_files.main()
-        sap_date.update(column='Automat_Start')
-        if new_data_uploader.main():
-            file_manager.main()
-        if self_update.check_for_update():
-            self_update.update()
-            subprocess.call(Paths.AUTOMAT_BAT)
-            break
-        wait(TimeConsts.TIME_OF_BREAK)
-        print(' ')
-    print_reset_break()
+    if self_update.check_for_update():
+        self_update.update()
+        subprocess.call(Paths.AUTOMAT_BAT)
+    print_now()
+    sap_date.update(column='Automat')
+    add_new_files.main()
+    sap_date.update(column='Automat_Start')
+    if new_data_uploader.main():
+        file_manager.main()
+
 
 
 if __name__ == '__main__':
     if launch_able():
         print_introduction()
-        main()
+        while launch_able():
+            main()
+            wait(TimeConsts.TIME_OF_BREAK)
+        print_reset_break()
     else:
         print_reset_break()
 
