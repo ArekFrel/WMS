@@ -8,7 +8,7 @@ import sap_date
 import self_update
 import subprocess
 import os
-from const import TIME_OF_BREAK, FROM_OCLOCK, TO_OCLOCK, Paths, TimeConsts
+from const import Paths, TimeConsts
 
 
 def launch_able():
@@ -53,7 +53,7 @@ def print_introduction():
     print('')
 
 
-@time_break(from_=FROM_OCLOCK, to_=TO_OCLOCK)
+@time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
 def main():
     while launch_able():
         print_now()

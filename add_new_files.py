@@ -1,12 +1,9 @@
 import inspect
-# import os
-# import time
 import shutil
 import re
 
 from class_file import File, Catalog
-from datetime import datetime, date
-# from stat import S_IWRITE
+from datetime import date
 from timer_dec import timer
 from const import *
 from pyodbc import Error
