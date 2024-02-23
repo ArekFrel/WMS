@@ -29,6 +29,7 @@ def wait(period):
         time.sleep(1)
         period -= 1
         print(' ' * len(text), end="\r")
+    print(' ')
 
 
 def print_now():
