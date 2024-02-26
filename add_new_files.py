@@ -99,7 +99,7 @@ def list_new_files_new_way_class():
 
         deep_path = os.path.join(Paths.START_CATALOG, any_file)
         """ If path is not directory, and loose file are not forbidden."""
-        if not os.path.isdir(deep_path) and LOOSE_FILE_PERMISSION:
+        if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:
             file = File(name=any_file)
             if validate_file_class(file=file):
                 os.chmod(file.start_path, S_IWRITE)
@@ -130,7 +130,7 @@ def list_new_files_new_way_class():
                         File.add_bad_file()
                         continue
 
-            elif file.lower() in BOUGHT_NAMES:
+            elif file.lower() in Options.BOUGHT_NAMES:
                 init_path = os.path.join(Paths.START_CATALOG, catalog.name, file)
                 end_path = generate_end_path()
                 shutil.move(init_path, end_path)
@@ -337,7 +337,7 @@ def validate_file_class(file: File):
     if re.search(r"\d{7} .*[.]*", file.new_name.lower()) is None:
         return False
 
-    if file.extension.lower() not in ACC_EXT:
+    if file.extension.lower() not in Options.ACC_EXT:
         return False
 
     if not file.loose:
@@ -398,9 +398,9 @@ def check_po_in_sap(po_num):
 def main():
     new_files_to_db()
     truncate_bad_files()
-    if GENERAL_CHECK_PERMISSION and general_checker():
+    if Options.GENERAL_CHECK_PERMISSION and general_checker():
         list_new_files()
-    elif not GENERAL_CHECK_PERMISSION:
+    elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
     list_new_files_new_way_class()
     merging()

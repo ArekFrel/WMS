@@ -12,16 +12,30 @@ def upload_new_data():
     sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
+        query = ''
+        query_counter = 0
         for index, record in enumerate(changed_records):
             if index == 0:
                 if ''.join(record) == '':
                     print(f'SAP_Insert file is empty.')
                     break
-            if send_record_to_db(record=record):
-                print(f'Records sent to database: {index + 1}', end="\r")
+            query = query + formulate_query_record(record=record)
+            print(f'Records sent to database: {index + 1}', end="\r")
+            query_counter += 1
+            if query_counter == 50:
+                if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    query = ''
+                    query_counter = 0
+                else:
+                    print('\nUnexpected error occurs during updating SAP.')
+                    return False
+        if query_counter != 0:
+            if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                pass
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
+
         print('\n', end='\r')
     return True
 
@@ -52,7 +66,7 @@ def redate(date):
     return new_date
 
 
-def send_record_to_db(record):
+def formulate_query_record(record):
     table = 'SAP'
 
     if len(record) < 29:
@@ -103,7 +117,7 @@ def send_record_to_db(record):
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
                 f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
 
-        return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+        return query
 
 
 def update_status(record):

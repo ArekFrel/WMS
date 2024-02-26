@@ -3,7 +3,7 @@ import re
 import time
 import shutil
 from stat import S_IWRITE
-from const import TimeConsts, Paths, BOUGHT_NAMES
+from const import TimeConsts, Paths, Options
 
 
 class File:
@@ -164,7 +164,7 @@ class Catalog:
         return os.listdir(self.catalog_path)
 
     def is_bought(self):
-        for word in BOUGHT_NAMES:
+        for word in Options.BOUGHT_NAMES:
             if word == self.name.lower():
                 return True
         if self.name.startswith('bought_script_'):

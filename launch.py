@@ -67,7 +67,6 @@ def main():
         file_manager.main()
 
 
-
 if __name__ == '__main__':
     if launch_able():
         print_introduction()
