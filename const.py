@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = True
+IS_IT_TEST = False
 
 
 class TimeConsts:
@@ -22,7 +22,7 @@ class TimeConsts:
     GCP = 15
 
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 10
+    TIME_OF_BREAK = 120
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
@@ -51,40 +51,50 @@ class Paths:
         START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 
 
-"""Names of catalogs to be considered to be bought."""
-BOUGHT_NAMES = [
-    'kup',
-    'buy',
-    'bought',
-    'zakupowy',
-    'zakupowe',
-    'kupne',
-    'kupowane',
-    'bought_script'
+class Options:
+    """The number of records sent to the database at one time"""
+    QUERY_WRAPPER = 50
+
+    """Permission to adding loose files to Paths.START_CATALOG"""
+    LOOSE_FILE_PERMISSION = True
+
+    """Names of catalogs to be considered to be bought."""
+    BOUGHT_NAMES = [
+        'kup',
+        'buy',
+        'bought',
+        'zakupowy',
+        'zakupowe',
+        'kupne',
+        'kupowane',
+        'bought_script'
     ]
 
-"""Extensions of the files, that are allowed to go."""
-ACC_EXT = [
-    'pdf',
-    'xlsx'  # to add another extensions add coma here
-            # and type another extension between '' in this line
-]
+    """Extensions of the files, that are allowed to go."""
+    ACC_EXT = [
+        'pdf',
+        'xlsx'  # to add another extensions add coma here
+        # and type another extension between '' in this line
+    ]
+
+    '''Permission to adding files uploaded directly into Paths.PRODUCTION catalog once per day
+    GCP_OCLOCK is time when all files are checked if they're new'''
+    GENERAL_CHECK_PERMISSION = True
+
+
+
 
 
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
-'''Permission to adding loose files to Paths.START_CATALOG'''
-LOOSE_FILE_PERMISSION = True
+
 
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
 
-'''Permission to adding files uploaded directly into Paths.PRODUCTION catalog once per day
-GCP_OCLOCK is time when all files are checked if they're new'''
-GENERAL_CHECK_PERMISSION = True
-GCP_OCLOCK = 15
+
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
