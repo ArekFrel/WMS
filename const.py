@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 
 class TimeConsts:
@@ -22,7 +22,7 @@ class TimeConsts:
     GCP = 15
 
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 120
+    TIME_OF_BREAK = 10
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
