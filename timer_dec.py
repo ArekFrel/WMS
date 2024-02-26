@@ -1,6 +1,6 @@
 import functools
 from datetime import datetime
-from const import FROM_OCLOCK, TO_OCLOCK
+from const import TimeConsts
 import time
 
 
@@ -21,7 +21,7 @@ def time_break(from_=1, to_=6):
                 func()
             else:
                 now = str(datetime.fromtimestamp(time.time(), ))[0:-7]
-                print(f'{now} - Break from {FROM_OCLOCK} to {TO_OCLOCK}.\n')
+                print(f'{now} - Break from {TimeConsts.FROM_OCLOCK} to {TimeConsts.TO_OCLOCK}.\n')
         return wrapper
     return dec
 

@@ -2,13 +2,13 @@ import csv
 import os
 import os.path
 from quote_dict import list_of_operations
-from const import CURSOR, RAPORT_CATALOG
+from const import CURSOR, Paths
 from pyodbc import DatabaseError, OperationalError
 from timer_dec import timer
 
 
 def upload_quotation():
-    quot_files = [os.path.join(RAPORT_CATALOG, file) for file in os.listdir(RAPORT_CATALOG) if file.startswith('SAP_QUOT')]
+    quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if file.startswith('SAP_QUOT')]
     for quot_file in quot_files:
         with open(quot_file) as file:
             changed_records = csv.reader(file)
@@ -61,7 +61,7 @@ def send_quotation(record):
 
 # @timer
 def main():
-    if 'SAP_QUOT.csv' in os.listdir(RAPORT_CATALOG):
+    if 'SAP_QUOT.csv' in os.listdir(Paths.RAPORT_CATALOG):
         upload_quotation()
 
 

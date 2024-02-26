@@ -4,7 +4,7 @@ from const import *
 
 def files_in_db(order_number):
     print('')
-    source_cat = PRODUCTION
+    source_cat = Paths.PRODUCTION
     query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
     result = CURSOR.execute(query)
     table_files = [(t[0], t[1]) for t in result]
@@ -30,7 +30,7 @@ def files_in_db(order_number):
 
 
 def rem(order):
-    source_cat = PRODUCTION
+    source_cat = Paths.PRODUCTION
     order = str(order)
     query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order};'
     result = CURSOR.execute(query)

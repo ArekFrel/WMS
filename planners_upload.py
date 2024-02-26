@@ -3,10 +3,11 @@ import pathlib
 import shutil
 import datetime
 from pathlib import Path
+from const import Paths
 
 HERE = pathlib.Path(__file__).parent
-# PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-PRODUCTION = 'C:/Dokumenty/planners_drawings_upload/test_area'
+# Paths.PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+Paths.PRODUCTION = 'C:/Dokumenty/planners_drawings_upload/test_area'
 
 
 def archive(file_name):
@@ -41,13 +42,13 @@ def upload_drawings():
             if not file_name_validator(str(drawing)):
                 continue
             prod_order = str(drawing)[:drawing.index(' ')]
-            dest_cat = os.path.join(PRODUCTION, prod_order)
+            dest_cat = os.path.join(Paths.PRODUCTION, prod_order)
             dest_drawing = drawing
-            dest_file = os.path.join(PRODUCTION, prod_order, dest_drawing)
+            dest_file = os.path.join(Paths.PRODUCTION, prod_order, dest_drawing)
             a = 1
             while os.path.exists(dest_file):
                 dest_drawing = name_if_exist(dest_drawing, a)
-                dest_file = os.path.join(PRODUCTION, prod_order, dest_drawing)
+                dest_file = os.path.join(Paths.PRODUCTION, prod_order, dest_drawing)
                 a += 1
 
             if not os.path.exists(dest_cat):
