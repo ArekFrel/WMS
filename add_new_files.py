@@ -1,12 +1,12 @@
 import inspect
-import os
-import time
+# import os
+# import time
 import shutil
 import re
 
 from class_file import File, Catalog
-from datetime import datetime, date
-from stat import S_IWRITE
+# from datetime import datetime, date
+# from stat import S_IWRITE
 from timer_dec import timer
 from const import *
 from pyodbc import Error
@@ -138,7 +138,7 @@ def list_new_files_new_way_class():
                 end_path = generate_end_path()
                 shutil.move(init_path, end_path)
                 '''Below turns off this order to merge'''
-                query = f'UPDATE Otm SET merged = 1 WHERE PO = {catalog.name};'
+                query = f'UPDATE OTM SET merged = 1 WHERE PO = {catalog.name};'
                 db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
 
         if not contains_pdfs(catalog=catalog.name) and catalog.ready:
