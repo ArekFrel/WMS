@@ -11,6 +11,10 @@ import os
 from const import Paths, TimeConsts
 
 
+class Restart:
+    proceed = False
+
+
 def launch_able():
     if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
         return False
@@ -55,10 +59,7 @@ def print_introduction():
 
 
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
-def main():
-    if self_update.check_for_update():
-        self_update.update()
-        subprocess.call(Paths.AUTOMAT_BAT)
+def cycle():
     print_now()
     sap_date.update(column='Automat')
     add_new_files.main()
@@ -67,14 +68,32 @@ def main():
         file_manager.main()
 
 
-if __name__ == '__main__':
+def main():
+    Restart.proceed = False
+    if self_update.check_for_update():
+        self_update.update()
+        subprocess.call(Paths.AUTOMAT_BAT)
+        Restart.proceed = False
+        return None
+
     if launch_able():
         print_introduction()
         while launch_able():
-            main()
+            cycle()
             wait(TimeConsts.TIME_OF_BREAK)
+            if self_update.check_for_update():
+                self_update.update()
+                Restart.proceed = True
+                return None
         print_reset_break()
     else:
         print_reset_break()
+
+
+if __name__ == '__main__':
+    main()
+    if Restart.proceed:
+        subprocess.call(Paths.AUTOMAT_BAT)
+
 
 

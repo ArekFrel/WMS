@@ -15,7 +15,7 @@ class TimeConsts:
     TO_OCLOCK = 6
 
     """Reset Options:"""
-    HOUR = 5
+    HOUR = 14
     MINUTES = 56
 
     '''GCP_OCLOCK is time when all files are checked if they're new'''
@@ -82,18 +82,13 @@ class Options:
     GENERAL_CHECK_PERMISSION = True
 
 
-
-
-
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
 
-
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
-
 
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""

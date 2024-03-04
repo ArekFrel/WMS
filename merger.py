@@ -88,7 +88,8 @@ def merging():
 
 
 def main():
-    merging()
+    if 'bought_script' not in os.listdir(Paths.START_CATALOG):
+        merging()
 
 
 if __name__ == '__main__':
