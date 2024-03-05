@@ -145,6 +145,7 @@ def db_commit(query, func_name):
 
     try:
         with CURSOR:
+            register(query)
             CURSOR.execute(query)
             CURSOR.commit()
         return True

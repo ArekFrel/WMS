@@ -105,9 +105,9 @@ class File:
     def print_good_files():
         if File.moved_files > 0:
             if File.moved_files == 1:
-                print(f'{File.moved_files} file moved to Paths.PRODUCTION and added to Database')
+                print(f'{File.moved_files} file moved to Production and added to Database')
             else:
-                print(f'{File.moved_files} files moved to Paths.PRODUCTION and added to Database')
+                print(f'{File.moved_files} files moved to Production and added to Database')
 
     @staticmethod
     def print_bad_files():
