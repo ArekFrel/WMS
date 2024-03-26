@@ -23,6 +23,7 @@ class TimeConsts:
 
     """Number of second to wait before new refreshing"""
     TIME_OF_BREAK = 120
+    SCHD_TIME = 600
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:

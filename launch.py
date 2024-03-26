@@ -12,7 +12,28 @@ from const import Paths, TimeConsts
 
 
 class Restart:
+
     proceed = False
+
+    def __init__(self):
+        self.start_time = time.time()
+
+    def launch_able(self):
+        if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
+            return False
+        if time.time() - self.start_time > TimeConsts.SCHD_TIME - TimeConsts.TIME_OF_BREAK:
+            return False
+        return True
+
+
+def countdown(reset_start):
+    t = TimeConsts.SCHD_TIME - int(time.time() - reset_start)
+    while t >= 0:
+        secs = t
+        timer = f'The window closes in {secs:02d}s'
+        print(timer, end="\r")
+        time.sleep(1)
+        t -= 1
 
 
 def launch_able():
@@ -21,9 +42,10 @@ def launch_able():
     return True
 
 
-def print_reset_break():
+def print_reset_break(t):
     os.system('')
-    print('\033[1;32m' + 'Please wait until Script will be launched by Microsoft Windows At 6:00' + '\033[0m')
+    print('\033[1;32m' + 'Everything ok, restart soon' + '\033[0m')
+    countdown(t)
 
 
 def wait(period):
@@ -69,23 +91,23 @@ def cycle():
 
 
 def main():
-    Restart.proceed = False
+    restart = Restart()
     if self_update.check_for_update():
         self_update.update()
         subprocess.call(Paths.AUTOMAT_BAT)
         Restart.proceed = False
         return None
 
-    if launch_able():
+    if restart.launch_able():
         print_introduction()
-        while launch_able():
+        while restart.launch_able():
             cycle()
             wait(TimeConsts.TIME_OF_BREAK)
             if self_update.check_for_update():
                 self_update.update()
                 Restart.proceed = True
                 return None
-        print_reset_break()
+        print_reset_break(restart.start_time)
     else:
         print_reset_break()
 
