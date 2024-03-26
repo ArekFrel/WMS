@@ -10,7 +10,6 @@ from pyodbc import Error
 import stamps_adder
 from merger import merging
 
-
 catalogs_to_remove = []
 
 

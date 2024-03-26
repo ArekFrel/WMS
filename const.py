@@ -26,7 +26,7 @@ class TimeConsts:
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 1800
+        TIMEOUT_FOR_PLANERS = 180
 
 
 class Paths:
