@@ -11,15 +11,43 @@ import os
 from const import Paths, TimeConsts
 
 
+class Restart:
+
+    proceed = False
+
+    def __init__(self):
+        self.start_time = time.time()
+
+    def launch_able(self):
+        if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
+            return False
+        if time.time() - self.start_time > TimeConsts.SCHD_TIME - TimeConsts.TIME_OF_BREAK:
+            return False
+        return True
+
+
+def countdown(restart_start):
+    secs = TimeConsts.SCHD_TIME - (int(time.time() - restart_start)) - 1
+    # print(f'{t} rest\n')
+    # print(f'{int(restart_start)} restart start \n')
+    # print(f'{int(time.time())} now time \n')
+    while secs >= 0:
+        timer = f'The window closes in {secs:02d}'
+        print(timer, end="\r")
+        time.sleep(1)
+        secs -= 1
+
+
 def launch_able():
     if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
         return False
     return True
 
 
-def print_reset_break():
+def print_reset_break(arg):
     os.system('')
-    print('\033[1;32m' + 'Please wait until Script will be launched by Microsoft Windows At 6:00' + '\033[0m')
+    print('\033[1;32m' + 'Everything ok, restart soon' + '\033[0m')
+    countdown(arg)
 
 
 def wait(period):
@@ -55,10 +83,7 @@ def print_introduction():
 
 
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
-def main():
-    if self_update.check_for_update():
-        self_update.update()
-        subprocess.call(Paths.AUTOMAT_BAT)
+def cycle():
     print_now()
     sap_date.update(column='Automat')
     add_new_files.main()
@@ -67,14 +92,29 @@ def main():
         file_manager.main()
 
 
-if __name__ == '__main__':
-    if launch_able():
+def main():
+    restart = Restart()
+    if self_update.check_for_update():
+        self_update.update()
+        subprocess.call(Paths.AUTOMAT_BAT)
+        Restart.proceed = False
+        return None
+
+    if restart.launch_able():
         print_introduction()
-        while launch_able():
-            main()
+        while restart.launch_able():
+            cycle()
             wait(TimeConsts.TIME_OF_BREAK)
-        print_reset_break()
+            if self_update.check_for_update():
+                self_update.update()
+                Restart.proceed = True
+                return None
+        print_reset_break(restart.start_time)
     else:
-        print_reset_break()
+        print_reset_break(restart.start_time)
 
 
+if __name__ == '__main__':
+    main()
+    if Restart.proceed:
+        subprocess.call(Paths.AUTOMAT_BAT)

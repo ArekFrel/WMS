@@ -1,4 +1,5 @@
 import inspect
+import teco_completer
 import shutil
 import re
 
@@ -9,7 +10,6 @@ from const import *
 from pyodbc import Error
 import stamps_adder
 from merger import merging
-
 
 catalogs_to_remove = []
 
@@ -214,7 +214,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
         query_2 = f"Insert Into Technologia (" \
             f"Plik, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,1 ,'{now}'" \
             f");"
     else:
         query_2 = f"Insert Into Technologia (" \
@@ -399,7 +399,9 @@ def main():
     new_files_to_db()
     truncate_bad_files()
     if Options.GENERAL_CHECK_PERMISSION and general_checker():
+        teco_completer.main()
         list_new_files()
+
     elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
     list_new_files_new_way_class()

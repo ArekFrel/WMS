@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 
 class TimeConsts:
@@ -15,18 +15,25 @@ class TimeConsts:
     TO_OCLOCK = 6
 
     """Reset Options:"""
-    HOUR = 5
+    HOUR = 14
     MINUTES = 56
 
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
 
+    """Time when TECO orders are set to completed."""
+    TECO_TIME = 15
+
+    """Number of day after which Teco_completer completes the order"""
+    TECO_DAYS = 0
+
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 120
+    TIME_OF_BREAK = 119
+    SCHD_TIME = 600
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 1800
+        TIMEOUT_FOR_PLANERS = 180
 
 
 class Paths:
@@ -82,18 +89,13 @@ class Options:
     GENERAL_CHECK_PERMISSION = True
 
 
-
-
-
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
 
-
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
-
 
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
@@ -150,6 +152,7 @@ def db_commit(query, func_name):
 
     try:
         with CURSOR:
+            register(query)
             CURSOR.execute(query)
             CURSOR.commit()
         return True

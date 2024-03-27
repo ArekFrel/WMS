@@ -169,6 +169,7 @@ class Application(tk.Frame):
             query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'
             result = CURSOR.execute(query)
             table_files = [(t[0], t[1]) for t in result]
+            print(table_files)
             po_cat = os.path.join(Paths.PRODUCTION, order_number)
             try:
                 cat_content = os.listdir(po_cat)
@@ -189,6 +190,7 @@ class Application(tk.Frame):
                 rf.write(f'{deleting_query}')
             if len(deleting_query) > 1:
                 db_commit(deleting_query, "deleting")
+                print('deleting')
 
             self.message_box_del_succes(msg=f'Usunięto {num} rekordów')
 
