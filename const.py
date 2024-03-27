@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 
 class TimeConsts:
@@ -21,8 +21,14 @@ class TimeConsts:
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
 
+    """Time when TECO orders are set to completed."""
+    TECO_TIME = 15
+
+    """Number of day after which Teco_completer completes the order"""
+    TECO_DAYS = 0
+
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 120
+    TIME_OF_BREAK = 119
     SCHD_TIME = 600
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1

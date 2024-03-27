@@ -26,14 +26,16 @@ class Restart:
         return True
 
 
-def countdown(reset_start):
-    t = TimeConsts.SCHD_TIME - int(time.time() - reset_start)
-    while t >= 0:
-        secs = t
-        timer = f'The window closes in {secs:02d}s'
+def countdown(restart_start):
+    secs = TimeConsts.SCHD_TIME - (int(time.time() - restart_start)) - 1
+    # print(f'{t} rest\n')
+    # print(f'{int(restart_start)} restart start \n')
+    # print(f'{int(time.time())} now time \n')
+    while secs >= 0:
+        timer = f'The window closes in {secs:02d}'
         print(timer, end="\r")
         time.sleep(1)
-        t -= 1
+        secs -= 1
 
 
 def launch_able():
@@ -42,10 +44,10 @@ def launch_able():
     return True
 
 
-def print_reset_break(t):
+def print_reset_break(arg):
     os.system('')
     print('\033[1;32m' + 'Everything ok, restart soon' + '\033[0m')
-    countdown(t)
+    countdown(arg)
 
 
 def wait(period):
@@ -109,7 +111,7 @@ def main():
                 return None
         print_reset_break(restart.start_time)
     else:
-        print_reset_break()
+        print_reset_break(restart.start_time)
 
 
 if __name__ == '__main__':
