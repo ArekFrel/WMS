@@ -6,10 +6,12 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = True
+IS_IT_TEST = False
 
 
 class TimeConsts:
+
+    MINUTE_START = 3
     """Script is stopped between:"""
     FROM_OCLOCK = 1
     TO_OCLOCK = 6
@@ -28,7 +30,7 @@ class TimeConsts:
     TECO_DAYS = 0
 
     """Number of second to wait before new refreshing"""
-    TIME_OF_BREAK = 119
+    TIME_OF_BREAK = 120
     SCHD_TIME = 600
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
