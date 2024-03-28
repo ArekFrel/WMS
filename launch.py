@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 from timer_dec import time_break
 import add_new_files
+import math
 import new_data_uploader
 import file_manager
 import sap_date
@@ -12,42 +13,40 @@ from const import Paths, TimeConsts
 
 
 class Restart:
-
     proceed = False
 
-    def __init__(self):
-        self.start_time = time.time()
-
-    def launch_able(self):
-        if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
-            return False
-        if time.time() - self.start_time > TimeConsts.SCHD_TIME - TimeConsts.TIME_OF_BREAK:
-            return False
+    @staticmethod
+    def launch_able(arg):
+        minutes_rest = int(datetime.now().minute % 10)
+        minutes_break = math.ceil(TimeConsts.TIME_OF_BREAK / 60)
+        # print(f'{minutes_break=} ')
+        # print(f'{minutes_rest=} ')
+        # if TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1):
+        if arg == "start":
+            return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break))
+        if arg == "continue":
+            return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1))
+        # if TimeConsts.MINUTE_START - minutes_rest in range(0, minutes_break):
+        #     return False
         return True
 
 
-def countdown(restart_start):
-    secs = TimeConsts.SCHD_TIME - (int(time.time() - restart_start)) - 1
-    # print(f'{t} rest\n')
-    # print(f'{int(restart_start)} restart start \n')
-    # print(f'{int(time.time())} now time \n')
+def countdown():
+    rest_minutes = datetime.now().minute % 10
+    secs = 60 * (TimeConsts.MINUTE_START - rest_minutes - 1) + (60 - datetime.now().second) - 2
+    # print(secs)
     while secs >= 0:
-        timer = f'The window closes in {secs:02d}'
-        print(timer, end="\r")
+        timer = f'The window closes in {secs:03d}s'
+        print(timer,  end="\r")
         time.sleep(1)
         secs -= 1
+        print(' ' * len(timer),  end="\r")
 
 
-def launch_able():
-    if datetime.now().hour == TimeConsts.HOUR and datetime.now().minute > TimeConsts.MINUTES:
-        return False
-    return True
-
-
-def print_reset_break(arg):
+def print_reset_break():
     os.system('')
-    print('\033[1;32m' + 'Everything ok, restart soon' + '\033[0m')
-    countdown(arg)
+    print('\033[1;32m' + 'Everything is ok, restart soon' + '\033[0m')
+    countdown()
 
 
 def wait(period):
@@ -100,18 +99,21 @@ def main():
         Restart.proceed = False
         return None
 
-    if restart.launch_able():
+    if restart.launch_able(arg="start"):
         print_introduction()
-        while restart.launch_able():
+        while True:
             cycle()
-            wait(TimeConsts.TIME_OF_BREAK)
-            if self_update.check_for_update():
-                self_update.update()
-                Restart.proceed = True
+            if restart.launch_able(arg="continue"):
+                wait(TimeConsts.TIME_OF_BREAK)
+                if self_update.check_for_update():
+                    self_update.update()
+                    Restart.proceed = True
+                    return None
+            else:
+                print_reset_break()
                 return None
-        print_reset_break(restart.start_time)
     else:
-        print_reset_break(restart.start_time)
+        print_reset_break()
 
 
 if __name__ == '__main__':
