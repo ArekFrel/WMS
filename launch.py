@@ -16,13 +16,18 @@ class Restart:
     proceed = False
 
     @staticmethod
-    def launch_able():
+    def launch_able(arg):
         minutes_rest = int(datetime.now().minute % 10)
         minutes_break = math.ceil(TimeConsts.TIME_OF_BREAK / 60)
         # print(f'{minutes_break=} ')
         # print(f'{minutes_rest=} ')
-        if TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1):
-            return False
+        # if TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1):
+        if arg == "start":
+            return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break))
+        if arg == "continue":
+            return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1))
+        # if TimeConsts.MINUTE_START - minutes_rest in range(0, minutes_break):
+        #     return False
         return True
 
 
@@ -31,25 +36,16 @@ def countdown():
     secs = 60 * (TimeConsts.MINUTE_START - rest_minutes - 1) + (60 - datetime.now().second) - 2
     # print(secs)
     while secs >= 0:
-        timer = f'The window closes in {secs:02d}'
-        print(timer, end="\r")
+        timer = f'The window closes in {secs:03d}s'
+        print(timer,  end="\r")
         time.sleep(1)
         secs -= 1
-
-
-def launch_able():
-    minutes_rest = int(datetime.now().minute % 10)
-    minutes_break = math.ceil(TimeConsts.TIME_OF_BREAK / 60)
-    # print(f'{minutes_break=} ')
-    # print(f'{minutes_rest=} ')
-    if TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1):
-        return False
-    return True
+        print(' ' * len(timer),  end="\r")
 
 
 def print_reset_break():
     os.system('')
-    print('\033[1;32m' + 'Everything ok, restart soon' + '\033[0m')
+    print('\033[1;32m' + 'Everything is ok, restart soon' + '\033[0m')
     countdown()
 
 
@@ -103,16 +99,19 @@ def main():
         Restart.proceed = False
         return None
 
-    if restart.launch_able():
+    if restart.launch_able(arg="start"):
         print_introduction()
-        while restart.launch_able():
+        while True:
             cycle()
-            wait(TimeConsts.TIME_OF_BREAK)
-            if self_update.check_for_update():
-                self_update.update()
-                Restart.proceed = True
+            if restart.launch_able(arg="continue"):
+                wait(TimeConsts.TIME_OF_BREAK)
+                if self_update.check_for_update():
+                    self_update.update()
+                    Restart.proceed = True
+                    return None
+            else:
+                print_reset_break()
                 return None
-        print_reset_break()
     else:
         print_reset_break()
 

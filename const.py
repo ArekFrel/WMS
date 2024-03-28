@@ -11,7 +11,7 @@ IS_IT_TEST = False
 
 class TimeConsts:
 
-    MINUTE_START = 3
+    MINUTE_START = 5
     """Script is stopped between:"""
     FROM_OCLOCK = 1
     TO_OCLOCK = 6
@@ -28,6 +28,7 @@ class TimeConsts:
 
     """Number of day after which Teco_completer completes the order"""
     TECO_DAYS = 0
+    TECO_DRAWING_DAYS = 7
 
     """Number of second to wait before new refreshing"""
     TIME_OF_BREAK = 120
