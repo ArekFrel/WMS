@@ -46,7 +46,9 @@ def last_drawing(po_number):
             query = f"Select datediff(day, MAX(kiedy), GETDATE()) from technologia where po = {po_number}"
             CURSOR.execute(query)
             result = CURSOR.fetchone()[0]
+
             return result >= const.TimeConsts.TECO_DRAWING_DAYS
+
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
@@ -63,9 +65,8 @@ def teco_closer(records):
 
 
 def main():
-    if datetime.now().hour > (TimeConsts.GCP - 1):
-        records = get_data()
-        teco_closer(records)
+    records = get_data()
+    teco_closer(records)
 
 
 if __name__ == '__main__':
