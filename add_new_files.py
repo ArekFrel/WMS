@@ -199,7 +199,11 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
     now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
 
     if 'info' in new_pdf.lower() or 'sap' in new_pdf.lower():
-        query_1 = ""
+        query_1 = f"Insert Into Technologia (" \
+                  f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+                  f") VALUES (" \
+                  f"'{new_pdf}' ,8 ,'{komentarz}' ,0 ,1 ,'{now}'" \
+                  f");"
     else:
         query_1 = f"IF NOT EXISTS (SELECT PO FROM OTM WHERE PO = {order}) " \
                   f"BEGIN " \
@@ -216,12 +220,14 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
             f") VALUES (" \
             f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,1 ,'{now}'" \
             f");"
-    else:
+    elif not ('info' in new_pdf.lower() or 'sap' in new_pdf.lower()):
         query_2 = f"Insert Into Technologia (" \
             f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
             f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
+    else:
+        query_2 = ''
     query = query_1 + query_2
 
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
