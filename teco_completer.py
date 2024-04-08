@@ -1,5 +1,4 @@
 import inspect
-from datetime import datetime
 import const
 from const import CURSOR, db_commit, register, TimeConsts
 from pyodbc import OperationalError, DatabaseError, Error
