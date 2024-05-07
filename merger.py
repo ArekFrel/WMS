@@ -8,8 +8,8 @@ from const import Paths
 
 def get_orders_to_merge():
     """Orders that should be merged are stored in table OTM in data base."""
-    if IS_IT_TEST:
-        return TEST_RETURN_ORDERS
+    # if IS_IT_TEST: #this one is turned off fo test
+    #     return TEST_RETURN_ORDERS #this one is turned off fo test
     query = f"SELECT po FROM OTM WHERE quantity >= {MERGED_MIN} AND merged = 0;"
     return get_data(query)
 
@@ -61,13 +61,16 @@ def set_merged_true(order):
 
 
 def merging():
-
+    print(get_orders_to_merge())
     for order in get_orders_to_merge():
         order_path = os.path.join(Paths.PRODUCTION, order)
         drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
+        drawings = update_drawings_list(drawings, order)
         first_drawing_path = os.path.join(order_path, drawings[0])
         merge_name = merged_name_available(order_path)
         merged_doc = os.path.join(order_path, f'{order} {merge_name}')
+        if not os.path.exists(first_drawing_path):
+            continue
         with fitz.open(first_drawing_path) as doc:
             count = 1
             for index, drawing in enumerate(drawings):
@@ -85,6 +88,13 @@ def merging():
 
         set_merged_true(order=order)
         print(f'{count} drawings of {order} order has been merged.')
+
+
+def update_drawings_list(drawings, order):
+    # Return actual list of drawings
+    result = list(set(drawings).intersection(set(os.listdir(os.path.join(Paths.PRODUCTION, order)))))
+    print(result)
+    return result
 
 
 def main():
