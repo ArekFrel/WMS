@@ -61,7 +61,6 @@ def set_merged_true(order):
 
 
 def merging():
-    print(get_orders_to_merge())
     for order in get_orders_to_merge():
         order_path = os.path.join(Paths.PRODUCTION, order)
         drawings = [f'{drawing}.pdf' for drawing in get_drawings_to_merge(order)]
@@ -93,8 +92,7 @@ def merging():
 def update_drawings_list(drawings, order):
     # Return actual list of drawings
     result = list(set(drawings).intersection(set(os.listdir(os.path.join(Paths.PRODUCTION, order)))))
-    print(result)
-    return result
+    return sorted(result)
 
 
 def main():
