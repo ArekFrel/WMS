@@ -11,32 +11,43 @@ IS_IT_TEST = False
 
 class TimeConsts:
 
+    """Script runs in 10-minutes cycle,
+    below variable says in which minute does it start every 10 minutes
+    variable range 0 - 9 included
+    this variable must comply with task manager settings:
+    if Script launches everyday at 00:0X o'clock then variable should be = X
+    """
     MINUTE_START = 5
-    """Script is stopped between:"""
+
+    """Script does not work between:"""
     FROM_OCLOCK = 1
     TO_OCLOCK = 6
 
-    """Reset Options:"""
-    HOUR = 14
-    MINUTES = 56
+    """Reset Options - obsolete variables, currently not in use"""
+    #HOUR = 14
+    #MINUTES = 56
 
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
 
-    """Time when TECO orders are set to completed."""
-    TECO_TIME = 15
+    """Time when TECO orders are set to completed. - obsolete"""
+    #TECO_TIME = 15
 
-    """Number of day after which Teco_completer completes the order"""
+    """Number of day after Finish date when Teco_completer completes the order"""
     TECO_DAYS = 0
+    """Number of day after last drawing uploaded when Teco_completer completes the order"""
     TECO_DRAWING_DAYS = 7
 
     """Number of second to wait before new refreshing"""
     TIME_OF_BREAK = 120
+    """Script lunches every SCHD_TIME second- variable should comply with task manager settingd."""
     SCHD_TIME = 600
+
+    """Number of seconds after wich script work with folder from START_CATALOG"""
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 180
+        TIMEOUT_FOR_PLANERS = 1800
 
 
 class Paths:
@@ -183,4 +194,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

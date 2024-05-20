@@ -19,15 +19,11 @@ class Restart:
     def launch_able(arg):
         minutes_rest = int(datetime.now().minute % 10)
         minutes_break = math.ceil(TimeConsts.TIME_OF_BREAK / 60)
-        # print(f'{minutes_break=} ')
-        # print(f'{minutes_rest=} ')
-        # if TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1):
         if arg == "start":
             return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break))
         if arg == "continue":
             return not(TimeConsts.MINUTE_START - minutes_rest in range(1, minutes_break + 1))
-        # if TimeConsts.MINUTE_START - minutes_rest in range(0, minutes_break):
-        #     return False
+
         return True
 
 
