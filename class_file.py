@@ -4,6 +4,69 @@ import time
 import shutil
 from stat import S_IWRITE
 from const import TimeConsts, Paths, Options
+from const import CURSOR, REFILL_CAT, CatalogType
+from pyodbc import Error
+
+
+class Catalog:
+
+    def __init__(self, name, path=()):
+        self.name = name
+        self.path_tuple = path
+        self.catalog_path = os.path.join(Paths.START_CATALOG, '/'.join(self.path_tuple), name)
+        self.age = time.time() - os.path.getctime(self.catalog_path)
+        self.ready = (self.age > TimeConsts.TIMEOUT_FOR_PLANERS)
+        self.bought = self.is_bought()
+        self.refill_cat = self.is_refill()
+        self.catalog_type = ''
+        self.catalog_category()
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def __bool__(self):
+        return True
+
+    def path_of_cat(self):
+        if self.path_tuple:
+            return f'{"/".join(self.path_tuple)}/{self.name}'
+        else:
+            return self.name
+
+    def catalog_category(self):
+        if self.is_refill() and self.is_bought():
+            self.catalog_type = CatalogType.REFILL_BOUGHT
+            return None
+        if self.is_bought():
+            self.catalog_type = CatalogType.BOUGHT
+            return None
+        if self.is_refill():
+            self.catalog_type = CatalogType.REFILL
+            return None
+        self.catalog_type = CatalogType.NORMAL
+        return None
+
+    def catalog_content(self):
+        return os.listdir(self.catalog_path)
+
+    def is_bought(self):
+        for word in Options.BOUGHT_NAMES:
+            if word == self.name.lower():
+                return True
+        if self.name.startswith('bought_script_'):
+            return True
+        return False
+
+    def is_refill(self):
+        if self.name.upper() == REFILL_CAT or any(item in [REFILL_CAT, REFILL_CAT.lower()] for item in self.path_tuple):
+            return True
+        else:
+            return False
+
+    def quit_catalog(self):
+        if self.catalog_type in (CatalogType.NORMAL, CatalogType.BOUGHT) and not self.ready:
+            return True
+        return False
 
 
 class File:
@@ -13,28 +76,40 @@ class File:
     refilled_files = 0
     replaced_files = 0
 
-    def __init__(self, name, bought_cat=False, catalog=''):
+    def __init__(self, name: str, catalog=None):
         self.name = name
         self.file_name, self.extension = name.rsplit('.', 1)
-        self.bought_cat = bought_cat
-        self.catalog = '' if bought_cat else catalog
+        self.bought_cat = False
+        self.catalog = ''
+        self.refill = False
+        self.new_name = self.name
+        self.start_path_new_name = os.path.join(Paths.START_CATALOG, self.new_name)
+        self.catalog_path = Paths.START_CATALOG
+        self.catalog_options(catalog)
+        self.replace = False
         self.loose = not bool(self.catalog)
         self.bought_name = False
         self.sub_bought = False
-        self.new_name = self.name
         self.check_for_watermarking()
         self.new_name_create()
-        self.start_path_new_name = os.path.join(Paths.START_CATALOG, catalog, self.new_name)
         self.po = self.new_name[:7]
-        self.catalog_path = os.path.join(Paths.START_CATALOG, catalog)
-        self.start_path = os.path.join(Paths.START_CATALOG, catalog, name)
-        self.proper_name = (catalog == self.po) if not self.bought_cat else True
+        self.start_path = os.path.join(self.catalog_path, self.name)
+        print(self.start_path, '---Start path')
+        self.proper_name = self.is_proper_name()
         self.dest_catalog = os.path.join(Paths.PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
         self.un_read_only()
 
     def __str__(self):
         return f'{self.start_path}'
+
+    def catalog_options(self, catalog=None):
+        if catalog:
+            self.bought_cat = catalog.bought
+            self.catalog = '' if catalog.bought else catalog.name
+            self.refill = catalog.refill_cat
+            self.start_path_new_name = os.path.join(Paths.START_CATALOG, catalog.path_of_cat(), self.new_name)
+            self.catalog_path = os.path.join(Paths.START_CATALOG, catalog.path_of_cat())
 
     def new_name_create(self):
         annotate = 'bu' if self.sub_bought else 'buy'
@@ -59,7 +134,32 @@ class File:
     def move_file(self):
         """Moving file to a new location."""
         os.rename(self.start_path, self.start_path)
-        shutil.move(self.start_path, self.dest_path)
+        if self.refill:
+            if os.path.exists(self.dest_path):
+                os.remove(self.dest_path)
+                self.replace = True
+                File.add_replaced_file()
+            else:
+                shutil.move(self.start_path, self.dest_path)
+                File.add_refilled_file()
+        else:
+            shutil.move(self.start_path, self.dest_path)
+            File.add_moved_file()
+
+    def set_file_modifable(self):
+        os.chmod(self.start_path, S_IWRITE)
+
+    def create_catalog(self):
+        # Creating po folder if not exists
+        if not os.path.exists(self.dest_catalog) and not self.loose:
+            os.mkdir(self.dest_catalog)
+        # Creating po folder for loose file
+        elif not os.path.exists(self.dest_catalog) and File.check_po_in_sap(self.po):
+            os.mkdir(self.dest_catalog)
+
+    def set_available_name(self):
+        while os.path.exists(self.dest_path) and not self.refill:
+            self.name_if_exist_class()
 
     def name_if_exist_class(self):
         """Changes a new name of the file in new location, if current already exists."""
@@ -70,6 +170,11 @@ class File:
             self.new_name = f'{self.file_name}_1.{self.extension}'
         self.file_name = self.new_name.rsplit('.', 1)[0]
         self.dest_path = os.path.join(Paths.PRODUCTION, self.po, self.new_name)
+
+    def is_proper_name(self):
+        if any((self.refill, self.bought_cat)):
+            return True
+        return (self.catalog == self.po) if not self.bought_cat else True
 
     @staticmethod
     def delete_double_space(text):
@@ -147,29 +252,18 @@ class File:
         File.replaced_files = 0
         File.refilled_files = 0
 
+    @staticmethod
+    def check_po_in_sap(po_num):
+        query = f"SELECT COUNT(Confirmation) FROM Sap WHERE [P.O.] = {po_num};"
+        with CURSOR:
+            try:
+                CURSOR.execute(query)
+                result = CURSOR.fetchone()
 
-class Catalog:
-
-    def __init__(self, name):
-        self.name = name
-        self.catalog_path = os.path.join(Paths.START_CATALOG, name)
-        self.age = time.time() - os.path.getctime(self.catalog_path)
-        self.ready = (self.age > TimeConsts.TIMEOUT_FOR_PLANERS)
-        self.bought = self.is_bought()
-
-    def __str__(self):
-        return f'{self.name}'
-
-    def catalog_content(self):
-        return os.listdir(self.catalog_path)
-
-    def is_bought(self):
-        for word in Options.BOUGHT_NAMES:
-            if word == self.name.lower():
-                return True
-        if self.name.startswith('bought_script_'):
-            return True
-        return False
+            except Error:
+                print(f'Database Error in "check_po_in_sap"')
+                return False
+        return result[0] > 0
 
 
 def main():

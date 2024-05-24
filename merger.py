@@ -8,8 +8,8 @@ from const import Paths
 
 def get_orders_to_merge():
     """Orders that should be merged are stored in table OTM in data base."""
-    # if IS_IT_TEST: #this one is turned off fo test
-    #     return TEST_RETURN_ORDERS #this one is turned off fo test
+    if IS_IT_TEST: # this one is turned off fo test
+        return TEST_RETURN_ORDERS # this one is turned off fo test
     query = f"SELECT po FROM OTM WHERE quantity >= {MERGED_MIN} AND merged = 0;"
     return get_data(query)
 
@@ -91,7 +91,8 @@ def merging():
 
 def update_drawings_list(drawings, order):
     # Return actual list of drawings
-    result = list(set(drawings).intersection(set(os.listdir(os.path.join(Paths.PRODUCTION, order)))))
+    # result = sorted(list(set(drawings).intersection(set(os.listdir(os.path.join(Paths.PRODUCTION, order))))))
+    result = [drawing for drawing in drawings if drawing in os.listdir(os.path.join(Paths.PRODUCTION, order))]
     return sorted(result)
 
 

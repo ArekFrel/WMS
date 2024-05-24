@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 
 class TimeConsts:
@@ -101,6 +101,13 @@ class Options:
     '''Permission to adding files uploaded directly into Paths.PRODUCTION catalog once per day
     GCP_OCLOCK is time when all files are checked if they're new'''
     GENERAL_CHECK_PERMISSION = True
+
+
+class CatalogType:
+    BOUGHT = 'BOUGHT'
+    REFILL = 'REFILL'
+    NORMAL = 'NORMAL'
+    REFILL_BOUGHT = 'REFILL_BOUGHT'
 
 
 TEST_RETURN_ORDERS = []

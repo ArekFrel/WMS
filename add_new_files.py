@@ -180,8 +180,7 @@ def archive(file_name):
 
 
 def contains_pdfs(catalog):
-    catalog_path = os.path.join(Paths.START_CATALOG, catalog)
-    if [file for file in os.listdir(catalog_path) if file.lower().endswith('pdf')]:
+    if [file for file in os.listdir(catalog.catalog_path) if file.lower().endswith('pdf')]:
         return True
     else:
         return False
@@ -237,22 +236,16 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
 def del_empty_catalogs():
     for folder in catalogs_to_remove:
-        catalog_to_remove = os.path.join(Paths.START_CATALOG, folder)
-        os.chmod(catalog_to_remove, S_IWRITE)
-        shutil.rmtree(catalog_to_remove, ignore_errors=True, )
+        os.chmod(folder, S_IWRITE)
+        shutil.rmtree(folder, ignore_errors=True, )
     catalogs_to_remove.clear()
 
 
 def cut_file_class(file):
 
-    if not os.path.exists(file.dest_catalog) and not file.loose:
-        os.mkdir(file.dest_catalog)
-
-    elif not os.path.exists(file.dest_catalog) and check_po_in_sap(file.po):
-        os.mkdir(file.dest_catalog)
-
-    while os.path.exists(file.dest_path):
-        file.name_if_exist_class()
+    file.set_file_modifable()   # set file as modifiable
+    file.create_catalog()       # Creating po folder if not exists
+    file.set_available_name()   # Change name if file exists in PRODUCTION and is not replaced
 
     if os.path.exists(file.dest_catalog):
         if file.bought_cat | file.bought_name | file.sub_bought:
@@ -267,10 +260,13 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    new_rec(new_pdf=file.file_name,
-            buy=(file.bought_name or file.bought_cat),
-            sub_buy=file.sub_bought,
-            order=file.po)
+    # if file has not been replaced add it into database
+    if not file.replace:
+        new_rec(new_pdf=file.file_name,
+                buy=(file.bought_name or file.bought_cat),
+                sub_buy=file.sub_bought,
+                order=file.po)
+        return True
     return True
 
 
@@ -398,8 +394,51 @@ def check_po_in_sap(po_num):
         except Error:
             print(f'Database Error in "check_po_in_sap"')
             return False
-
     return result[0] > 0
+
+
+def list_new_files_class():
+
+    for item in os.listdir(Paths.START_CATALOG):
+
+        deep_path = os.path.join(Paths.START_CATALOG, item)
+        """ If path is not directory, and loose file are not forbidden."""
+        if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:
+            file_handler(file_name=item)
+        elif not os.path.isdir(deep_path):
+            continue
+        if os.path.isdir(deep_path):
+            catalog_handler(item, path=())
+
+    File.print_counter_status()
+    File.set_counter_zero()
+
+
+def file_handler(file_name, folder=None):
+
+    if file_name in ['Thumbs.db', '_v']:
+        return
+    file = File(name=file_name, catalog=folder)
+    if validate_file_class(file=file):
+        cut_file_class(file=file)
+    else:
+        if new_bad_file(new_pdf=file.name, catalog=file.catalog):
+            print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
+            File.add_bad_file()
+
+
+def catalog_handler(name, path):
+    catalog = Catalog(name, path)
+    if catalog.quit_catalog():
+        return
+    for item in catalog.catalog_content():
+        if not os.path.isdir(os.path.join(catalog.catalog_path, item)):
+            file_handler(file_name=item, folder=catalog)
+        else:
+            catalog_handler(name=item, path=(path + (name,)))
+
+    if not contains_pdfs(catalog=catalog) and catalog.ready:
+        catalogs_to_remove.append(catalog.catalog_path)
 
 
 def main():
@@ -411,7 +450,8 @@ def main():
 
     elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
-    list_new_files_new_way_class()
+    # list_new_files_new_way_class()
+    list_new_files_class()
     merging()
     del_empty_catalogs()
 

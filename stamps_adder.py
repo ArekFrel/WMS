@@ -1,6 +1,5 @@
 import os
 import fitz
-from stat import S_IWRITE
 from const import Paths
 
 
@@ -16,7 +15,7 @@ def stamper(file):
             overlay=False,
             keep_proportion=True)
         pdf_document.save(file.dest_path)
-        os.chmod(file.start_path, S_IWRITE)
+        file.set_file_modifable()
     os.rename(file.start_path, file.start_path)
     os.remove(file.start_path)
 
