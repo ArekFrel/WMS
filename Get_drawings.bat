@@ -40,3 +40,4 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 @rem python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\get_drawing.py
 python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\workpiece.py
+pause

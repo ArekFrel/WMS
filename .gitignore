@@ -3,9 +3,7 @@
 /venv
 /__wms_update__
 /_old
-BT_OPEN.bat
-ANY_OPEN.bat
-Delete_empty.bat
+*.bat
 Quotation_export.bat
 delete_empty_files.py
 Open_some.py
