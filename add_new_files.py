@@ -118,7 +118,7 @@ def list_new_files_new_way_class():
                 if file in ['Thumbs.db', '_v']:
                     continue
 
-                file = File(name=file, bought_cat=catalog.bought, catalog=catalog.name)
+                file = File(name=file, catalog=catalog.name)
                 if validate_file_class(file):
                     os.chmod(file.start_path, S_IWRITE)
                     if cut_file_class(file=file):
@@ -234,6 +234,43 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
     return None
 
 
+def update_rec(file):
+    draw_id, former_bought = check_db_buy()
+
+    if (file.bought_cat or file.bought_name) and not former_bought:
+        # if updating made to bought
+        query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = 'Zmiana na zakupowy'," \
+                f"OP_2 = '', OP_3 = '',OP_4 = '',OP_5 = '',OP_6 = '',OP_7 = '',OP_8 = '',OP_9 = '',OP_10 = ''," \
+                f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {draw_id};"
+        db_commit(query, 'update_rec made to bought')
+        return
+
+    if not (file.bought_cat or file.bought_name) and former_bought:
+        query = f"UPDATE TECHNOLOGIA SET OP_1 = '', OP0 = '', OP1 = '', KOMENTARZ = 'Zmiana na do zrobienia', " \
+                f"STATUS_OP = 6, STAT = 0 WHERE ID = {draw_id};"
+        db_commit(query, 'update_rec bought to made')
+        return
+
+
+def update_query(id_num):
+    query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = 'Zmiana na zakupowy'," \
+            f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {id_num};"
+    return query
+
+
+def check_db_buy(file):
+    query = f"SELECT ID, KOMENTARZ FROM TECHNOLOGIA WHERE PO ='{file.po}' AND RYSUNEK = '{file.file_name}';"
+    with CURSOR:
+        try:
+            CURSOR.execute(query)
+            rec_id, komentarz = CURSOR.fetchone()
+        except Error:
+            print(f'Database Error in "check_po_in_sap"')
+            return None, None
+    bought = komentarz == 'kupowany'
+    return rec_id, bought
+
+
 def del_empty_catalogs():
     for folder in catalogs_to_remove:
         os.chmod(folder, S_IWRITE)
@@ -267,6 +304,8 @@ def cut_file_class(file):
                 sub_buy=file.sub_bought,
                 order=file.po)
         return True
+    else:
+        update_rec(file)
     return True
 
 
@@ -458,3 +497,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

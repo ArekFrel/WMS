@@ -9,6 +9,7 @@ import sap_date
 import self_update
 import subprocess
 import os
+import quotation_export
 from const import Paths, TimeConsts
 
 
@@ -85,6 +86,7 @@ def cycle():
     sap_date.update(column='Automat_Start')
     if new_data_uploader.main():
         file_manager.main()
+    quotation_export.main()
 
 
 def main():
