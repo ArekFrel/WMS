@@ -36,7 +36,7 @@ class TimeConsts:
     """Number of day after Finish date when Teco_completer completes the order"""
     TECO_DAYS = 0
     """Number of day after last drawing uploaded when Teco_completer completes the order"""
-    TECO_DRAWING_DAYS = 7
+    TECO_DRAWING_DAYS = 2
 
     """Number of second to wait before new refreshing"""
     TIME_OF_BREAK = 120
@@ -47,7 +47,7 @@ class TimeConsts:
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 1800
+        TIMEOUT_FOR_PLANERS = 18
 
 
 class Paths:
@@ -101,6 +101,13 @@ class Options:
     '''Permission to adding files uploaded directly into Paths.PRODUCTION catalog once per day
     GCP_OCLOCK is time when all files are checked if they're new'''
     GENERAL_CHECK_PERMISSION = True
+
+
+class CatalogType:
+    BOUGHT = 'BOUGHT'
+    REFILL = 'REFILL'
+    NORMAL = 'NORMAL'
+    REFILL_BOUGHT = 'REFILL_BOUGHT'
 
 
 TEST_RETURN_ORDERS = []
