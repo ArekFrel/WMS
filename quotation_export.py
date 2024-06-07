@@ -108,22 +108,26 @@ def send_to_db_by_csv():
     quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if
                   file.startswith('SAP_QUOT')]
     for quot_file in quot_files:
+        print(f'New file opened {quot_file}', 50 * '_')
         with open(quot_file) as file:
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
-                if record[1] == 'Sprzedane':
-                    continue    # ommiting bought parts
                 if index % 2 != 0:
                     obj = QuotationObj(record[0])
                     vals = [val for val in record[6:]]
                     pairs = [(op, proper_val(val)) for op, val in zip(obj.all_ops(), vals) if not is_equal_zero(val)]
+                    any_pairs = len(pairs) > 0
                     while pairs:
                         op, val = pairs.pop(0)
                         obj.__setattr__(op, float(val))
+                    if any_pairs:
+                        obj.send_to_db()
                 else:
                     continue
-                obj.send_to_db()
-        os.remove(quot_file)
+        try:
+            os.remove(quot_file)
+        except PermissionError:
+            print(f'nie usunięto pliku {quot_file}')
     return True
 
 
