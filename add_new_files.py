@@ -90,61 +90,6 @@ def general_checker():
     return False
 
 
-def list_new_files_new_way_class():
-
-    for any_file in os.listdir(Paths.START_CATALOG):
-        if any_file.upper() == REFILL_CAT:
-            refill_doc()
-            continue
-
-        deep_path = os.path.join(Paths.START_CATALOG, any_file)
-        """ If path is not directory, and loose file are not forbidden."""
-        if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:
-            file = File(name=any_file)
-            if validate_file_class(file=file):
-                os.chmod(file.start_path, S_IWRITE)
-                if cut_file_class(file=file):
-                    File.add_moved_file()
-            continue
-        elif not os.path.isdir(deep_path):
-            continue
-
-        catalog = Catalog(any_file)
-        if not catalog.ready:
-            continue
-
-        for file in catalog.catalog_content():
-            if not os.path.isdir(os.path.join(catalog.catalog_path, file)):
-                if file in ['Thumbs.db', '_v']:
-                    continue
-
-                file = File(name=file, catalog=catalog.name)
-                if validate_file_class(file):
-                    os.chmod(file.start_path, S_IWRITE)
-                    if cut_file_class(file=file):
-                        File.add_moved_file()
-                        continue
-                else:
-                    if new_bad_file(new_pdf=file.name, catalog=file.catalog):
-                        print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
-                        File.add_bad_file()
-                        continue
-
-            elif file.lower() in Options.BOUGHT_NAMES:
-                init_path = os.path.join(Paths.START_CATALOG, catalog.name, file)
-                end_path = generate_end_path()
-                shutil.move(init_path, end_path)
-                '''Below turns off this order to merge'''
-                query = f'UPDATE OTM SET merged = 1 WHERE PO = {catalog.name};'
-                db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
-
-        if not contains_pdfs(catalog=catalog.name) and catalog.ready:
-            catalogs_to_remove.append(catalog.name)
-
-    File.print_counter_status()
-    File.set_counter_zero()
-
-
 def refill_doc():
     start_cat = os.path.join(Paths.START_CATALOG, REFILL_CAT)
     for any_file in os.listdir(start_cat):
@@ -494,7 +439,6 @@ def main():
         list_new_files()
     elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
-    list_new_files_new_way_class()
     list_new_files_class()
     merging()
     del_empty_catalogs()
