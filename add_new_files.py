@@ -235,7 +235,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
 
 def update_rec(file):
-    draw_id, former_bought = check_db_buy()
+    draw_id, former_bought = check_db_buy(file)
 
     if (file.bought_cat or file.bought_name) and not former_bought:
         # if updating made to bought
@@ -259,13 +259,17 @@ def update_query(id_num):
 
 
 def check_db_buy(file):
-    query = f"SELECT ID, KOMENTARZ FROM TECHNOLOGIA WHERE PO ='{file.po}' AND RYSUNEK = '{file.file_name}';"
+    query = f"SELECT ID, KOMENTARZ FROM TECHNOLOGIA WHERE PO ='{file.po}' AND Plik = '{file.file_name}';"
     with CURSOR:
         try:
             CURSOR.execute(query)
-            rec_id, komentarz = CURSOR.fetchone()
+            result = CURSOR.fetchone()
+            if len(result) == 2:
+                rec_id, komentarz = result
+            else:
+                return None, None
         except Error:
-            print(f'Database Error in "check_po_in_sap"')
+            print(f'Database Error in "check_db_buy"')
             return None, None
     bought = komentarz == 'kupowany'
     return rec_id, bought
@@ -287,6 +291,7 @@ def cut_file_class(file):
     if os.path.exists(file.dest_catalog):
         if file.bought_cat | file.bought_name | file.sub_bought:
             stamps_adder.stamper(file=file)
+            # pass
         else:
             try:
                 file.move_file()
@@ -444,6 +449,7 @@ def list_new_files_class():
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:
             file_handler(file_name=item)
+            continue
         elif not os.path.isdir(deep_path):
             continue
         if os.path.isdir(deep_path):
@@ -486,10 +492,9 @@ def main():
     if Options.GENERAL_CHECK_PERMISSION and general_checker():
         teco_completer.main()
         list_new_files()
-
     elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
-    # list_new_files_new_way_class()
+    list_new_files_new_way_class()
     list_new_files_class()
     merging()
     del_empty_catalogs()

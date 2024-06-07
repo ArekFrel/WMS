@@ -86,7 +86,6 @@ class File:
         self.start_path_new_name = os.path.join(Paths.START_CATALOG, self.new_name)
         self.catalog_path = Paths.START_CATALOG
         self.catalog_options(catalog)
-        self.replace = False
         self.loose = not bool(self.catalog)
         self.bought_name = False
         self.sub_bought = False
@@ -94,10 +93,10 @@ class File:
         self.new_name_create()
         self.po = self.new_name[:7]
         self.start_path = os.path.join(self.catalog_path, self.name)
-        print(self.start_path, '---Start path')
         self.proper_name = self.is_proper_name()
         self.dest_catalog = os.path.join(Paths.PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
+        self.replace = self.refill and os.path.exists(self.dest_path)
         self.un_read_only()
 
     def __str__(self):
@@ -138,6 +137,7 @@ class File:
             if os.path.exists(self.dest_path):
                 os.remove(self.dest_path)
                 self.replace = True
+                shutil.move(self.start_path, self.dest_path)
                 File.add_replaced_file()
             else:
                 shutil.move(self.start_path, self.dest_path)

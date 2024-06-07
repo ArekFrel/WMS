@@ -9,6 +9,7 @@ def stamper(file):
             watermark = Paths.WATERMARK_SUB_BOUGHT
         if (file.bought_name | file.bought_cat) and ~file.sub_bought:
             watermark = Paths.WATERMARK_BOUGHT
+
         pdf_document[0].insert_image(
             pdf_document[0].bound(),
             filename=watermark,
