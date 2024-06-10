@@ -110,7 +110,7 @@ def send_to_db_by_csv():
     quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if
                   file.startswith('SAP_QUOT')]
     for quot_file in quot_files:
-        print(f'New file opened {file}', 10 * '_')
+        print(f'New file opened {quot_file}', 10 * '_')
         with open(quot_file) as file:
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
