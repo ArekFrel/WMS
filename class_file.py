@@ -65,9 +65,9 @@ class Catalog:
             return False
 
     def quit_catalog(self):
-        if self.catalog_type in (CatalogType.NORMAL, CatalogType.BOUGHT) and not self.ready:
-            return True
-        return False
+        if self.ready:
+            return False
+        return True
 
 
 class File:

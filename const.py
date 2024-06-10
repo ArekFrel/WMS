@@ -31,7 +31,7 @@ class TimeConsts:
     GCP = 15
 
     """Time when TECO orders are set to completed. - obsolete"""
-    #TECO_TIME = 15
+    # TECO_TIME = 15
 
     """Number of day after Finish date when Teco_completer completes the order"""
     TECO_DAYS = 0
