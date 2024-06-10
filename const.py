@@ -24,8 +24,8 @@ class TimeConsts:
     TO_OCLOCK = 6
 
     """Reset Options - obsolete variables, currently not in use"""
-    #HOUR = 14
-    #MINUTES = 56
+    # HOUR = 14
+    # MINUTES = 56
 
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
@@ -47,7 +47,8 @@ class TimeConsts:
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 18
+        TIMEOUT_FOR_PLANERS = 1800
+        TIME_REFILL_CAT = 299
 
 
 class Paths:

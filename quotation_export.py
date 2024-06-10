@@ -76,7 +76,9 @@ class QuotationObj:
         return ops_list
 
     def all_attr_reset(self):
-        val_list = [f"{attr} = {QuotationObj.is_null(val)}" for attr, val in self.__dict__.items() if isinstance(val, float)]
+        val_list = [
+            f"{attr} = {QuotationObj.is_null(val)}" for attr, val in self.__dict__.items() if isinstance(val, float)
+        ]
         return ' ,'.join(val_list) + ' '
 
     def query(self):
@@ -108,7 +110,7 @@ def send_to_db_by_csv():
     quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if
                   file.startswith('SAP_QUOT')]
     for quot_file in quot_files:
-        print(f'New file opened {quot_file}', 50 * '_')
+        print(f'New file opened {file}', 10 * '_')
         with open(quot_file) as file:
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
@@ -151,4 +153,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

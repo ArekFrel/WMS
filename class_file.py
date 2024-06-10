@@ -59,6 +59,7 @@ class Catalog:
 
     def is_refill(self):
         if self.name.upper() == REFILL_CAT or any(item in [REFILL_CAT, REFILL_CAT.lower()] for item in self.path_tuple):
+            self.ready = (self.age > TimeConsts.TIME_REFILL_CAT)
             return True
         else:
             return False
@@ -272,4 +273,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
