@@ -145,10 +145,11 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
     if 'info' in new_pdf.lower() or 'sap' in new_pdf.lower():
         query = f"Insert Into Technologia (" \
-                  f"Plik, OP_1, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+                  f"Plik, PO, Rysunek, OP_1, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
                   f") VALUES (" \
-                  f"'{new_pdf}', 'Info', 8, '{komentarz}', 0, 1, '{now}'" \
+                  f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Info', 8, '{komentarz}', 0, 1, '{now}'" \
                   f");"
+        print(query)
         db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
         return None
     else:
@@ -163,15 +164,15 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
                   f"END; "
     if buy | sub_buy:
         query_2 = f"Insert Into Technologia (" \
-            f"Plik, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, PO, Rysunek, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,1 ,'{now}'" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Brygada', 'Brygada', 1 ,'{komentarz}' ,0 ,1 ,'{now}'" \
             f");"
     else:
         query_2 = f"Insert Into Technologia (" \
-            f"Plik, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, PO, Rysunek, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}' ,6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
 
     query = query_1 + query_2
