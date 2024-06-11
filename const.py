@@ -48,7 +48,7 @@ class TimeConsts:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 299
+        TIME_REFILL_CAT = 179
 
 
 class Paths:
