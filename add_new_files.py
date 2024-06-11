@@ -149,7 +149,6 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
                   f") VALUES (" \
                   f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Info', 8, '{komentarz}', 0, 1, '{now}'" \
                   f");"
-        print(query)
         db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
         return None
     else:

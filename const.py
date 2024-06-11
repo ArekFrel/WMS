@@ -47,7 +47,7 @@ class TimeConsts:
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
-        TIMEOUT_FOR_PLANERS = 18
+        TIMEOUT_FOR_PLANERS = 1800
         TIME_REFILL_CAT = 179
 
 
