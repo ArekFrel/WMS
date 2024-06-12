@@ -5,6 +5,7 @@ from const import Paths
 
 def stamper(file):
     with fitz.open(file.start_path) as pdf_document:
+
         if file.sub_bought:
             watermark = Paths.WATERMARK_SUB_BOUGHT
         if (file.bought_name | file.bought_cat) and ~file.sub_bought:
@@ -19,6 +20,7 @@ def stamper(file):
         file.set_file_modifable()
     os.rename(file.start_path, file.start_path)
     os.remove(file.start_path)
+    return True
 
 
 def main():
