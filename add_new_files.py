@@ -209,10 +209,10 @@ def check_db_buy(file):
         try:
             CURSOR.execute(query)
             result = CURSOR.fetchone()
-            if len(result) == 2:
-                rec_id, komentarz = result
-            else:
+            if result is None:
                 return None, None
+            else:
+                rec_id, komentarz = result
         except Error:
             print(f'Database Error in "check_db_buy"')
             return None, None
@@ -235,8 +235,17 @@ def cut_file_class(file):
 
     if os.path.exists(file.dest_catalog):
         if file.bought_cat | file.bought_name | file.sub_bought:
-            stamps_adder.stamper(file=file)
-            # pass
+            try:
+                os.rename(file.dest_path, file.dest_path)
+            except PermissionError:
+                return
+            except RuntimeError:
+                return
+            except FileNotFoundError:
+                pass
+            if not stamps_adder.stamper(file=file):
+                print(f'{file.name} -- not stamped, permission error.')
+                return False
         else:
             try:
                 file.move_file()
