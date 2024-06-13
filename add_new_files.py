@@ -238,13 +238,14 @@ def cut_file_class(file):
             try:
                 os.rename(file.dest_path, file.dest_path)
             except PermissionError:
+                print(f'{file.name} -- not stamped, permission error.')
                 return
             except RuntimeError:
+                print(f'{file.name} -- not stamped, runtime error.')
                 return
             except FileNotFoundError:
                 pass
             if not stamps_adder.stamper(file=file):
-                print(f'{file.name} -- not stamped, permission error.')
                 return False
         else:
             try:
