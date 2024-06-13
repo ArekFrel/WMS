@@ -17,7 +17,6 @@ def stamper(file):
             overlay=False,
             keep_proportion=True)
         pdf_document.save(file.dest_path)
-        file.set_file_modifable()
     os.rename(file.start_path, file.start_path)
     os.remove(file.start_path)
     return True

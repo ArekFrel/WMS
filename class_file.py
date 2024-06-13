@@ -98,7 +98,7 @@ class File:
         self.dest_catalog = os.path.join(Paths.PRODUCTION, self.po)
         self.dest_path = os.path.join(self.dest_catalog, self.new_name)
         self.replace = self.refill and os.path.exists(self.dest_path)
-        self.un_read_only()
+        self.set_file_modifable()
 
     def __str__(self):
         return f'{self.start_path}'
@@ -149,6 +149,8 @@ class File:
 
     def set_file_modifable(self):
         os.chmod(self.start_path, S_IWRITE)
+        if os.path.exists(self.dest_path):
+            os.chmod(self.dest_path, S_IWRITE)
 
     def create_catalog(self):
         # Creating po folder if not exists
