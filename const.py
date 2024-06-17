@@ -57,12 +57,15 @@ class Paths:
     REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
     TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
     UPDATE_CAT = 'T:/__wms_update__'
+
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
     AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
+
     """Path of watermarks"""
     WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
     WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+
     if IS_IT_TEST:
         PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
         START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
