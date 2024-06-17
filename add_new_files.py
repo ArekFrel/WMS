@@ -182,9 +182,13 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 def update_rec(file):
     draw_id, former_bought = check_db_buy(file)
 
-    if (file.bought_cat or file.bought_name) and not former_bought:
+    if (file.bought_cat or file.bought_name or file.sub_bought) and not former_bought:
+        if not file.sub_bought:
+            change_txt = 'Zmiana na zakupowy'
+        else:
+            change_txt = 'Zmiana na Część złożenia zakupowego'
         # if updating made to bought
-        query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = 'Zmiana na zakupowy'," \
+        query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = '{change_txt}'," \
                 f"OP_2 = '', OP_3 = '',OP_4 = '',OP_5 = '',OP_6 = '',OP_7 = '',OP_8 = '',OP_9 = '',OP_10 = ''," \
                 f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec made to bought')
@@ -195,12 +199,6 @@ def update_rec(file):
                 f"STATUS_OP = 6, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec bought to made')
         return
-
-
-def update_query(id_num):
-    query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = 'Zmiana na zakupowy'," \
-            f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {id_num};"
-    return query
 
 
 def check_db_buy(file):
