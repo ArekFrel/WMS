@@ -153,8 +153,19 @@ CURSOR = CONN.cursor()
 
 
 def register(text):
-    if text.startswith('Delete from SAP WHERE Confirmation ='):
-        return None
+
+    def do_quit():
+        if any(text.startswith(start_text) for start_text in [
+            'Delete from SAP WHERE Confirmation =',
+            'Update SAP_Data SET Automat =',
+            'SELECT Item_Data FROM SAP_data',
+            'SELECT SAP_Skrypt_Zmiana FROM SAP_data']
+        ):
+            return True
+
+    if do_quit():
+        return
+
     os.chmod(Paths.REGISTER, S_IWRITE)
     with open(Paths.REGISTER, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
