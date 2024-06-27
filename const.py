@@ -158,7 +158,9 @@ def register(text):
         if any(text.startswith(start_text) for start_text in [
             'Delete from SAP WHERE Confirmation =',
             'Update SAP_Data SET Automat =',
+            'Update SAP_Data SET Automat_Start =',
             'SELECT Item_Data FROM SAP_data',
+            'Delete From Złe_Pliki',
             'SELECT SAP_Skrypt_Zmiana FROM SAP_data']
         ):
             return True
