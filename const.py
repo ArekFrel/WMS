@@ -106,6 +106,13 @@ class Options:
     GCP_OCLOCK is time when all files are checked if they're new'''
     GENERAL_CHECK_PERMISSION = True
 
+    NOREG_QUERIES = [
+            'Delete from SAP WHERE Confirmation =',
+            'Update SAP_Data',
+            'SELECT Item_Data FROM SAP_data',
+            'Delete From Złe_Pliki',
+            'SELECT SAP_Skrypt_Zmiana FROM SAP_data']
+
 
 class CatalogType:
     BOUGHT = 'BOUGHT'
@@ -155,14 +162,7 @@ CURSOR = CONN.cursor()
 def register(text):
 
     def do_quit():
-        if any(text.startswith(start_text) for start_text in [
-            'Delete from SAP WHERE Confirmation =',
-            'Update SAP_Data SET Automat =',
-            'Update SAP_Data SET Automat_Start =',
-            'SELECT Item_Data FROM SAP_data',
-            'Delete From Złe_Pliki',
-            'SELECT SAP_Skrypt_Zmiana FROM SAP_data']
-        ):
+        if any(text.startswith(start_text) for start_text in Options.NOREG_QUERIES):
             return True
 
     if do_quit():

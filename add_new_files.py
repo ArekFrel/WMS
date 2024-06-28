@@ -243,6 +243,7 @@ def cut_file_class(file):
                 return
             except FileNotFoundError:
                 pass
+            # print('stamping here')
             if not stamps_adder.stamper(file=file):
                 return False
         else:
@@ -255,7 +256,7 @@ def cut_file_class(file):
         print(f'{file.name} -- not moved, There is no such Prod Order in Sap.')
         return False
 
-    # if file has not been replaced add it into database
+    # if file has not been replaced, add it into database
     if not file.replace:
         new_rec(new_pdf=file.file_name,
                 buy=(file.bought_name or file.bought_cat),
@@ -454,4 +455,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
+    list_new_files_class()
