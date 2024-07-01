@@ -48,7 +48,7 @@ class TimeConsts:
         TIMEOUT_FOR_PLANERS = 0.1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 179
+        TIME_REFILL_CAT = 1
 
 
 class Paths:
@@ -107,11 +107,12 @@ class Options:
     GENERAL_CHECK_PERMISSION = True
 
     NOREG_QUERIES = [
-            'Delete from SAP WHERE Confirmation =',
-            'Update SAP_Data',
-            'SELECT Item_Data FROM SAP_data',
-            'Delete From Złe_Pliki',
-            'SELECT SAP_Skrypt_Zmiana FROM SAP_data']
+            'delete from sap where confirmation =',
+            'update sap_data',
+            'update sap_data',
+            'select item_data from sap_data',
+            'delete from złe_pliki',
+            'select sap_skrypt_zmiana from sap_data']
 
 
 class CatalogType:
@@ -162,7 +163,7 @@ CURSOR = CONN.cursor()
 def register(text):
 
     def do_quit():
-        if any(text.startswith(start_text) for start_text in Options.NOREG_QUERIES):
+        if any(text.lower().startswith(start_text) for start_text in Options.NOREG_QUERIES):
             return True
 
     if do_quit():
