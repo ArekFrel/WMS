@@ -180,13 +180,20 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
 
 def update_rec(file):
-    draw_id, former_bought = check_db_buy(file)
+    draw_id, former_bought, tech_made = check_db_buy(file)
 
     if (file.bought_cat or file.bought_name or file.sub_bought) and not former_bought:
-        if not file.sub_bought:
-            change_txt = 'Zmiana na zakupowy'
-        else:
-            change_txt = 'Zmiana na Część złożenia zakupowego'
+        if tech_made:
+            if not file.sub_bought:
+                change_txt = 'Zmiana na zakupowy'
+            else:
+                change_txt = 'Zmiana na Część złożenia zakupowego'
+        if not tech_made:
+            if file.sub_bought:
+                change_txt = 'Część złożenia zakupowego'
+            else:
+                change_txt = 'kupowany'
+
         # if updating made to bought
         query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = '{change_txt}'," \
                 f"OP_2 = '', OP_3 = '',OP_4 = '',OP_5 = '',OP_6 = '',OP_7 = '',OP_8 = '',OP_9 = '',OP_10 = ''," \
@@ -202,20 +209,22 @@ def update_rec(file):
 
 
 def check_db_buy(file):
-    query = f"SELECT ID, KOMENTARZ FROM TECHNOLOGIA WHERE PO ='{file.po}' AND Plik = '{file.file_name}';"
+    query = f"SELECT ID, KOMENTARZ, Status_Op FROM TECHNOLOGIA WHERE PO ='{file.po}' AND Plik = '{file.file_name}';"
     with CURSOR:
         try:
             CURSOR.execute(query)
+            register(query)
             result = CURSOR.fetchone()
             if result is None:
-                return None, None
+                return None, None, None
             else:
-                rec_id, komentarz = result
+                rec_id, komentarz, status_op = result
         except Error:
             print(f'Database Error in "check_db_buy"')
-            return None, None
+            return None, None, None
     bought = komentarz == 'kupowany'
-    return rec_id, bought
+    tech_done = int(status_op) != 6
+    return rec_id, bought, tech_done
 
 
 def del_empty_catalogs():

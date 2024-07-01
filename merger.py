@@ -1,9 +1,10 @@
 import os
-import fitz
+from const import CURSOR, MERGED_MIN, db_commit, IS_IT_TEST, TEST_RETURN_ORDERS, TEST_RETURN_NUM, TEST_RETURN_DRAWINGS, register
 from stat import S_IWRITE
-from const import CURSOR, MERGED_MIN, db_commit, IS_IT_TEST, TEST_RETURN_ORDERS, TEST_RETURN_NUM, TEST_RETURN_DRAWINGS
 from pyodbc import Error, OperationalError
 from const import Paths
+if not IS_IT_TEST:
+    import fitz
 
 
 def get_orders_to_merge():
@@ -70,20 +71,23 @@ def merging():
         merged_doc = os.path.join(order_path, f'{order} {merge_name}')
         if not os.path.exists(first_drawing_path):
             continue
-        with fitz.open(first_drawing_path) as doc:
-            count = 1
-            for index, drawing in enumerate(drawings):
-                if index == 0:
-                    continue
-                drawing_path = os.path.join(order_path, drawing)
-                if not os.path.isfile(drawing_path):
-                    continue
-                with fitz.open(drawing_path) as added_doc:
-                    doc.insert_file(added_doc)
-                    count += 1
+        if not IS_IT_TEST:
+            with fitz.open(first_drawing_path) as doc:
+                count = 1
+                for index, drawing in enumerate(drawings):
+                    if index == 0:
+                        continue
+                    drawing_path = os.path.join(order_path, drawing)
+                    if not os.path.isfile(drawing_path):
+                        continue
+                    with fitz.open(drawing_path) as added_doc:
+                        doc.insert_file(added_doc)
+                        count += 1
 
-            doc.save(merged_doc)
-            os.chmod(merged_doc, S_IWRITE)
+                doc.save(merged_doc)
+                os.chmod(merged_doc, S_IWRITE)
+        else:
+            register(f'mock mergin in {order}')
 
         set_merged_true(order=order)
         print(f'{count} drawings of {order} order has been merged.')

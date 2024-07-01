@@ -46,6 +46,7 @@ class TimeConsts:
     """Number of seconds after wich script work with folder from START_CATALOG"""
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
+        TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
         TIME_REFILL_CAT = 1
@@ -187,6 +188,7 @@ def db_commit(query, func_name):
 
     if IS_IT_TEST:
         print(query)
+        register('TEST =========' + query)
         return None
 
     try:
