@@ -46,6 +46,7 @@ class TimeConsts:
     """Number of seconds after wich script work with folder from START_CATALOG"""
     if IS_IT_TEST:
         TIMEOUT_FOR_PLANERS = 0.1
+        TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
         TIME_REFILL_CAT = 179
@@ -106,6 +107,14 @@ class Options:
     GCP_OCLOCK is time when all files are checked if they're new'''
     GENERAL_CHECK_PERMISSION = True
 
+    NOREG_QUERIES = [
+            'delete from sap where confirmation =',
+            'update sap_data',
+            'update sap_data',
+            'select item_data from sap_data',
+            'delete from złe_pliki',
+            'select sap_skrypt_zmiana from sap_data']
+
 
 class CatalogType:
     BOUGHT = 'BOUGHT'
@@ -153,8 +162,14 @@ CURSOR = CONN.cursor()
 
 
 def register(text):
-    if text.startswith('Delete from SAP WHERE Confirmation ='):
-        return None
+
+    def do_quit():
+        if any(text.lower().startswith(start_text) for start_text in Options.NOREG_QUERIES):
+            return True
+
+    if do_quit():
+        return
+
     os.chmod(Paths.REGISTER, S_IWRITE)
     with open(Paths.REGISTER, 'a', encoding='utf-8') as history_file:
         now = str(datetime.fromtimestamp(time.time(), ))[0:-6]
@@ -173,6 +188,7 @@ def db_commit(query, func_name):
 
     if IS_IT_TEST:
         print(query)
+        register('TEST =========' + query)
         return None
 
     try:
