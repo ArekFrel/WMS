@@ -49,7 +49,7 @@ class TimeConsts:
         TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 1
+        TIME_REFILL_CAT = 179
 
 
 class Paths:
