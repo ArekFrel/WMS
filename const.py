@@ -6,7 +6,7 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
 
 class TimeConsts:
@@ -93,7 +93,9 @@ class Options:
         'zakupowe',
         'kupne',
         'kupowane',
-        'bought_script'
+        'kupowany',
+        'bought_script',
+        'Zmiana na zakupowy'
     ]
 
     """Extensions of the files, that are allowed to go."""

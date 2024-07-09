@@ -127,6 +127,8 @@ def archive(file_name):
 def contains_pdfs(catalog):
     if [file for file in os.listdir(catalog.catalog_path) if file.lower().endswith('pdf')]:
         return True
+    if [file for file in os.listdir(catalog.catalog_path) if os.path.isdir(catalog.catalog_path + f'//{file}')]:
+        return True
     else:
         return False
 
