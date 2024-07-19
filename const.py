@@ -94,6 +94,7 @@ class Options:
         'kupne',
         'kupowane',
         'kupowany',
+        'zakup',
         'bought_script',
         'Zmiana na zakupowy'
     ]
