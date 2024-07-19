@@ -90,6 +90,7 @@ class File:
         self.loose = not bool(self.catalog)
         self.bought_name = False
         self.sub_bought = False
+        self.partially_cooperated = False
         self.check_for_watermarking()
         self.new_name_create()
         self.po = self.new_name[:7]
