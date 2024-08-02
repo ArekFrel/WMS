@@ -127,6 +127,8 @@ def archive(file_name):
 def contains_pdfs(catalog):
     if [file for file in os.listdir(catalog.catalog_path) if file.lower().endswith('pdf')]:
         return True
+    if [file for file in os.listdir(catalog.catalog_path) if os.path.isdir(catalog.catalog_path + f'//{file}')]:
+        return True
     else:
         return False
 
@@ -222,7 +224,7 @@ def check_db_buy(file):
         except Error:
             print(f'Database Error in "check_db_buy"')
             return None, None, None
-    bought = komentarz == 'kupowany'
+    bought = komentarz in Options.BOUGHT_NAMES
     tech_done = int(status_op) != 6
     return rec_id, bought, tech_done
 

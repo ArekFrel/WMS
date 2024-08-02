@@ -15,6 +15,7 @@ redo_db.py
 *.csv
 *.docx
 *deep_copy
+*.txtpy
 const.py
 class_file.py
 temp_data.py

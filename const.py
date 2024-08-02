@@ -93,7 +93,10 @@ class Options:
         'zakupowe',
         'kupne',
         'kupowane',
-        'bought_script'
+        'kupowany',
+        'zakup',
+        'bought_script',
+        'Zmiana na zakupowy'
     ]
 
     """Extensions of the files, that are allowed to go."""
