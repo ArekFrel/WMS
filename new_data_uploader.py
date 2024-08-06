@@ -4,7 +4,7 @@ import os
 import os.path
 import sap_date
 import confirmation_deleter
-from const import CURSOR, Paths, db_commit
+from const import CURSOR, Paths, db_commit, so_list_getter
 
 
 def upload_new_data():
@@ -102,7 +102,7 @@ def formulate_query_record(record):
         finish_po_aktualny = redate(record[25])
         start_op_aktualny = redate(record[26])
         finish_op_aktualny = redate(record[27])
-        urzadzenie_glowne = record[28]
+        urzadzenie_glowne = str(record[28]).replace('/', '_').replace('\\', '_')
         system_status_full = record[22]
 
         query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
@@ -150,6 +150,16 @@ def send_item_to_db(record):
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
         return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+
+
+def so_folder_creator():
+    current_list = os.listdir(Paths.MODELS_CATALOG)
+    db_list = so_list_getter()
+    list_to_create = [so for so in db_list if so not in current_list]
+    for so in list_to_create:
+        dest_path = os.path.join(Paths.MODELS_CATALOG, so)
+        os.mkdir(dest_path)
+        print(f'{so} -- has been created.')
 
 
 def uploader_checker():
@@ -206,6 +216,7 @@ def update_system_status():
 def main():
     if uploader_checker():
         if upload_new_data():
+            so_folder_creator()
             sap_date.update(column='SAP_Skrypt_zmiana')
         else:
             return False
