@@ -80,7 +80,7 @@ def formulate_query_record(record):
         start_po = redate(record[3])
         finish_po = redate(record[4])
         ilosc = record[5]
-        urzadzenie = record[6]
+        urzadzenie = slash_remover(str(record[6]))
         brygada = record[7]
         nr_op = record[8]
         operacja = record[9]
@@ -102,7 +102,7 @@ def formulate_query_record(record):
         finish_po_aktualny = redate(record[25])
         start_op_aktualny = redate(record[26])
         finish_op_aktualny = redate(record[27])
-        urzadzenie_glowne = str(record[28]).replace('/', '_').replace('\\', '_')
+        urzadzenie_glowne = slash_remover(str(record[28]))
         system_status_full = record[22]
 
         query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
@@ -160,6 +160,14 @@ def so_folder_creator():
         dest_path = os.path.join(Paths.MODELS_CATALOG, so)
         os.mkdir(dest_path)
         print(f'{so} -- has been created.')
+
+
+def slash_remover(string):
+    forbidden = ['\\', '/', ':']
+    for sign in forbidden:
+        string = string.replace(sign, '_')
+    return string
+
 
 
 def uploader_checker():
