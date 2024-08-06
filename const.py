@@ -58,6 +58,7 @@ class Paths:
     REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
     TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
     UPDATE_CAT = 'T:/__wms_update__'
+    MODELS_CATALOG = 'W:/!!__PRODUKCJA__!!/5__Modele_3D/'
 
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
