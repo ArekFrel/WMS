@@ -219,6 +219,17 @@ def db_commit(query, func_name):
         return False
 
 
+def so_list_getter():
+    query = "SELECT DISTINCT [S.O.] FROM SAP WHERE [S.O.] != 0 AND [System Status] <> 'TECO'"
+    try:
+        CURSOR.execute(query)
+        result = [str(val[0]) for val in CURSOR.fetchall()]
+    except pyodbc.Error:
+        print('Connection to database failed.')
+        return []
+    return result
+
+
 def main():
     pass
 
