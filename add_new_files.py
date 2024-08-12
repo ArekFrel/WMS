@@ -1,8 +1,9 @@
 import inspect
+import os.path
+
 import teco_completer
 import shutil
 import re
-
 from class_file import File, Catalog
 from datetime import date
 from timer_dec import timer
@@ -201,13 +202,28 @@ def update_rec(file):
                 f"OP_2 = '', OP_3 = '',OP_4 = '',OP_5 = '',OP_6 = '',OP_7 = '',OP_8 = '',OP_9 = '',OP_10 = ''," \
                 f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec made to bought')
+        merger_information(file, text=change_txt)
         return
 
     if not (file.bought_cat or file.bought_name) and former_bought:
         query = f"UPDATE TECHNOLOGIA SET OP_1 = '', OP0 = '', OP1 = '', KOMENTARZ = 'Zmiana na do zrobienia', " \
                 f"STATUS_OP = 6, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec bought to made')
+        merger_information(file, text='zmiana na do zrobienia.')
         return
+
+
+def merger_information(file, text):
+    info_file_name = f'{file.po}__merge_info.txt'
+    info_file = os.path.join(Paths.PRODUCTION, file.po, info_file_name)
+    now = str(datetime.fromtimestamp(time.time(), ))[0:-7]
+    if os.path.exists(info_file):
+        with open(info_file, 'a', encoding='utf-8') as info:
+            info.write(f'{now}  {file.file_name}: {text}\n')
+    else:
+        with open(info_file, 'w', encoding='utf-8') as info:
+            info.write(f'{now}  {file.file_name}: {text}\n')
+    return
 
 
 def check_db_buy(file):
