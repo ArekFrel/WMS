@@ -58,6 +58,7 @@ class Paths:
     REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
     TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
     UPDATE_CAT = 'T:/__wms_update__'
+    MODELS_CATALOG = 'W:/!!__PRODUKCJA__!!/5__Modele_3D/'
 
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
@@ -216,6 +217,17 @@ def db_commit(query, func_name):
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
+
+
+def so_list_getter():
+    query = "SELECT DISTINCT [S.O.] FROM SAP WHERE [S.O.] != 0 AND [System Status] <> 'TECO'"
+    try:
+        CURSOR.execute(query)
+        result = [str(val[0]) for val in CURSOR.fetchall()]
+    except pyodbc.Error:
+        print('Connection to database failed.')
+        return []
+    return result
 
 
 def main():

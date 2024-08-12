@@ -40,8 +40,6 @@ dict_of_quotes = {
 	'DOKONCZENIE W TETRAPAK': 'Dokończenie'
 }
 
-list_of_operations = [v for v in dict_of_quotes.values()]
-
 
 def main():
 	query = f'CREATE TABLE dbo.Quotation (' \
