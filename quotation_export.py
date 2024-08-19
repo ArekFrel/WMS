@@ -141,7 +141,7 @@ def proper_val(num):
 
 
 def is_equal_zero(num):
-    if num in ('0', ''):
+    if num in ('0', '', ' '):
         return True
     else:
         return False

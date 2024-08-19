@@ -156,18 +156,23 @@ def so_folder_creator():
     current_list = os.listdir(Paths.MODELS_CATALOG)
     db_list = so_list_getter()
     list_to_create = [so for so in db_list if so not in current_list]
-    for so in list_to_create:
-        dest_path = os.path.join(Paths.MODELS_CATALOG, so)
-        os.mkdir(dest_path)
-        print(f'{so} -- has been created.')
+    if list_to_create:
+        for so in list_to_create:
+            dest_path = os.path.join(Paths.MODELS_CATALOG, so)
+            os.mkdir(dest_path)
+            print(f'{so} -- has been created.')
 
 
 def slash_remover(string):
-    forbidden = ['\\', '/', ':']
+    forbidden = ['\\', '/']
+    removeable = [':', '*', '?', '"', '<', '>', '|']
     for sign in forbidden:
         string = string.replace(sign, '_')
-    return string
-
+    for sign in removeable:
+        string = string.replace(sign, '')
+    if string.endswith('.'):
+        string = string[0:-1]
+    return string.rstrip()
 
 
 def uploader_checker():
@@ -244,4 +249,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    so_folder_creator()
+    # main()
