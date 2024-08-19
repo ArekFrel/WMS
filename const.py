@@ -220,7 +220,11 @@ def db_commit(query, func_name):
 
 
 def so_list_getter():
-    query = "SELECT DISTINCT [S.O.] FROM SAP WHERE [S.O.] != 0 AND [System Status] <> 'TECO'"
+    query = "SELECT " \
+            "DISTINCT CONCAT([S.O.], ' ', [urządzenie Główne]) "\
+            "FROM SAP "\
+            "WHERE [S.O.] != 0 "\
+            "AND [System Status] <> 'TECO'"
     try:
         CURSOR.execute(query)
         result = [str(val[0]) for val in CURSOR.fetchall()]
