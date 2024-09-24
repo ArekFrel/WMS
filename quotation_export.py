@@ -20,6 +20,9 @@ class Server:
 
 
 class QuotationObj:
+
+    quot_cache = []
+
     def __init__(self, name: str):
         self.drawing_number = name
         self.laser_pomoc = 0.0
@@ -59,6 +62,13 @@ class QuotationObj:
         self.pakowanie = 0.0
         self.dokonczenie = 0.0
 
+    @staticmethod
+    def clear_cache():
+        QuotationObj.quot_cache = None
+
+    def add_to_cache(self):
+        QuotationObj.quot_cache.append(self.drawing_number)
+
     def list_of_operations(self):
         op_list = [f"{attr}" for attr, val in self.__dict__.items() if isinstance(val, float) and val != 0]
         return "drawing_number, " + ','.join(op_list)
@@ -97,6 +107,7 @@ class QuotationObj:
     def send_to_db(self):
         db_commit(self.query(), 'quotation_insert')
         print(self.drawing_number, '- added to quotation database')
+        self.add_to_cache()
 
     @staticmethod
     def is_null(value):
@@ -114,7 +125,7 @@ def send_to_db_by_csv():
         with open(quot_file) as file:
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
-                if index % 2 != 0:
+                if index % 2 != 0 and record[0] not in QuotationObj.quot_cache:
                     obj = QuotationObj(record[0])
                     vals = [val for val in record[6:]]
                     pairs = [(op, proper_val(val)) for op, val in zip(obj.all_ops(), vals) if not is_equal_zero(val)]
@@ -130,6 +141,7 @@ def send_to_db_by_csv():
             os.remove(quot_file)
         except PermissionError:
             print(f'nie usunięto pliku {quot_file}')
+    QuotationObj.clear_cache()
     return True
 
 
