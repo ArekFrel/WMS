@@ -234,6 +234,21 @@ def so_list_getter():
     return result
 
 
+def check_for_qoutation_export():
+    def is_quote(arg):
+        if arg.startswith('SAP_QUOT'):
+            return True
+        else:
+            return False
+
+    if any(
+        list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
+    ):
+        return True
+    else:
+        return False
+
+
 def main():
     pass
 

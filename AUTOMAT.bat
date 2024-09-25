@@ -1,6 +1,6 @@
 @echo off
 
-set "VIRTUAL_ENV=C:\venv"
+set "VIRTUAL_ENV=C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\venv"
 
 if defined _OLD_VIRTUAL_PROMPT (
     set "PROMPT=%_OLD_VIRTUAL_PROMPT%"
@@ -40,4 +40,4 @@ set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
 python launch.py
 
-PAUSE
+@rem PAUSE

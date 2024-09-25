@@ -123,6 +123,7 @@ def send_to_db_by_csv():
     for quot_file in quot_files:
         print(f'New file opened {quot_file}', 10 * '_')
         with open(quot_file) as file:
+            remove_permission = True
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
                 if index % 2 != 0 and record[0] not in QuotationObj.quot_cache:
@@ -132,13 +133,25 @@ def send_to_db_by_csv():
                     any_pairs = len(pairs) > 0
                     while pairs:
                         op, val = pairs.pop(0)
-                        obj.__setattr__(op, float(val))
+                        try:
+                            obj.__setattr__(op, float(val))
+                        except ValueError:
+                            print(f'Wrong value in "{quot_file}"')
+                            any_pairs = False
+                            break
                     if any_pairs:
                         obj.send_to_db()
+                    else:
+                        remove_permission = False
+                        break
                 else:
                     continue
         try:
-            os.remove(quot_file)
+            if remove_permission:
+                os.remove(quot_file)
+            else:
+                # tu dopisać generowanie niepowtarzalnej nazwy
+                os.rename(quot_file, quot_file.replace('SAP_QUOT', 'SAP_failed_QUOT'))
         except PermissionError:
             print(f'nie usunięto pliku {quot_file}')
     QuotationObj.clear_cache()
