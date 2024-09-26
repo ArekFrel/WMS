@@ -10,7 +10,7 @@ import self_update
 import subprocess
 import os
 import quotation_export
-from const import Paths, TimeConsts
+from const import Paths, TimeConsts, check_for_qoutation_export
 
 
 class Restart:
@@ -80,13 +80,16 @@ def print_introduction():
 
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
 def cycle():
+
+    if check_for_qoutation_export():
+        subprocess.run(["cmd", "/c", "start", 'Quotation_export'], shell=True)
+
     print_now()
     sap_date.update(column='Automat')
     add_new_files.main()
     sap_date.update(column='Automat_Start')
     if new_data_uploader.main():
         file_manager.main()
-    quotation_export.main()
 
 
 def main():

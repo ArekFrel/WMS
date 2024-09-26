@@ -20,6 +20,9 @@ class Server:
 
 
 class QuotationObj:
+
+    quot_cache = []
+
     def __init__(self, name: str):
         self.drawing_number = name
         self.laser_pomoc = 0.0
@@ -59,6 +62,13 @@ class QuotationObj:
         self.pakowanie = 0.0
         self.dokonczenie = 0.0
 
+    @staticmethod
+    def clear_cache():
+        QuotationObj.quot_cache = None
+
+    def add_to_cache(self):
+        QuotationObj.quot_cache.append(self.drawing_number)
+
     def list_of_operations(self):
         op_list = [f"{attr}" for attr, val in self.__dict__.items() if isinstance(val, float) and val != 0]
         return "drawing_number, " + ','.join(op_list)
@@ -97,6 +107,7 @@ class QuotationObj:
     def send_to_db(self):
         db_commit(self.query(), 'quotation_insert')
         print(self.drawing_number, '- added to quotation database')
+        self.add_to_cache()
 
     @staticmethod
     def is_null(value):
@@ -112,25 +123,52 @@ def send_to_db_by_csv():
     for quot_file in quot_files:
         print(f'New file opened {quot_file}', 10 * '_')
         with open(quot_file) as file:
+            remove_permission = True
             records = csv.reader(file)
             for index, record in enumerate(records, start=1):
-                if index % 2 != 0:
+                if index % 2 != 0 and record[0] not in QuotationObj.quot_cache:
                     obj = QuotationObj(record[0])
                     vals = [val for val in record[6:]]
                     pairs = [(op, proper_val(val)) for op, val in zip(obj.all_ops(), vals) if not is_equal_zero(val)]
                     any_pairs = len(pairs) > 0
                     while pairs:
                         op, val = pairs.pop(0)
-                        obj.__setattr__(op, float(val))
+                        try:
+                            obj.__setattr__(op, float(val))
+                        except ValueError:
+                            print(f'Wrong value in "{quot_file}"')
+                            any_pairs = False
+                            break
                     if any_pairs:
                         obj.send_to_db()
+                    else:
+                        remove_permission = False
+                        break
                 else:
                     continue
         try:
-            os.remove(quot_file)
+            if remove_permission:
+                os.remove(quot_file)
+            else:
+                os.rename(quot_file, new_failed_name_gen(quot_file))
         except PermissionError:
             print(f'nie usunięto pliku {quot_file}')
+    QuotationObj.clear_cache()
     return True
+
+
+def new_failed_name_gen(arg):
+    new_name = f'{arg.split(".")[0].replace("SAP_QUOT", "SAP_failed_QUOT")}.csv'
+    while new_name in os.listdir(Paths.RAPORT_CATALOG):
+        name_list = new_name.split('QUOT_')
+        if len(name_list) == 1:
+            old_num = 0
+            new_name = new_name.replace('QUOT', f'QUOT_{old_num + 1}')
+        else:
+            name_list = new_name.split('_')
+            old_num = int(name_list[-1][:-4])
+            new_name = f'{"_".join(name_list[0:-1])}_{old_num + 1}.csv'
+    return new_name
 
 
 def proper_val(num):
@@ -148,7 +186,8 @@ def is_equal_zero(num):
 
 
 def main():
-    send_to_db_by_csv()
+    # send_to_db_by_csv()
+    print(new_failed_name_gen('SAP_QUOT.csv'))
 
 
 if __name__ == '__main__':

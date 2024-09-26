@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from const import *
+import os
+import sys
 
 
 class Application(tk.Frame):
@@ -205,7 +207,7 @@ class Application(tk.Frame):
     def open_files(self):
         t = 0
         warn = False
-        while Application.FILES_TO_OPEN and t <= 10:
+        while Application.FILES_TO_OPEN and t < 10:
             the_file = Application.FILES_TO_OPEN.pop(0) + '.pdf'
             space_index = the_file.find(' ')
             the_file = Paths.PRODUCTION + the_file.strip()[0:space_index] + '/' + the_file.strip()
@@ -233,10 +235,25 @@ class Application(tk.Frame):
         self.msgbox = messagebox.showwarning(title='Usunięto pliki', message=msg)
 
 
+def resource_path(relative_path):
+    """ Funkcja do uzyskania ścieżki do plików w spakowanej aplikacji """
+    try:
+        # Ścieżka do katalogu tymczasowego (dla spakowanego pliku)
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # Ścieżka dla uruchamiania w trybie developerskim (nie spakowanym)
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 def main():
+
     root = tk.Tk()
     root.title("WMS")
-    root.geometry("350x300")
+    # root.geometry("350x300")
+    root.geometry("380x335")
+    root.iconbitmap(resource_path("utils/icon.ico"))
     Application(root)
     root.mainloop()
     # files_in_db()
