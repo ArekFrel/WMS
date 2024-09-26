@@ -186,8 +186,7 @@ def is_equal_zero(num):
 
 
 def main():
-    # send_to_db_by_csv()
-    print(new_failed_name_gen('SAP_QUOT.csv'))
+    send_to_db_by_csv()
 
 
 if __name__ == '__main__':
