@@ -150,12 +150,25 @@ def send_to_db_by_csv():
             if remove_permission:
                 os.remove(quot_file)
             else:
-                # tu dopisać generowanie niepowtarzalnej nazwy
-                os.rename(quot_file, quot_file.replace('SAP_QUOT', 'SAP_failed_QUOT'))
+                os.rename(quot_file, new_failed_name_gen(quot_file))
         except PermissionError:
             print(f'nie usunięto pliku {quot_file}')
     QuotationObj.clear_cache()
     return True
+
+
+def new_failed_name_gen(arg):
+    new_name = f'{arg.split(".")[0].replace("SAP_QUOT", "SAP_failed_QUOT")}.csv'
+    while new_name in os.listdir(Paths.RAPORT_CATALOG):
+        name_list = new_name.split('QUOT_')
+        if len(name_list) == 1:
+            old_num = 0
+            new_name = new_name.replace('QUOT', f'QUOT_{old_num + 1}')
+        else:
+            name_list = new_name.split('_')
+            old_num = int(name_list[-1][:-4])
+            new_name = f'{"_".join(name_list[0:-1])}_{old_num + 1}.csv'
+    return new_name
 
 
 def proper_val(num):
@@ -173,7 +186,8 @@ def is_equal_zero(num):
 
 
 def main():
-    send_to_db_by_csv()
+    # send_to_db_by_csv()
+    print(new_failed_name_gen('SAP_QUOT.csv'))
 
 
 if __name__ == '__main__':
