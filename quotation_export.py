@@ -130,29 +130,36 @@ def send_to_db_by_csv():
                     obj = QuotationObj(record[0])
                     vals = [val for val in record[6:]]
                     pairs = [(op, proper_val(val)) for op, val in zip(obj.all_ops(), vals) if not is_equal_zero(val)]
-                    any_pairs = len(pairs) > 0
+                    any_pairs = len(pairs)
                     while pairs:
                         op, val = pairs.pop(0)
                         try:
                             obj.__setattr__(op, float(val))
                         except ValueError:
                             print(f'Wrong value in "{quot_file}"')
-                            any_pairs = False
+                            any_pairs = -1
                             break
-                    if any_pairs:
+                    if any_pairs > 1:
                         obj.send_to_db()
-                    else:
+                    elif any_pairs == -1:
                         remove_permission = False
                         break
+                    else:
+                        continue
                 else:
                     continue
-        try:
-            if remove_permission:
+
+        if remove_permission:
+            try:
                 os.remove(quot_file)
-            else:
+            except PermissionError:
+                print(f'nie usunięto pliku {quot_file}')
+        else:
+            try:
                 os.rename(quot_file, new_failed_name_gen(quot_file))
-        except PermissionError:
-            print(f'nie usunięto pliku {quot_file}')
+            except PermissionError:
+                print(f'nie usunięto zmieniono nazy pliku failed {quot_file}')
+
     QuotationObj.clear_cache()
     return True
 
