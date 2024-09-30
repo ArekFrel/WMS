@@ -21,7 +21,11 @@ class Server:
 
 class QuotationObj:
 
-    quot_cache = []
+    FORBIDDEN_NAMES = [
+        '0',
+        '0.0'
+    ]
+    quot_cache = [] + FORBIDDEN_NAMES
 
     def __init__(self, name: str):
         self.drawing_number = name
@@ -64,7 +68,7 @@ class QuotationObj:
 
     @staticmethod
     def clear_cache():
-        QuotationObj.quot_cache = None
+        QuotationObj.quot_cache = [] + QuotationObj.FORBIDDEN_NAMES
 
     def add_to_cache(self):
         QuotationObj.quot_cache.append(self.drawing_number)
@@ -136,10 +140,10 @@ def send_to_db_by_csv():
                         try:
                             obj.__setattr__(op, float(val))
                         except ValueError:
-                            print(f'Wrong value in "{quot_file}"')
+                            print(f'Wrong value in "{quot_file}" drawing: {obj.drawing_number}')
                             any_pairs = -1
                             break
-                    if any_pairs > 1:
+                    if any_pairs >= 1:
                         obj.send_to_db()
                     elif any_pairs == -1:
                         remove_permission = False
@@ -153,7 +157,7 @@ def send_to_db_by_csv():
             try:
                 os.remove(quot_file)
             except PermissionError:
-                print(f'nie usunięto pliku {quot_file}')
+                print(f'Nie usunięto pliku {quot_file}')
         else:
             try:
                 os.rename(quot_file, new_failed_name_gen(quot_file))
