@@ -132,6 +132,9 @@ def send_to_db_by_csv():
             for index, record in enumerate(records, start=1):
                 if index % 2 != 0 and record[0] not in QuotationObj.quot_cache:
                     obj = QuotationObj(record[0])
+                    if obj.drawing_number == '':
+                        remove_permission = False
+                        break
                     vals = [val for val in record[6:]]
                     pairs = [(op, proper_val(val)) for op, val in zip(obj.all_ops(), vals) if not is_equal_zero(val)]
                     any_pairs = len(pairs)
@@ -169,17 +172,24 @@ def send_to_db_by_csv():
 
 
 def new_failed_name_gen(arg):
-    new_name = f'{arg.split(".")[0].replace("SAP_QUOT", "SAP_failed_QUOT")}.csv'
-    while new_name in os.listdir(Paths.RAPORT_CATALOG):
-        name_list = new_name.split('QUOT_')
+    new_path = f'{arg.split(".")[0].replace("SAP_QUOT", "SAP_failed_QUOT")}.csv'
+    just_name, ext = new_path.split('/')[-1].split('.')
+    full_name = '.'.join([just_name, ext])
+    while full_name in os.listdir(Paths.RAPORT_CATALOG):
+        name_list = just_name.split('QUOT_')
         if len(name_list) == 1:
             old_num = 0
-            new_name = new_name.replace('QUOT', f'QUOT_{old_num + 1}')
+            just_name = just_name.replace('QUOT', f'QUOT_{old_num + 1}')
+            new_path = arg.replace('SAP_QUOT', just_name)
+            full_name = '.'.join([just_name, ext])
         else:
-            name_list = new_name.split('_')
-            old_num = int(name_list[-1][:-4])
-            new_name = f'{"_".join(name_list[0:-1])}_{old_num + 1}.csv'
-    return new_name
+            name_list = just_name.split('_')
+            old_num = int(name_list[-1])
+            just_name = f'{"_".join(name_list[0:-1])}_{old_num + 1}'
+            quot_enum = arg.split('/')[-1].rstrip('.csv')
+            new_path = f'{arg.replace(quot_enum, just_name)}'
+            full_name = '.'.join([just_name, ext])
+    return new_path
 
 
 def proper_val(num):
