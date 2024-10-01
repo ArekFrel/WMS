@@ -138,6 +138,7 @@ class Application(tk.Frame):
         if len(self.text_entered) > 0:
             f_var = Application.filtered_list(Application.ORDERS, self.text_entered)  # filter var
             var = tk.Variable(value=f_var)
+            self.listbox.yview_moveto(0)
         else:
             var = tk.Variable(value=Application.ORDERS)
         self.listbox.configure(listvariable=var)
