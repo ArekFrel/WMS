@@ -79,6 +79,14 @@ class Paths:
 
 
 class Options:
+
+    """IQE stands for Immediate quotation export - scripts scans raport catalog for quote files in each second"""
+    """, else it scans in a period of TIME_BREAK"""
+    IQE = True
+
+    """Name of file stopping quotation export script"""
+    QESR_NAME = '.qesr'
+
     """The number of records sent to the database at one time"""
     QUERY_WRAPPER = 50
 
@@ -232,21 +240,6 @@ def so_list_getter():
         print('Connection to database failed.')
         return []
     return result
-
-
-def check_for_qoutation_export():
-    def is_quote(arg):
-        if arg.startswith('SAP_QUOT'):
-            return True
-        else:
-            return False
-
-    if any(
-        list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
-    ):
-        return True
-    else:
-        return False
 
 
 def main():

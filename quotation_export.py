@@ -1,8 +1,11 @@
 import csv
-from const import Paths, db_commit
+from const import Paths, db_commit, Options
 import os
 import pyodbc
+import subprocess
+from timer_dec import timer
 from confidential import *
+from pathlib import Path
 
 
 class Server:
@@ -121,7 +124,22 @@ class QuotationObj:
             return value
 
 
+def create_qser_file(path):
+    """Creates file that stops quotation export from running its script"""
+    with open(path, 'w'):
+        pass
+    os.system(f'attrib +h "{path}"')
+    return None
+
+
+def remove_qser_file(path):
+    """Deletes file that stops quotation export from running its script"""
+    os.remove(path)
+    return None
+
+
 def send_to_db_by_csv():
+
     quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if
                   file.startswith('SAP_QUOT')]
     for quot_file in quot_files:
@@ -178,8 +196,7 @@ def new_failed_name_gen(arg):
     while full_name in os.listdir(Paths.RAPORT_CATALOG):
         name_list = just_name.split('QUOT_')
         if len(name_list) == 1:
-            old_num = 0
-            just_name = just_name.replace('QUOT', f'QUOT_{old_num + 1}')
+            just_name = just_name.replace('QUOT', f'QUOT_1')
             new_path = arg.replace('SAP_QUOT', just_name)
             full_name = '.'.join([just_name, ext])
         else:
@@ -206,8 +223,36 @@ def is_equal_zero(num):
         return False
 
 
+@timer
+def check_for_qoutation_export():
+    """This function is called by 'wait' function / launch.py module"""
+    if Path(
+            os.path.join(
+                Paths.RAPORT_CATALOG,
+                Options.QESR_NAME
+            )
+    ).is_file():
+        return False
+
+    def is_quote(arg):
+        if arg.startswith('SAP_QUOT'):
+            return True
+        else:
+            return False
+
+    if any(
+        list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
+    ):
+        subprocess.run(["cmd", "/c", "start", 'Quotation_export'], shell=True)
+        return True
+    else:
+        return False
+
+
 def main():
+    create_qser_file(os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME))
     send_to_db_by_csv()
+    remove_qser_file(os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME))
 
 
 if __name__ == '__main__':
