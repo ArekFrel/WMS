@@ -3,6 +3,7 @@ from const import Paths, db_commit, Options
 import os
 import pyodbc
 import subprocess
+import time
 from timer_dec import timer
 from confidential import *
 from pathlib import Path
@@ -125,7 +126,8 @@ class QuotationObj:
 
 
 def create_command():
-    bat_path = os.path.abspath(__name__).rstrip('quotation_export')
+    bat_path = os.path.abspath(__file__).rstrip('quotation_export.py')
+    # bat_path = r"C:\Dokumenty\automat_light\WMS"
     bat_name = Options.QEBF
     bat_cmd = os.path.join(bat_path, bat_name)
     return f'start cmd /c "{bat_cmd}"'
@@ -258,6 +260,8 @@ def check_for_qoutation_export():
     if any(
         list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
     ):
+        create_qser_file()
+        time.sleep(0.2)
         command = create_command()
         subprocess.run(command, shell=True)
 
@@ -267,7 +271,6 @@ def check_for_qoutation_export():
 
 
 def main():
-    create_qser_file()
     send_to_db_by_csv()
     remove_qser_file()
 
