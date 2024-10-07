@@ -125,23 +125,31 @@ class QuotationObj:
 
 
 def create_command():
-    bat_path = os.path.abspath(__name__).rstrip('__main__')
+    bat_path = os.path.abspath(__name__).rstrip('quotation_export')
     bat_name = Options.QEBF
     bat_cmd = os.path.join(bat_path, bat_name)
     return f'start cmd /c "{bat_cmd}"'
 
 
-def create_qser_file(path):
+def create_qser_file():
     """Creates file that stops quotation export from running its script"""
-    with open(path, 'w'):
-        pass
-    os.system(f'attrib +h "{path}"')
+    path = os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME)
+    try:
+        with open(path, 'w'):
+            pass
+        os.system(f'attrib +h "{path}"')
+    except PermissionError:
+        print('QESR already exists.')
     return None
 
 
-def remove_qser_file(path):
+def remove_qser_file():
     """Deletes file that stops quotation export from running its script"""
-    os.remove(path)
+    path = os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME)
+    try:
+        os.remove(path)
+    except PermissionError:
+        print('QESR cannot be deleted')
     return None
 
 
@@ -250,10 +258,7 @@ def check_for_qoutation_export():
     if any(
         list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
     ):
-        bat_path = os.path.abspath(__name__).rstrip('__main__')
-        bat_name = 'Quotation_export.bat'
-        bat_cmd = os.path.join(bat_path, bat_name)
-        command = f'start cmd /c "{bat_cmd}"'
+        command = create_command()
         subprocess.run(command, shell=True)
 
         return True
@@ -262,9 +267,9 @@ def check_for_qoutation_export():
 
 
 def main():
-    create_qser_file(os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME))
+    create_qser_file()
     send_to_db_by_csv()
-    remove_qser_file(os.path.join(Paths.RAPORT_CATALOG, Options.QESR_NAME))
+    remove_qser_file()
 
 
 if __name__ == '__main__':
