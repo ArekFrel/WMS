@@ -80,12 +80,15 @@ class Paths:
 
 class Options:
 
-    """IQE stands for Immediate quotation export - scripts scans raport catalog for quote files in each second"""
+    """IQE stands for Immediate quotation export - scripts scans raport catalog for quote files in every second"""
     """, else it scans in a period of TIME_BREAK"""
     IQE = True
 
     """Name of file stopping quotation export script"""
     QESR_NAME = '.qesr'
+
+    """Quotation Export bat file name"""
+    QEBF = 'Quotation_export.bat'
 
     """The number of records sent to the database at one time"""
     QUERY_WRAPPER = 50

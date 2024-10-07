@@ -124,6 +124,13 @@ class QuotationObj:
             return value
 
 
+def create_command():
+    bat_path = os.path.abspath(__name__).rstrip('__main__')
+    bat_name = Options.QEBF
+    bat_cmd = os.path.join(bat_path, bat_name)
+    return f'start cmd /c "{bat_cmd}"'
+
+
 def create_qser_file(path):
     """Creates file that stops quotation export from running its script"""
     with open(path, 'w'):
@@ -243,7 +250,12 @@ def check_for_qoutation_export():
     if any(
         list(map(is_quote, os.listdir(Paths.RAPORT_CATALOG)))
     ):
-        subprocess.run(["cmd", "/c", "start", 'Quotation_export'], shell=True)
+        bat_path = os.path.abspath(__name__).rstrip('__main__')
+        bat_name = 'Quotation_export.bat'
+        bat_cmd = os.path.join(bat_path, bat_name)
+        command = f'start cmd /c "{bat_cmd}"'
+        subprocess.run(command, shell=True)
+
         return True
     else:
         return False
