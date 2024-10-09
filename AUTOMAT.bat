@@ -38,6 +38,5 @@ if defined _OLD_VIRTUAL_PATH goto ENDIFVPATH2
 
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
-python launch.py
-
-@rem PAUSE
+python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\launch.py
+pause
