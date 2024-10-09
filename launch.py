@@ -4,7 +4,7 @@ from timer_dec import time_break
 import add_new_files
 import math
 import new_data_uploader
-from quotation_export import check_for_qoutation_export
+from utils.quotation_export import check_for_qoutation_export
 import file_manager
 import sap_date
 import self_update

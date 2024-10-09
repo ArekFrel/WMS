@@ -6,7 +6,7 @@ import subprocess
 import time
 from timer_dec import timer
 from confidential import *
-from pathlib import Path
+from pathlib import Path, pathlib
 
 
 class Server:
@@ -126,8 +126,7 @@ class QuotationObj:
 
 
 def create_command():
-    bat_path = os.path.abspath(__file__).rstrip('quotation_export.py')
-    # bat_path = r"C:\Dokumenty\automat_light\WMS"
+    bat_path = pathlib.Path(__file__).parent
     bat_name = Options.QEBF
     bat_cmd = os.path.join(bat_path, bat_name)
     return f'start cmd /c "{bat_cmd}"'
@@ -157,6 +156,7 @@ def remove_qser_file():
 
 def send_to_db_by_csv():
 
+    """Goes through all SAP Quote files and sends/updates record in database"""
     quot_files = [os.path.join(Paths.RAPORT_CATALOG, file) for file in os.listdir(Paths.RAPORT_CATALOG) if
                   file.startswith('SAP_QUOT')]
     for quot_file in quot_files:

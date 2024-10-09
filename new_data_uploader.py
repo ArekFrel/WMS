@@ -3,7 +3,7 @@ import inspect
 import os
 import os.path
 import sap_date
-import confirmation_deleter
+from utils import confirmation_deleter
 from const import CURSOR, Paths, db_commit, so_list_getter
 
 

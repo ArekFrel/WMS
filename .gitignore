@@ -16,14 +16,11 @@
 class_file.py
 confidential.py
 const.py
-delete_empty_files.py
 Get_drawings.bat
 Open_some.py
 other_data/sheet_data.csv
 Quotation_export.bat
-quote_dict.py
-redo_db.py
-temp_data.py
+utils/quote_dict.py
 workpiece.py
 
 

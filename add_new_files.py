@@ -9,8 +9,8 @@ from datetime import date
 from timer_dec import timer
 from const import *
 from pyodbc import Error
-import stamps_adder
-from merger import merging
+from utils import stamps_adder
+from utils.merger import merging
 
 catalogs_to_remove = []
 
