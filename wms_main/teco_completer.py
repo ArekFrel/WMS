@@ -1,6 +1,5 @@
 import inspect
-import const
-from const import CURSOR, db_commit, register, TimeConsts
+from .const import CURSOR, db_commit, register, TimeConsts
 from pyodbc import OperationalError, DatabaseError, Error
 
 
@@ -46,7 +45,7 @@ def last_drawing(po_number):
             CURSOR.execute(query)
             result = CURSOR.fetchone()[0]
 
-            return result >= const.TimeConsts.TECO_DRAWING_DAYS
+            return result >= TimeConsts.TECO_DRAWING_DAYS
 
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')

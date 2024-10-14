@@ -1,6 +1,6 @@
 import inspect
 import os
-from const import Paths, db_commit
+from wms_main.const import Paths, db_commit
 from datetime import datetime
 
 s_ins = 'sap_insert.csv'

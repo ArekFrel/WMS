@@ -1,8 +1,7 @@
 import fitz  # PyMuPDF
 import os
-from const import Paths
+from wms_main.const import Paths
 from stat import S_IWRITE
-PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
 
 
 def remove_watermark(drawing):

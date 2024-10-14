@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from const import *
+from wms_main.const import *
 import os
 import sys
 

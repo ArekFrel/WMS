@@ -2,9 +2,9 @@ import csv
 import inspect
 import os
 import os.path
-import sap_date
+from wms_main import sap_date
 from utils import confirmation_deleter
-from const import CURSOR, Paths, db_commit, so_list_getter
+from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
 
 
 def upload_new_data():
@@ -250,4 +250,4 @@ def main():
 
 if __name__ == '__main__':
     so_folder_creator()
-    # main()
+    # wms_main()

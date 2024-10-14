@@ -1,5 +1,5 @@
 import os
-from const import Paths, IS_IT_TEST, register
+from wms_main.const import Paths
 import fitz
 
 

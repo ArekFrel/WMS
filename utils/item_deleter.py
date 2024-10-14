@@ -1,6 +1,6 @@
 import os
 import os.path
-from const import CURSOR, Paths
+from wms_main.const import CURSOR, Paths
 
 
 def delete_item():

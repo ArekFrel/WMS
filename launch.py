@@ -1,16 +1,12 @@
 import time
 from datetime import datetime
-from timer_dec import time_break
-import add_new_files
+from wms_main.timer_dec import time_break
 import math
-import new_data_uploader
 from utils.quotation_export import check_for_qoutation_export
-import file_manager
-import sap_date
-import self_update
+from wms_main import sap_date, file_manager, new_data_uploader, self_update, add_new_files
 import subprocess
 import os
-from const import Paths, TimeConsts, Options
+from wms_main.const import Paths, TimeConsts, Options
 
 
 class Restart:

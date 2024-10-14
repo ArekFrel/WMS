@@ -1,12 +1,12 @@
 import csv
-from const import Paths, db_commit, Options
 import os
 import pyodbc
 import subprocess
 import time
-from timer_dec import timer
-from confidential import *
-from pathlib import Path, pathlib
+from wms_main.const import Paths, db_commit, Options
+from wms_main.confidential import *
+from wms_main.timer_dec import timer
+from pathlib import Path
 
 
 class Server:
@@ -126,7 +126,7 @@ class QuotationObj:
 
 
 def create_command():
-    bat_path = pathlib.Path(__file__).parent
+    bat_path = Path(__file__).parent.parent
     bat_name = Options.QEBF
     bat_cmd = os.path.join(bat_path, bat_name)
     return f'start cmd /c "{bat_cmd}"'
@@ -151,6 +151,8 @@ def remove_qser_file():
         os.remove(path)
     except PermissionError:
         print('QESR cannot be deleted')
+    except FileNotFoundError:
+        pass
     return None
 
 

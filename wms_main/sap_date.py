@@ -1,7 +1,7 @@
 from datetime import datetime
 import inspect
 import time
-from const import db_commit
+from wms_main.const import db_commit
 
 
 def update(column):

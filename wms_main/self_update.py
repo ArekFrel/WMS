@@ -1,6 +1,6 @@
 import os
 import shutil
-from const import Paths
+from wms_main.const import Paths
 from stat import S_IWRITE
 
 

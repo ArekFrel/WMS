@@ -1,8 +1,8 @@
 import os
-from const import CURSOR, MERGED_MIN, db_commit, IS_IT_TEST, TEST_RETURN_ORDERS, TEST_RETURN_NUM, TEST_RETURN_DRAWINGS, register
+from wms_main.const import CURSOR, MERGED_MIN, db_commit, IS_IT_TEST, TEST_RETURN_ORDERS, TEST_RETURN_NUM, TEST_RETURN_DRAWINGS
 from stat import S_IWRITE
 from pyodbc import Error, OperationalError
-from const import Paths
+from wms_main.const import Paths
 import fitz
 
 

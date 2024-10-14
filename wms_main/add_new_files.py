@@ -1,13 +1,13 @@
 import inspect
 import os.path
 
-import teco_completer
+from wms_main import teco_completer
 import shutil
 import re
-from class_file import File, Catalog
+from wms_main.class_file import File, Catalog
 from datetime import date
-from timer_dec import timer
-from const import *
+from wms_main.timer_dec import timer
+from wms_main.const import *
 from pyodbc import Error
 from utils import stamps_adder
 from utils.merger import merging

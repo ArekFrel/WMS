@@ -37,6 +37,7 @@ if defined _OLD_VIRTUAL_PATH goto ENDIFVPATH2
 :ENDIFVPATH2
 
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
+set PYTHONPATH=%PYTHONPATH%;C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\wms_main
 
 python C:\Users\PLFRELA\OneDrive\PythonProjects\WMS\launch.py
-pause
+@rem pause
