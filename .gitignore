@@ -13,9 +13,7 @@
 *.spec
 *.txtpy
 *.xlsx
-wms_main/class_file.py
 wms_main/confidential.py
-wms_main/const.py
 Get_drawings.bat
 Open_some.py
 other_data/sheet_data.csv
