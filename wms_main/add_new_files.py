@@ -11,6 +11,7 @@ from wms_main.const import *
 from pyodbc import Error
 from utils import stamps_adder
 from utils.merger import merging
+from utils.pump_block_tracker import pb_tracker
 
 catalogs_to_remove = []
 
@@ -331,10 +332,8 @@ def validate_file(name, catalog=''):
     if '.' not in name:
         return False
 
-    base_name, extension = name.rsplit('.', 1)
-
-    if extension.lower() != 'pdf':
-        return False
+    if 'merged' in name:
+        return 'merged'
 
     if catalog:
         if catalog != name[0:7]:
@@ -346,14 +345,16 @@ def validate_file(name, catalog=''):
     if not name[:6].isnumeric():
         return False
 
-    if base_name.endswith('_99'):
-        return False
-
     if '--' in name:
         return False
 
-    if 'merged' in name:
-        return 'merged'
+    base_name, extension = name.rsplit('.', 1)
+
+    if extension.lower() != 'pdf':
+        return False
+
+    if base_name.endswith('_99'):
+        return False
 
     return base_name
 
@@ -438,6 +439,7 @@ def list_new_files_class():
 
     File.print_counter_status()
     File.set_counter_zero()
+    pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
 
 
 def file_handler(file_name, folder=None):
@@ -468,7 +470,7 @@ def catalog_handler(name, path):
 
 
 def main():
-    new_files_to_db()
+    new_files_to_db()  # just SAP annotation
     truncate_bad_files()
     if Options.GENERAL_CHECK_PERMISSION and general_checker():
         teco_completer.main()
@@ -481,5 +483,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    list_new_files_class()
+    pass
+    # main()
+    # list_new_files_class()

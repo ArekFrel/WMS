@@ -128,7 +128,8 @@ class Options:
             'update sap_data',
             'select item_data from sap_data',
             'delete from złe_pliki',
-            'select sap_skrypt_zmiana from sap_data']
+            'select sap_skrypt_zmiana from sap_data',
+            'merge into sap as target']
 
 
 class CatalogType:

@@ -5,6 +5,7 @@ import os.path
 from wms_main import sap_date
 from utils import confirmation_deleter
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
+from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
 
 def upload_new_data():
@@ -105,18 +106,80 @@ def formulate_query_record(record):
         urzadzenie_glowne = slash_remover(str(record[28]))
         system_status_full = record[22]
 
-        query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
-                f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
-                f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
-                f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
-                f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
-                f"[Urządzenie Główne], [System Status Full]) " \
+        # zmiana kwerendy na MERGE
+
+        query = f"MERGE INTO {table} As target " \
+                f"USING (" \
                 f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
                 f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
                 f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
                 f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
+                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny}, " \
+                f"'{urzadzenie_glowne}','{system_status_full}')) " \
+                f"AS source ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
+                f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
+                f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
+                f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny]," \
+                f"[Finish Op Aktualny],[Urządzenie Główne], [System Status Full])" \
+                f"ON target.Confirmation = source.Confirmation " \
+                f"WHEN MATCHED THEN " \
+                f"UPDATE SET " \
+                f"target.[S.O.] = source.[S.O.], " \
+                f"target.[Obiekt] = source.[Obiekt], " \
+                f"target.[P.O.] = source.[P.O.], " \
+                f"target.[Start P.O.] = source.[Start P.O.], " \
+                f"target.[Finish P.O.] = source.[Finish P.O.], " \
+                f"target.[Ilość] = source.[Ilość], " \
+                f"target.[Urządzenie] = source.[Urządzenie], " \
+                f"target.[Brygada] = source.[Brygada], " \
+                f"target.[Nr Op] = source.[Nr Op], " \
+                f"target.[Operacja] = source.[Operacja], " \
+                f"target.[Start Op] = source.[Start Op], " \
+                f"target.[Finish Op] = source.[Finish Op], " \
+                f"target.[Czas Plan] = source.[Czas Plan], " \
+                f"target.[Czas Raport] = source.[Czas Raport], " \
+                f"target.[Opis] = source.[Opis], " \
+                f"target.[Create] = source.[Create], " \
+                f"target.[Planista 0] = source.[Planista 0], " \
+                f"target.[Ostatnia Zmiana] = source.[Ostatnia Zmiana], " \
+                f"target.[Planista 1] = source.[Planista 1], " \
+                f"target.[Release Aktualny] = source.[Release Aktualny], " \
+                f"target.[Release Plan] = source.[Release Plan], " \
+                f"target.[Network] = source.[Network], " \
+                f"target.[System Status] = source.[System Status], " \
+                f"target.[Confirmation] = source.[Confirmation], " \
+                f"target.[Start P.O. Aktualny] = source.[Start P.O. Aktualny], " \
+                f"target.[Finish P.O. Aktualny] = source.[Finish P.O. Aktualny], " \
+                f"target.[Start Op Aktualny] = source.[Start Op Aktualny], " \
+                f"target.[Finish Op Aktualny] = source.[Finish Op Aktualny], " \
+                f"target.[Urządzenie Główne] = source.[Urządzenie Główne], " \
+                f"target.[System Status Full] = source.[System Status Full] " \
+                f"WHEN NOT MATCHED BY TARGET THEN " \
+                f"INSERT ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada],[Nr Op]," \
+                f"[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis]," \
+                f"[Create],[Planista 0],[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan]," \
+                f"[Network],[System Status],[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny]," \
+                f"[Start Op Aktualny],[Finish Op Aktualny],[Urządzenie Główne],[System Status Full])" \
+                f"VALUES (source.[S.O.], source.[Obiekt],source.[P.O.], source.[Start P.O.], source.[Finish P.O.], " \
+                f"source.[Ilość], source.[Urządzenie],   source.[Brygada], source.[Nr Op], source.[Operacja], " \
+                f"source.[Start Op], source.[Finish Op], source.[Czas Plan], source.[Czas Raport],   source.[Opis], " \
+                f"source.[Create], source.[Planista 0], source.[Ostatnia Zmiana], source.[Planista 1], " \
+                f"source.[Release Aktualny],   source.[Release Plan], source.[Network], source.[System Status], " \
+                f"source.[Confirmation], source.[Start P.O. Aktualny], source.[Finish P.O. Aktualny], " \
+                f"source.[Start Op Aktualny], source.[Finish Op Aktualny], " \
+                f"source.[Urządzenie Główne], source.[System Status Full]);"
 
+        # query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
+        #         f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
+        #         f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
+        #         f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
+        #         f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
+        #         f"[Urządzenie Główne], [System Status Full]) " \
+        #         f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
+        #         f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
+        #         f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
+        #         f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
+        #         f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
         return query
 
 
@@ -230,6 +293,7 @@ def main():
     if uploader_checker():
         if upload_new_data():
             so_folder_creator()
+            po_pumpblock_recorder()  # identyfikacja nowych zleceń na pump blocki
             sap_date.update(column='SAP_Skrypt_zmiana')
         else:
             return False
@@ -249,5 +313,7 @@ def main():
 
 
 if __name__ == '__main__':
-    so_folder_creator()
-    # wms_main()
+    upload_new_data()
+    # pass
+    # so_folder_creator()
+
