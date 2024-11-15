@@ -6,6 +6,8 @@
 /deep_copy
 /dist
 /_old
+/*/__pycache__
+/*/*/__pycache__
 *.bat
 *.csv
 *.txt
