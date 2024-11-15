@@ -109,7 +109,8 @@ class QuotationObj:
                 f"UPDATE Quotation " \
                 f"SET {self.all_attr_reset()}" \
                 f"WHERE drawing_number = '{self.drawing_number}' " \
-                f"END; "
+                f"END;"
+
         return query
 
     def send_to_db(self):
