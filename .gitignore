@@ -6,8 +6,10 @@
 /deep_copy
 /dist
 /_old
-/*/__pycache__
-/*/*/__pycache__
+/wms_main/__pycache__
+/utils/__pycache__
+/utils/watermark_remover/__pycache__
+/utils/pump_block_tracker/__pycache__
 *.bat
 *.csv
 *.txt
