@@ -39,3 +39,12 @@ BEGIN
     END
 END;
 """
+# stworzenie tabeli PB_NC
+
+"""
+CREATE TABLE PB_NC_LIST (
+ PB_NC VARCHAR(16) PRIMARY_KEY,
+ DRAWING VARCHAR(64)    
+)
+
+"""
