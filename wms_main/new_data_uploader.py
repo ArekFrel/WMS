@@ -97,7 +97,7 @@ def formulate_query_record(record):
         release_aktualny = redate(record[19])
         release_plan = redate(record[20])
         network = record[21]
-        system_status = record[22].split(' ')[-1]
+        system_status = status_select(record[22])
         confirmation = record[23]
         start_po_aktualny = redate(record[24])
         finish_po_aktualny = redate(record[25])
@@ -110,12 +110,12 @@ def formulate_query_record(record):
 
         query = f"MERGE INTO {table} As target " \
                 f"USING (" \
-                f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
-                f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
-                f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
-                f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-                f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny}, " \
-                f"'{urzadzenie_glowne}','{system_status_full}')) " \
+                f"VALUES('{so}', '{obiekt}', '{po}', {start_po}, {finish_po}, '{ilosc}', '{urzadzenie}', '{brygada}', "\
+                f"'{nr_op}', '{operacja}', {start_op}, {finish_op}, '{czas_plan}', '{czas_raport}', '{opis}', {create}, "\
+                f"'{planista_0}', {ostatnia_zmiana}, '{planista_1}', {release_aktualny}, "\
+                f"{release_plan}, '{network}', '{system_status}', '{confirmation}', {start_po_aktualny}," \
+                f"{finish_po_aktualny}, {start_op_aktualny}, {finish_op_aktualny}, " \
+                f"'{urzadzenie_glowne}', '{system_status_full}')) " \
                 f"AS source ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
                 f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
                 f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
@@ -167,7 +167,7 @@ def formulate_query_record(record):
                 f"source.[Release Aktualny],   source.[Release Plan], source.[Network], source.[System Status], " \
                 f"source.[Confirmation], source.[Start P.O. Aktualny], source.[Finish P.O. Aktualny], " \
                 f"source.[Start Op Aktualny], source.[Finish Op Aktualny], " \
-                f"source.[Urządzenie Główne], source.[System Status Full]);"
+                f"source.[Urządzenie Główne], source.[System Status Full]); "
 
         # query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
         #         f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
@@ -181,6 +181,13 @@ def formulate_query_record(record):
         #         f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
         #         f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
         return query
+
+
+def status_select(stat: str) -> str:
+    if 'CNF' in stat and 'PCNF' not in stat:
+        return "TECO"
+    else:
+        return stat.split(' ')[-1]
 
 
 def update_status(record):
@@ -313,7 +320,7 @@ def main():
 
 
 if __name__ == '__main__':
-    upload_new_data()
-    # pass
+    # upload_new_data()
+    pass
     # so_folder_creator()
 
