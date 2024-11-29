@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from const import *
+from wms_main.const import *
 import os
 import sys
 
@@ -134,14 +134,17 @@ class Application(tk.Frame):
         self.button_3.grid(row=6, column=3, sticky=tk.NS)
 
     def lb_data_update(self):
+        """ 'lb' stands for 'list box' """
         if len(self.text_entered) > 0:
             f_var = Application.filtered_list(Application.ORDERS, self.text_entered)  # filter var
             var = tk.Variable(value=f_var)
+            self.listbox.yview_moveto(0)
         else:
             var = tk.Variable(value=Application.ORDERS)
         self.listbox.configure(listvariable=var)
 
     def cb_func(self):
+        """ 'cb' stands for 'create button' """
         if self.check_var.get():
             Application.ORDERS = Application.BTD
             self.create_button_2()
@@ -165,7 +168,7 @@ class Application(tk.Frame):
         # print(Application.FILES_TO_OPEN.pop(0))
 
     def files_in_db(self):
-        print('')
+        # print('')
         order_number = self.listbox.selection_get()
         if os.path.exists(Paths.PRODUCTION):
             query = f'SELECT id, Plik FROM TECHNOLOGIA WHERE PO = {order_number};'

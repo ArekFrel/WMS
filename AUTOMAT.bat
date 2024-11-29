@@ -37,7 +37,6 @@ if defined _OLD_VIRTUAL_PATH goto ENDIFVPATH2
 :ENDIFVPATH2
 
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
-
-python launch.py
-
-@rem PAUSE
+set PYTHONPATH=%PYTHONPATH%;"C:\Users\PLFRELA\OneDrive - Tetra Pak\App_projects\WMS_app"
+python "C:\Users\PLFRELA\OneDrive - Tetra Pak\App_projects\WMS_app\launch.py"
+pause

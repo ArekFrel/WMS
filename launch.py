@@ -1,16 +1,12 @@
 import time
 from datetime import datetime
-from timer_dec import time_break
-import add_new_files
+from wms_main.timer_dec import time_break
 import math
-import new_data_uploader
-import file_manager
-import sap_date
-import self_update
+from utils.quotation_export import check_for_qoutation_export
+from wms_main import sap_date, file_manager, new_data_uploader, self_update, add_new_files
 import subprocess
 import os
-import quotation_export
-from const import Paths, TimeConsts, check_for_qoutation_export
+from wms_main.const import Paths, TimeConsts, Options
 
 
 class Restart:
@@ -47,10 +43,13 @@ def print_reset_break():
 
 
 def wait(period):
+    exec_time = 0
     while period > 0:
+        if Options.IQE:
+            exec_time = check_for_qoutation_export()
         text = f'Next Refresh in {period:03d}s'
         print(text, end="\r")
-        time.sleep(1)
+        time.sleep(1 - exec_time)
         period -= 1
         print(' ' * len(text), end="\r")
     print(' ')
@@ -81,15 +80,16 @@ def print_introduction():
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
 def cycle():
 
-    if check_for_qoutation_export():
-        subprocess.run(["cmd", "/c", "start", 'Quotation_export'], shell=True)
-
     print_now()
     sap_date.update(column='Automat')
     add_new_files.main()
     sap_date.update(column='Automat_Start')
+
     if new_data_uploader.main():
         file_manager.main()
+
+    if not Options.IQE:
+        check_for_qoutation_export()
 
 
 def main():
