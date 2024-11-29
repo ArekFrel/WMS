@@ -10,6 +10,7 @@
 /utils/__pycache__
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
+data_manipulator.py
 *.bat
 *.csv
 *.txt

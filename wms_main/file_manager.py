@@ -12,7 +12,6 @@ i_ins = 'item_insert.csv'
 
 
 def manage_files():
-
     cat_con = {x.lower() for x in os.listdir(Paths.RAPORT_CATALOG)}
     # if s_ins in cat_con and s3 in cat_con and s3old in cat_con:
     if {s_ins, s3, s3old}.issubset(cat_con):

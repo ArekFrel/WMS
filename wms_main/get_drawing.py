@@ -18,7 +18,7 @@ def main():
     QUERY = f"{query}"
 
     source_cat = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
-    destination = 'C:/Dokumenty/gen_cat/get_drawings/'
+    destination = 'C:/__main__/gen_cat/get_drawings/'
     server = 'SELUSQL16'
     database = 'PRODUKCJAWORKFLOW'
     conn = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
