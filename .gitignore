@@ -10,6 +10,7 @@
 /wms_main/build
 /wms_main/dist
 /utils/__pycache__
+/utils/ico_den.py
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
 data_manipulator.py
@@ -20,6 +21,7 @@ data_manipulator.py
 *.spec
 *.txtpy
 *.xlsx
+*.ico
 wms_main/confidential.py
 Get_drawings.bat
 Open_some.py
