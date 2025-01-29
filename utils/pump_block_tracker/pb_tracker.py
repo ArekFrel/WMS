@@ -98,7 +98,7 @@ def pumpblock_drawing_handler():
 
 
 def hash_id(num: int):
-    return f"#{num: 0>4}"
+    return f"#{num:0>4}"
 
 
 def po_drawing_added_setter(po):
