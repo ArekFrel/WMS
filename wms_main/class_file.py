@@ -132,6 +132,12 @@ class File:
         """Return base name and order number if file in destination already exist"""
         return self.file_name.rsplit(sep='_', maxsplit=1)
 
+    def is_bought(self):
+        for word in Options.BOUGHT_FILES_NAMES:
+            if word in self.name.lower():
+                return True
+        return False
+
     def move_file(self):
         """Moving file to a new location."""
         os.rename(self.start_path, self.start_path)

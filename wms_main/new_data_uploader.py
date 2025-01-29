@@ -180,7 +180,9 @@ def formulate_query_record(record):
         #         f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
         #         f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
         #         f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
-        return query
+    else:
+        query = ''
+    return query
 
 
 def status_select(stat: str) -> str:

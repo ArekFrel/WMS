@@ -142,6 +142,10 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
         komentarz = 'Część złożenia kupowanego'
     elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
+        last_id = -1
+        if new_pdf[-2] == ' ':
+            last_id = 2
+        new_pdf = new_pdf[:last_id]
     else:
         komentarz = ''
 
@@ -484,5 +488,4 @@ def main():
 
 if __name__ == '__main__':
     pass
-    # main()
-    # list_new_files_class()
+

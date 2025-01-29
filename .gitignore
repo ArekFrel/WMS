@@ -2,12 +2,15 @@
 /__pycache__
 /venv
 /__wms_update__
-/build/*
+/build
 /deep_copy
 /dist
 /_old
 /wms_main/__pycache__
+/wms_main/build
+/wms_main/dist
 /utils/__pycache__
+/utils/ico_den.py
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
 data_manipulator.py
@@ -18,6 +21,7 @@ data_manipulator.py
 *.spec
 *.txtpy
 *.xlsx
+*.ico
 wms_main/confidential.py
 Get_drawings.bat
 Open_some.py
