@@ -142,10 +142,10 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
         komentarz = 'Część złożenia kupowanego'
     elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
-        last_id = -1
-        if new_pdf[-2] == ' ':
-            last_id = 2
-        new_pdf = new_pdf[:last_id]
+        # last_id = -1                      '''recently deleted'''
+        # if new_pdf[-2] == ' ':            '''recently deleted'''
+        #     last_id = 2                   '''recently deleted'''
+        # new_pdf = new_pdf[:last_id]       '''recently deleted'''
     else:
         komentarz = ''
 

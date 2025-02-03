@@ -2,6 +2,7 @@ import csv
 import inspect
 import os
 import os.path
+from wms_main.const import TimeConsts
 from wms_main import sap_date
 from utils import confirmation_deleter
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
@@ -298,6 +299,17 @@ def update_system_status():
         print('\n', end='\r')
 
 
+def update_wms_table():
+    query = "SELECT DATEDIFF(MINUTE, wms_table_update, GETDATE()) FROM sap_data;"
+    CURSOR.execute(query)
+    COL_START = '\033[95m'
+    COL_END = '\033[0m'
+    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+        print(f'{COL_START}Updating wms_table for planners{COL_END}')
+        CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
+        sap_date.update(column='wms_table_update')
+
+
 def main():
     if uploader_checker():
         if upload_new_data():
@@ -315,6 +327,8 @@ def main():
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
 
+    update_wms_table()
+
     """UNREM if you need too update system Status"""
     # update_system_status()
 
@@ -322,7 +336,6 @@ def main():
 
 
 if __name__ == '__main__':
-    # upload_new_data()
     pass
     # so_folder_creator()
 

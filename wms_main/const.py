@@ -30,6 +30,9 @@ class TimeConsts:
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
 
+    '''UPDATES wms_table for planners every x minutes'''
+    PUT = 60
+
     """Time when TECO orders are set to completed. - obsolete"""
     # TECO_TIME = 15
 
