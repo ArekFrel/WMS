@@ -5,7 +5,7 @@ import os.path
 from wms_main.const import TimeConsts
 from wms_main import sap_date
 from utils import confirmation_deleter
-from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
+from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
 
@@ -107,6 +107,15 @@ def formulate_query_record(record):
         urzadzenie_glowne = slash_remover(str(record[28]))
         system_status_full = record[22]
 
+        if planista_0 == '':
+            planista = db_commit_getval(
+                f"Select distinct [Planista 0] from SAP where [P.O.] = {po} and [planista 0] != '';"
+            )
+            if planista:
+                planista_0 = planista
+
+
+
         # zmiana kwerendy na MERGE
 
         query = f"MERGE INTO {table} As target " \
@@ -189,8 +198,13 @@ def formulate_query_record(record):
 def status_select(stat: str) -> str:
     if 'CNF' in stat and 'PCNF' not in stat:
         return "TECO"
+    for _ in ('DSPT', 'DSEX', 'EXPL', 'EXTS'):
+        if _ in stat:
+            stat = stat.replace(_, '')
+    while '  ' in stat:
+        stat = stat.replace('  ', ' ')
     else:
-        return stat.split(' ')[-1]
+        return stat.rstrip().split(' ')[-1]
 
 
 def update_status(record):
@@ -337,5 +351,3 @@ def main():
 
 if __name__ == '__main__':
     pass
-    # so_folder_creator()
-

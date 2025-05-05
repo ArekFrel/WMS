@@ -99,6 +99,9 @@ class QuotationObj:
         ]
         return ' ,'.join(val_list) + ' '
 
+
+
+
     def query(self):
         query = f"IF NOT EXISTS (SELECT * FROM Quotation WHERE drawing_number = '{self.drawing_number}') " \
                 f"BEGIN " \

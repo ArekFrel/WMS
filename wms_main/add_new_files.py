@@ -6,6 +6,7 @@ import shutil
 import re
 from wms_main.class_file import File, Catalog
 from datetime import date
+from utils.watermark_remover import watermarks_remover as wm
 from wms_main.timer_dec import timer
 from wms_main.const import *
 from pyodbc import Error
@@ -296,7 +297,10 @@ def cut_file_class(file):
                 order=file.po)
         return True
     else:
+        if not (file.bought_name or file.bought_cat):
+            wm.remove_watermark(file.file_name) #added, not tested
         update_rec(file)
+
     return True
 
 

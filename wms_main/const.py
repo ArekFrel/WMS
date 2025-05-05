@@ -52,33 +52,33 @@ class TimeConsts:
         TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 179
+        TIME_REFILL_CAT = 120
 
 
 class Paths:
 
-    RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
-    REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
-    TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
-    UPDATE_CAT = 'T:/__wms_update__'
-    MODELS_CATALOG = 'W:/!!__PRODUKCJA__!!/5__Modele_3D/'
+    RAPORT_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\'
+    REGISTER = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\reg.txt'
+    TRANSFER_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\transfer_history.txt'
+    UPDATE_CAT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\TEMP\\__wms_update__'
+    MODELS_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\5__Modele_3D\\'
 
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
     AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
     """Path of watermarks"""
-    WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
-    WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+    WATERMARK_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_bought.jpg'
+    WATERMARK_SUB_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
 
     if IS_IT_TEST:
         PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
         START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
     else:
         """PRODUCTION - catalogs where drawings are stored. """
-        PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+        PRODUCTION = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!/1__Rysunki/'
         """START_CATALOG - catalog where new drawing are uploaded by planners."""
-        START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+        START_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
 
 
 class Options:
@@ -107,6 +107,7 @@ class Options:
         'zakupowy',
         'zakupowe',
         'kupne',
+        'kupno',
         'kupowane',
         'kupowany',
         'zakup',
@@ -232,6 +233,27 @@ def db_commit(query, func_name):
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
+
+
+def db_commit_getval(query):
+    try:
+        with CURSOR:
+            CURSOR.execute(query)
+            result = CURSOR.fetchval()
+        return result
+
+    except pyodbc.OperationalError:
+        return None
+
+    except pyodbc.DatabaseError:
+        return None
+
+    except pyodbc.Error:
+        return None
+
+    except Exception:
+        return None
+
 
 
 def so_list_getter():

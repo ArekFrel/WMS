@@ -64,7 +64,8 @@ def teco_closer(records):
 
 def main():
     records = get_data()
-    teco_closer(records)
+    if records:
+        teco_closer(records)
 
 
 if __name__ == '__main__':

@@ -271,7 +271,9 @@ class File:
                 result = CURSOR.fetchone()
 
             except Error:
-                print(f'Database Error in "check_po_in_sap"')
+                print(f'Database Error in "'
+                      f''
+                      f'check_po_in_sap"')
                 return False
         return result[0] > 0
 

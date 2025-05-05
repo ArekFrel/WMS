@@ -5,7 +5,7 @@ from pathlib import Path
 
 def step_saver(file):
     inventor = win32com.client.Dispatch("Inventor.Application")
-    inventor.Visible = False
+    inventor.Visible = True
     doc = inventor.Documents.Open(file)
     location = Path(file).parent
     new_file = file[len(str(location)) + 1:].split('.')[0] + '.x_t'
@@ -17,9 +17,10 @@ def step_saver(file):
 
 
 def main():
-    pass
+    path = input('podaj ścieżkę: ')
+    for model in [x for x in os.listdir(path) if x.endswith('.ipt') or x.endswith('.stp')]:
+        step_saver(os.path.join(path, model))
 
 
 if __name__ == '__main__':
-    step_saver('N:\\1740023\\0004_A\\1740023-0004.ipt')
     main()
