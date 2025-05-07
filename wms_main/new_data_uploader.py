@@ -22,10 +22,10 @@ def upload_new_data():
                     print(f'SAP_Insert file is empty.')
                     break
             query = query + formulate_query_record(record=record)
-            print(f'Records sent to database: {index + 1}', end="\r")
             query_counter += 1
             if query_counter == 50:
                 if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    print(f'Records sent to database: {index + 1}', end="\r")
                     query = ''
                     query_counter = 0
                 else:
@@ -92,7 +92,7 @@ def formulate_query_record(record):
         czas_raport = record[13]
         opis = record[14]
         create = redate(record[15])
-        planista_0 = record[16]
+        planista_0 = planer_seek(po, record[16])
         ostatnia_zmiana = redate(record[17])
         planista_1 = record[18]
         release_aktualny = redate(record[19])
@@ -106,15 +106,6 @@ def formulate_query_record(record):
         finish_op_aktualny = redate(record[27])
         urzadzenie_glowne = slash_remover(str(record[28]))
         system_status_full = record[22]
-
-        if planista_0 == '':
-            planista = db_commit_getval(
-                f"Select distinct [Planista 0] from SAP where [P.O.] = {po} and [planista 0] != '';"
-            )
-            if planista:
-                planista_0 = planista
-
-
 
         # zmiana kwerendy na MERGE
 
@@ -260,6 +251,17 @@ def slash_remover(string):
     if string.endswith('.'):
         string = string[0:-1]
     return string.rstrip()
+
+
+def planer_seek(po_num, planer):
+    if planer != '':
+        return planer
+    found_planer = db_commit_getval(
+        f"Select distinct [Planista 0] from SAP where [P.O.] = {po_num} and [planista 0] != '';"
+    )
+    if found_planer:
+        return found_planer
+    return ''
 
 
 def uploader_checker():

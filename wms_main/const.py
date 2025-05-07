@@ -64,7 +64,7 @@ class Paths:
     MODELS_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\5__Modele_3D\\'
 
     """Path of AUTOMAT file"""
-    AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+    AUTOMAT_FILES_STORED = 'C:/Users/plolprod5/OneDrive - Tetra Pak//'
     AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
     """Path of watermarks"""

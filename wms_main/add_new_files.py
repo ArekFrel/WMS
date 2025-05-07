@@ -215,6 +215,7 @@ def update_rec(file):
         query = f"UPDATE TECHNOLOGIA SET OP_1 = '', OP0 = '', OP1 = '', KOMENTARZ = 'Zmiana na do zrobienia', " \
                 f"STATUS_OP = 6, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec bought to made')
+        wm.remove_watermark(file.file_name)  # added, not tested
         merger_information(file, text='zmiana na do zrobienia.')
         return
 
@@ -297,8 +298,6 @@ def cut_file_class(file):
                 order=file.po)
         return True
     else:
-        if not (file.bought_name or file.bought_cat):
-            wm.remove_watermark(file.file_name) #added, not tested
         update_rec(file)
 
     return True
