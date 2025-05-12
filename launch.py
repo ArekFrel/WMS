@@ -96,7 +96,6 @@ def main():
     restart = Restart()
     if self_update.check_for_update():
         self_update.update()
-        subprocess.call(Paths.AUTOMAT_BAT)
         Restart.proceed = False
         return None
 

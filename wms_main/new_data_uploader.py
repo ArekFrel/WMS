@@ -4,7 +4,7 @@ import os
 import os.path
 from wms_main.const import TimeConsts
 from wms_main import sap_date
-from utils import confirmation_deleter
+from utils import confirmation_deleter, item_deleter
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
@@ -44,17 +44,30 @@ def upload_new_data():
 
 def upload_new_items():
     print('Uploading new Items')
-    item_insert_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_INSERT.csv")
+    item_insert_file = os.path.join(Paths.RAPORT_CATALOG, "aaITEM_INSERT.csv")
     with open(item_insert_file) as file:
         changed_records = csv.reader(file)
         i = 0
+        query = ''
         for record in changed_records:
-            if send_item_to_db(record=record):
-                i += 1
+            po, item = record
+            query = query + f'Delete from dbo.Items  WHERE Prod_Order = {po}; '
+            query = query + f"INSERT INTO dbo.Items (Prod_Order, Item) VALUES({po},{item})"
+            i += 1
+            if i % 50 == 0:
+                if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    query = ''
+                    print(f'Items sent to database: {i}', end="\r")
+                else:
+                    return False
+        if query:
+            if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
                 print(f'Items sent to database: {i}', end="\r")
             else:
-                break
-        print('\n', end='\r')
+                return False
+        return True
+
+
 
 
 def redate(date):
@@ -218,12 +231,13 @@ def send_item_to_db(record):
         for i in range(0, (2 - len(record))):
             record.append('')
 
-    if record[1] != '':
-        if record[0] == '0':
+
+    if record[0] != '':
+        if record[1] == '0':
             item = 'NULL'
         else:
-            item = record[0]
-        prod_order = int(record[1])
+            item = record[1]
+        prod_order = int(record[0])
         query = f"DELETE FROM {table} WHERE Prod_Order = {prod_order}; "\
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
@@ -282,21 +296,34 @@ def uploader_checker():
     return False
 
 
+def item_files_delte():
+
+    insert_file = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_INSERT.csv')
+    delete_file = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_DELETE.csv')
+    if os.path.exists(insert_file):
+        os.remove(insert_file)
+    if os.path.exists(delete_file):
+        os.remove(delete_file)
+
+
 def uploader_item_checker():
-    item_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'ITEM_INSERT.csv')
+    item_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_INSERT.csv')
     if os.path.exists(item_insert_path):
-        item_insert_date = os.path.getmtime(item_insert_path)
+        return True
+    else:
+        return False
+        # item_insert_date = os.path.getmtime(item_insert_path)
+        #
+        # query = 'SELECT Item_Data FROM SAP_data;'
+        # if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+        #     return False
+        # result = CURSOR.execute(query)
+        #
+        # for date_time in result:
+        #     item_db_date = date_time[0].timestamp()
+        #     if item_insert_date > item_db_date:
+        #         return True
 
-        query = 'SELECT Item_Data FROM SAP_data;'
-        if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-            return False
-        result = CURSOR.execute(query)
-
-        for date_time in result:
-            item_db_date = date_time[0].timestamp()
-            if item_insert_date > item_db_date:
-                return True
-    return False
 
 
 def update_system_status():
@@ -339,7 +366,11 @@ def main():
         print('No new data uploaded.')
 
     if uploader_item_checker():
-        upload_new_items()
+        proceed = upload_new_items()
+        if proceed:
+            proceed = item_deleter.main()
+        if proceed:
+            item_files_delte()
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
 
