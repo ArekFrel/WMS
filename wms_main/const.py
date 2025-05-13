@@ -71,6 +71,11 @@ class Paths:
     WATERMARK_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_bought.jpg'
     WATERMARK_SUB_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
 
+    """Items Managinng"""
+    II_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\ITEM_INSERT.csv'
+    ID_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\ITEM_DELETE.csv'
+
+
     if IS_IT_TEST:
         PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
         START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'

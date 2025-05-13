@@ -2,7 +2,7 @@ import csv
 import inspect
 import os
 import os.path
-from wms_main.const import TimeConsts
+from wms_main.const import TimeConsts, Paths
 from wms_main import sap_date
 from utils import confirmation_deleter, item_deleter
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
@@ -33,7 +33,7 @@ def upload_new_data():
                     return False
         if query_counter != 0:
             if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-                pass
+                print(f'Records sent to database: {index + 1}', end="\r")
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
@@ -44,10 +44,13 @@ def upload_new_data():
 
 def upload_new_items():
     print('Uploading new Items')
-    item_insert_file = os.path.join(Paths.RAPORT_CATALOG, "aaITEM_INSERT.csv")
+    item_insert_file = Paths.II_FILE
     with open(item_insert_file) as file:
         changed_records = csv.reader(file)
         i = 0
+        if changed_records.line_num == 0:
+            print(f'Items sent to database: {i}')
+            return True
         query = ''
         for record in changed_records:
             po, item = record
@@ -297,32 +300,17 @@ def uploader_checker():
 
 
 def item_files_delte():
-
-    insert_file = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_INSERT.csv')
-    delete_file = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_DELETE.csv')
-    if os.path.exists(insert_file):
-        os.remove(insert_file)
-    if os.path.exists(delete_file):
-        os.remove(delete_file)
+    if os.path.exists(Paths.II_FILE):
+        os.remove(Paths.II_FILE)
+    if os.path.exists(Paths.ID_FILE):
+        os.remove(Paths.ID_FILE)
 
 
 def uploader_item_checker():
-    item_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'aaITEM_INSERT.csv')
-    if os.path.exists(item_insert_path):
+    if os.path.exists(Paths.II_FILE):
         return True
     else:
         return False
-        # item_insert_date = os.path.getmtime(item_insert_path)
-        #
-        # query = 'SELECT Item_Data FROM SAP_data;'
-        # if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-        #     return False
-        # result = CURSOR.execute(query)
-        #
-        # for date_time in result:
-        #     item_db_date = date_time[0].timestamp()
-        #     if item_insert_date > item_db_date:
-        #         return True
 
 
 
