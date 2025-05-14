@@ -5,7 +5,7 @@ from wms_main.const import CURSOR, Paths,db_commit
 
 def delete_item():
     print('Item Delete started.')
-    item_delete_file = os.path.join(Paths.RAPORT_CATALOG, "aaITEM_DELETE.csv")
+    item_delete_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_DELETE.csv")
     if not os.path.exists(item_delete_file):
         return True
     with open(item_delete_file, encoding='utf-8-sig') as file:

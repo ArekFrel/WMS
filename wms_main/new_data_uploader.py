@@ -43,15 +43,14 @@ def upload_new_data():
 
 
 def upload_new_items():
-    print('Uploading new Items')
     item_insert_file = Paths.II_FILE
     with open(item_insert_file) as file:
-        changed_records = csv.reader(file)
+        changed_records = list(csv.reader(file))
         i = 0
-        if changed_records.line_num == 0:
-            print(f'Items sent to database: {i}')
-            return True
         query = ''
+        if not changed_records:
+            return True
+        print('Uploading new Items')
         for record in changed_records:
             po, item = record
             query = query + f'Delete from dbo.Items  WHERE Prod_Order = {po}; '
@@ -371,4 +370,5 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    upload_new_items()
+    # pass
