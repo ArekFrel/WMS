@@ -2,9 +2,10 @@ import csv
 import inspect
 import os
 import os.path
+from datetime import datetime
 from wms_main.const import TimeConsts, Paths
 from wms_main import sap_date
-from utils import confirmation_deleter, item_deleter
+from utils import confirmation_deleter, item_deleter, item_handler
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
@@ -48,7 +49,7 @@ def upload_new_items():
         changed_records = list(csv.reader(file))
         i = 0
         query = ''
-        if not changed_records:
+        if not changed_records[0]:
             return True
         print('Uploading new Items')
         for record in changed_records:
@@ -298,7 +299,7 @@ def uploader_checker():
     return False
 
 
-def item_files_delte():
+def item_files_delete():
     if os.path.exists(Paths.II_FILE):
         os.remove(Paths.II_FILE)
     if os.path.exists(Paths.ID_FILE):
@@ -306,7 +307,10 @@ def item_files_delte():
 
 
 def uploader_item_checker():
-    if os.path.exists(Paths.II_FILE):
+
+    query = "SELECT Item_data from sap_data;"
+    CURSOR.execute(query)
+    if CURSOR.fetchval() < datetime.fromtimestamp((os.path.getmtime(Paths.IR_FILE))):
         return True
     else:
         return False
@@ -340,6 +344,7 @@ def update_wms_table():
         sap_date.update(column='wms_table_update')
 
 
+
 def main():
     if uploader_checker():
         if upload_new_data():
@@ -353,11 +358,15 @@ def main():
         print('No new data uploaded.')
 
     if uploader_item_checker():
-        proceed = upload_new_items()
+        proceed = item_handler.main()
+        if proceed:
+            proceed = upload_new_items()
+        else:
+            return False
         if proceed:
             proceed = item_deleter.main()
         if proceed:
-            item_files_delte()
+            item_files_delete()
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
 
@@ -370,5 +379,4 @@ def main():
 
 
 if __name__ == '__main__':
-    upload_new_items()
-    # pass
+    pass

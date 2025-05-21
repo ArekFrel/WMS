@@ -56,24 +56,25 @@ class TimeConsts:
 
 
 class Paths:
-
-    RAPORT_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\'
-    REGISTER = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\reg.txt'
-    TRANSFER_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\transfer_history.txt'
+    LP = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\'
+    RAPORT_CATALOG = f'{LP}2__Baza_Danych\\'
+    REGISTER = f'{LP}2__Baza_Danych\\reg.txt'
+    TRANSFER_FILE = f'{LP}2__Baza_Danych\\transfer_history.txt'
     UPDATE_CAT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\TEMP\\__wms_update__'
-    MODELS_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\5__Modele_3D\\'
+    MODELS_CATALOG = f'{LP}5__Modele_3D\\'
 
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Users/plolprod5/OneDrive - Tetra Pak//'
     AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
     """Path of watermarks"""
-    WATERMARK_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_bought.jpg'
-    WATERMARK_SUB_BOUGHT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
+    WATERMARK_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_bought.jpg'
+    WATERMARK_SUB_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
 
     """Items Managinng"""
-    II_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\ITEM_INSERT.csv'
-    ID_FILE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\2__Baza_Danych\\ITEM_DELETE.csv'
+    IR_FILE = f'{LP}2__Baza_Danych\\DMS_Produkcja\\EXPORT_ALL.XLSX'
+    II_FILE = f'{LP}2__Baza_Danych\\ITEM_INSERT.csv'
+    ID_FILE = f'{LP}2__Baza_Danych\\ITEM_DELETE.csv'
 
 
     if IS_IT_TEST:
@@ -81,9 +82,9 @@ class Paths:
         START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
     else:
         """PRODUCTION - catalogs where drawings are stored. """
-        PRODUCTION = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!/1__Rysunki/'
+        PRODUCTION = f'{LP}1__Rysunki/'
         """START_CATALOG - catalog where new drawing are uploaded by planners."""
-        START_CATALOG = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+        START_CATALOG = f'{LP}4__Nowe_Rysunki/'
 
 
 class Options:

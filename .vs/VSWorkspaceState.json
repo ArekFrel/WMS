@@ -1,10 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\venv\\Lib",
-    "\\venv\\Lib\\site-packages",
-    "\\wms_main"
+    "\\utils",
+    "\\wms_main",
+    "\\wms_main\\utils"
   ],
-  "SelectedNode": "\\deep_copy",
+  "SelectedNode": "\\other_data",
   "PreviewInSolutionExplorer": false
 }
