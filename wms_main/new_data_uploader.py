@@ -5,7 +5,7 @@ import os.path
 from datetime import datetime
 from wms_main.const import TimeConsts, Paths
 from wms_main import sap_date
-from utils import confirmation_deleter, item_deleter, item_handler
+from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
@@ -38,7 +38,6 @@ def upload_new_data():
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
-
         print('\n', end='\r')
     return True
 
@@ -49,13 +48,17 @@ def upload_new_items():
         changed_records = list(csv.reader(file))
         i = 0
         query = ''
-        if not changed_records[0]:
+        try:
+            if not changed_records[0]:
+                return True
+        except IndexError:
             return True
+
         print('Uploading new Items')
         for record in changed_records:
             po, item = record
-            query = query + f'Delete from dbo.Items  WHERE Prod_Order = {po}; '
-            query = query + f"INSERT INTO dbo.Items (Prod_Order, Item) VALUES({po},{item})"
+            query = query + f"Delete from dbo.Items  WHERE Prod_Order = '{po}' "
+            query = query + f"INSERT INTO dbo.Items (Prod_Order, Item) VALUES('{po}','{item}') "
             i += 1
             if i % 50 == 0:
                 if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
@@ -108,7 +111,7 @@ def formulate_query_record(record):
         czas_raport = record[13]
         opis = record[14]
         create = redate(record[15])
-        planista_0 = planer_seek(po, record[16])
+        planista_0 = record[16]
         ostatnia_zmiana = redate(record[17])
         planista_1 = record[18]
         release_aktualny = redate(record[19])
@@ -310,7 +313,8 @@ def uploader_item_checker():
 
     query = "SELECT Item_data from sap_data;"
     CURSOR.execute(query)
-    if CURSOR.fetchval() < datetime.fromtimestamp((os.path.getmtime(Paths.IR_FILE))):
+    r = CURSOR.fetchval()
+    if r < datetime.fromtimestamp((os.path.getmtime(Paths.IR_FILE))):
         return True
     else:
         return False
@@ -348,6 +352,7 @@ def update_wms_table():
 def main():
     if uploader_checker():
         if upload_new_data():
+            planer_refiller.main()
             so_folder_creator()
             po_pumpblock_recorder()  # identyfikacja nowych zleceń na pump blocki
             sap_date.update(column='SAP_Skrypt_zmiana')
@@ -380,3 +385,4 @@ def main():
 
 if __name__ == '__main__':
     pass
+    # uploader_item_checker()

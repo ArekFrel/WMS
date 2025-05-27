@@ -3,21 +3,11 @@ from pyodbc import Error, DataError, OperationalError
 import inspect
 
 def main():
-    t=0
-
-    query = f"SELECT DISTINCT CONCAT(S.[s.o.], '_', I.Item) as SO_Item " \
-            f",[S.O.]" \
-            f",pop.Planista " \
-            f"FROM sap S " \
-            f"RIGHT JOIN Items I on I.Prod_Order = S.[P.O.] " \
-            f"RIGHT join prod_order_planist  pop on CONCAT(S.[s.o.], '_', I.Item) = pop.SO_or_PO " \
-            f"WHERE S.[Planista 0] != '' and [S.O.] != 0 " \
-            f"GROUP BY " \
-            f"S.[s.o.] " \
-            f",I.Item " \
-            f",pop.Planista;"
-
-
+    query = f"SELECT DISTINCT [P.O.], pot.Planista FROM sap S " \
+            f"LEFT JOIN Items I ON I.Prod_Order = S.[P.O.] " \
+            f"LEFT JOIN prod_order_planist  pop ON pop.SO_or_PO = concat(s.[s.o.], '_', i.item) " \
+            f"LEFT join prod_order_planist  pot ON CAST(pot.SO_or_PO AS VARCHAR) = CAST(s.[s.o.] AS VARCHAR) " \
+            f"WHERE [Planista 0] = '' AND [S.O.] != '';"
     try:
         CURSOR.execute(query)
         records = CURSOR.fetchall()
@@ -34,12 +24,19 @@ def main():
         print('Data Error.')
         return []
 
+    new_query = ''
+    cntr = 0
     for rec in records:
-        so_item, planista = rec
-        so, item = so_item.split('_')
-        new_query = f"UPDATE SAP SET [Planista 0] = '{planista}' WHERE [P.O.] in (" \
-                    f"Select distinct [P.O.] from SAP LEFT jOIN Items ON SAP.[P.O.] = Items.Prod_Order " \
-                    f"Where Sap.[S.O.] = {so} AND Items.Item = {item}) AND [Planista 0] = ''"
+        po, new_planner = rec
+        if not new_planner:
+            continue
+        new_query = new_query + f"UPDATE SAP SET [Planista 0] = '{new_planner}' WHERE [P.O.] = '{po}'; "
+        cntr += 1
+        if cntr == 2:
+            db_commit(new_query, inspect.currentframe())
+            cntr = 0
+            new_query = ''
+    if new_query:
         db_commit(new_query, inspect.currentframe())
 
 

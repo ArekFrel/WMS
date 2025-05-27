@@ -45,8 +45,8 @@ def print_reset_break():
 def wait(period):
     exec_time = 0
     while period > 0:
-        if Options.IQE:
-            exec_time = check_for_qoutation_export()
+        # if Options.IQE:
+        #     exec_time = check_for_qoutation_export()
         text = f'Next Refresh in {period:03d}s'
         print(text, end="\r")
         time.sleep(1 - exec_time)
@@ -88,8 +88,8 @@ def cycle():
     if new_data_uploader.main():
         file_manager.main()
 
-    if not Options.IQE:
-        check_for_qoutation_export()
+    # if not Options.IQE:
+    #     check_for_qoutation_export()
 
 
 def main():
