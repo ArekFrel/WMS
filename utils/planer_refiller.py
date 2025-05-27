@@ -7,7 +7,7 @@ def main():
             f"LEFT JOIN Items I ON I.Prod_Order = S.[P.O.] " \
             f"LEFT JOIN prod_order_planist  pop ON pop.SO_or_PO = concat(s.[s.o.], '_', i.item) " \
             f"LEFT join prod_order_planist  pot ON CAST(pot.SO_or_PO AS VARCHAR) = CAST(s.[s.o.] AS VARCHAR) " \
-            f"WHERE [Planista 0] = '' AND [S.O.] != '';"
+            f"WHERE [Planista 0] = '' AND [S.O.] != '' ;"
     try:
         CURSOR.execute(query)
         records = CURSOR.fetchall()
@@ -26,13 +26,12 @@ def main():
 
     new_query = ''
     cntr = 0
+    records = [[po, new_planner] for po, new_planner in records if new_planner is not None]
     for rec in records:
         po, new_planner = rec
-        if not new_planner:
-            continue
         new_query = new_query + f"UPDATE SAP SET [Planista 0] = '{new_planner}' WHERE [P.O.] = '{po}'; "
         cntr += 1
-        if cntr == 2:
+        if cntr == 10:
             db_commit(new_query, inspect.currentframe())
             cntr = 0
             new_query = ''

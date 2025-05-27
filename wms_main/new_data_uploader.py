@@ -68,7 +68,7 @@ def upload_new_items():
                     return False
         if query:
             if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-                print(f'Items sent to database: {i}', end="\r")
+                print(f'Items sent to database: {i}')
             else:
                 return False
         return True
