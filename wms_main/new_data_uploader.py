@@ -189,17 +189,6 @@ def formulate_query_record(record):
                 f"source.[Start Op Aktualny], source.[Finish Op Aktualny], " \
                 f"source.[Urządzenie Główne], source.[System Status Full]); "
 
-        # query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
-        #         f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
-        #         f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
-        #         f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
-        #         f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
-        #         f"[Urządzenie Główne], [System Status Full]) " \
-        #         f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
-        #         f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
-        #         f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
-        #         f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-        #         f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
     else:
         query = ''
     return query

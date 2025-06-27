@@ -204,7 +204,7 @@ def update_rec(file):
                 change_txt = 'kupowany'
 
         # if updating made to bought
-        query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Brygada', OP0 = 'Brygada', OP1 = '', KOMENTARZ = '{change_txt}'," \
+        query = f"UPDATE TECHNOLOGIA SET OP_1 = 'Kupowany', OP0 = 'Kupowany', OP1 = '', KOMENTARZ = '{change_txt}'," \
                 f"OP_2 = '', OP_3 = '',OP_4 = '',OP_5 = '',OP_6 = '',OP_7 = '',OP_8 = '',OP_9 = '',OP_10 = ''," \
                 f"MATERIAŁ = '', PRZYGOTÓWKA = '', CIĘCIA = '', STATUS_OP = 1, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec made to bought')

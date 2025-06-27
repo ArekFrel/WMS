@@ -153,18 +153,16 @@ TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
-
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
-
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
 
 """Minimal number of drawings to be merged in order"""
-
 MERGED_MIN = 2  # should be low value, f.e. 5
 # MERGED_TIME_PERIOD = 120# should be low value, f.e. 5
+
 
 '''
 **********************************
