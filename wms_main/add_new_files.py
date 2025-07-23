@@ -490,5 +490,5 @@ def main():
 
 
 if __name__ == '__main__':
+    list_new_files()
     pass
-

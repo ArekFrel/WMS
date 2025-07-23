@@ -8,6 +8,8 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
+VERSION = 1.01
+
 
 class TimeConsts:
 

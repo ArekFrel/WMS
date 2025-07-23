@@ -6,7 +6,7 @@ from utils.quotation_export import check_for_qoutation_export
 from wms_main import sap_date, file_manager, new_data_uploader, self_update, add_new_files
 import subprocess
 import os
-from wms_main.const import Paths, TimeConsts, Options
+from wms_main.const import Paths, TimeConsts, Options, VERSION
 
 
 class Restart:
@@ -68,6 +68,7 @@ def print_introduction():
     line_1 = 'AUTOMAT'
     COL_START = '\33[94m'
     COL_END = '\033[0m'
+    print(f"ver: {VERSION}")
     print(COL_START + ' ' + 48 * '_' + ' ' + COL_END)
     print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
     print(COL_START + f'|{line_1: ^48}|' + COL_END)

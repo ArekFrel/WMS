@@ -12,13 +12,16 @@ def copy_draw_file(draw, po, pb_id, pb):
         shutil.copyfile(base_file, new_file)
     except FileNotFoundError:
         print(f'Aint no such file {base_file}')
-    return None
+        return None
+    return True
 
 
 def drawing_multiplier(draw_id, draw, po, pcs, pb_id):
     query = ''
     pb = pb_id + 1
     for i in range(pcs - 1):
+        if not copy_draw_file(draw, po, pb_id, pb):
+            break
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
         query = f"{query} INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
@@ -26,12 +29,15 @@ def drawing_multiplier(draw_id, draw, po, pcs, pb_id):
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
             f"CONCAT('{po}', ' ', '{draw}', ' {hash_id(pb)}'), '{now}' " \
             f"FROM TECHNOLOGIA WHERE ID = {draw_id}"
-        copy_draw_file(draw, po, pb_id, pb)
         pb = pb + 1
-    db_commit(query=query, func_name='drawing_multiplier')
+    if query:
+        db_commit(query=query, func_name='drawing_multiplier')
+
 
 
 def pb_id_updater(num):
+    if not num:
+        return
     db_commit(f'UPDATE pb_identifier set pb_id_val = pb_id_val + {num}', func_name='pb_id_updater')
     return None
 
@@ -41,11 +47,14 @@ def pb_main_draw_rename(draw, po, pb_id):
     new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(pb_id)}.pdf')
     try:
         os.rename(old_name, new_name)
+        # shutil.copyfile(old_name, new_name)
     except FileNotFoundError:
         print(f'Aint no such file {old_name}')
+        return None
     except PermissionError:
         print(f'File locked {old_name}')
-    return None
+        return None
+    return True
 
 
 def pb_main_draw_tech_setter(draw_id, pb_id):
@@ -87,14 +96,16 @@ def pumpblock_drawing_handler():
     pb_id = pumpblock_info_getter('ID')
     num = 0
     for draw_id, draw, po, pcs in po_drawings_data:
+        if not pb_main_draw_rename(draw, po, pb_id):
+            break
         pb_main_draw_tech_setter(draw_id, pb_id)
-        pb_main_draw_rename(draw, po, pb_id)
         drawing_multiplier(draw_id, draw, po, pcs, pb_id)
         po_drawing_multiplied_setter(po)
         po_drawing_added_setter(po)
         pb_id = pb_id + pcs
         num = num + pcs
-    pb_id_updater(num)
+    if num:
+        pb_id_updater(num)
 
 
 def hash_id(num: int):
@@ -171,9 +182,11 @@ def pumpblock_info_getter(arg):
 
 
 def main():
-    po_pumpblock_recorder()   # pass
-    pumpblock_drawing_handler()
+    pass
+    # po_pumpblock_recorder()   # pass
+    # pumpblock_drawing_handler()
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    pass
