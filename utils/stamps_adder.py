@@ -6,14 +6,14 @@ import fitz
 def stamper(file):
     with fitz.open(file.start_path) as pdf_document:
 
-        if file.sub_bought:
-            watermark = Paths.WATERMARK_SUB_BOUGHT
-        if (file.bought_name | file.bought_cat) and ~file.sub_bought:
-            watermark = Paths.WATERMARK_BOUGHT
+        # if file.sub_bought:
+        #     watermark = Paths.WATERMARK_SUB_BOUGHT
+        # if (file.bought_name | file.bought_cat) and ~file.sub_bought:
+        #     watermark = Paths.WATERMARK_BOUGHT
 
         pdf_document[0].insert_image(
             pdf_document[0].bound(),
-            filename=watermark,
+            filename=file.watermark,
             overlay=False,
             keep_proportion=True)
         pdf_document.save(file.dest_path)

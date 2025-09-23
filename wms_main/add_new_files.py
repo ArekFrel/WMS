@@ -136,7 +136,7 @@ def contains_pdfs(catalog):
         return False
 
 
-def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
+def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
     if buy:
         komentarz = 'kupowany'
     elif sub_buy:
@@ -147,6 +147,8 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
         # if new_pdf[-2] == ' ':            '''recently deleted'''
         #     last_id = 2                   '''recently deleted'''
         # new_pdf = new_pdf[:last_id]       '''recently deleted'''
+    elif laser_colab:
+        komentarz = 'Laser kooperacja'
     else:
         komentarz = ''
 
@@ -176,11 +178,17 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
             f") VALUES (" \
             f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Kupowany', 'Kupowany', 1 ,'{komentarz}' ,0 ,1 ,'{now}'" \
             f");"
-    else:
+    elif laser_colab:
         query_2 = f"Insert Into Technologia (" \
-            f"Plik, PO, Rysunek, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, PO, Rysunek, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Brygada', 'Brygada', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f");"
+    else :
+        query_2 = f"Insert Into Technologia (" \
+            f"Plik, PO, Rysunek, Status_Op, Stat, Liczba_Operacji, Kiedy" \
+            f") VALUES (" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}',6 ,0 ,11 ,'{now}'" \
             f");"
 
     query = query_1 + query_2
@@ -189,9 +197,9 @@ def new_rec(new_pdf, buy=False, sub_buy=False, order=''):
 
 
 def update_rec(file):
-    draw_id, former_bought, tech_made = check_db_buy(file)
+    draw_id, former_bought, former_laser_colab, tech_made = check_db_buy(file)
 
-    if (file.bought_cat or file.bought_name or file.sub_bought) and not former_bought:
+    if any((file.bought_cat, file.bought_name, file.sub_bought, file.laser_collaborate)) and not former_bought:
         if tech_made:
             if not file.sub_bought:
                 change_txt = 'Zmiana na zakupowy'
@@ -241,15 +249,16 @@ def check_db_buy(file):
             register(query)
             result = CURSOR.fetchone()
             if result is None:
-                return None, None, None
+                return None, None, None, None
             else:
                 rec_id, komentarz, status_op = result
         except Error:
             print(f'Database Error in "check_db_buy"')
             return None, None, None
     bought = komentarz in Options.BOUGHT_NAMES
+    laser_colab = komentarz == 'Laser kooperacja'
     tech_done = int(status_op) != 6
-    return rec_id, bought, tech_done
+    return rec_id, bought, laser_colab, tech_done
 
 
 def del_empty_catalogs():
@@ -266,7 +275,7 @@ def cut_file_class(file):
     file.set_available_name()   # Change name if file exists in PRODUCTION and is not replaced
 
     if os.path.exists(file.dest_catalog):
-        if file.bought_cat | file.bought_name | file.sub_bought:
+        if any((file.bought_cat, file.bought_name, file.sub_bought, file.laser_collaborate)):
             try:
                 os.rename(file.dest_path, file.dest_path)
             except PermissionError:
@@ -294,6 +303,7 @@ def cut_file_class(file):
     if not file.replace:
         new_rec(new_pdf=file.file_name,
                 buy=(file.bought_name or file.bought_cat),
+                laser_colab=file.laser_collaborate,
                 sub_buy=file.sub_bought,
                 order=file.po)
         return True

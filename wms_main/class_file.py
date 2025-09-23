@@ -18,6 +18,7 @@ class Catalog:
         self.ready = (self.age > TimeConsts.TIMEOUT_FOR_PLANERS)
         self.bought = self.is_bought()
         self.refill_cat = self.is_refill()
+        self.laser_collaborate = self.is_laser_collaborate()
         self.catalog_type = ''
         self.catalog_category()
 
@@ -43,6 +44,9 @@ class Catalog:
         if self.is_refill():
             self.catalog_type = CatalogType.REFILL
             return None
+        if self.is_laser_collaborate():
+            self.catalog_type = CatalogType.LASER_COL
+            return None
         self.catalog_type = CatalogType.NORMAL
         return None
 
@@ -56,6 +60,13 @@ class Catalog:
         if self.name.startswith('bought_script_'):
             return True
         return False
+
+    def is_laser_collaborate(self):
+        for word in Options.LASER_COL_NAMES:
+            if word == self.name.lower():
+                return True
+        return False
+
 
     def is_refill(self):
         if self.name.upper() == REFILL_CAT or any(item in [REFILL_CAT, REFILL_CAT.lower()] for item in self.path_tuple):
@@ -79,8 +90,10 @@ class File:
 
     def __init__(self, name: str, catalog=None):
         self.name = name
+        self.annotate = ""
         self.file_name, self.extension = name.rsplit('.', 1)
         self.bought_cat = False
+        self.laser_collaborate = False
         self.catalog = ''
         self.refill = False
         self.new_name = self.name
@@ -90,7 +103,8 @@ class File:
         self.loose = not bool(self.catalog)
         self.bought_name = False
         self.sub_bought = False
-        self.partially_cooperated = False
+        # self.partially_cooperated = False
+        self.watermark = None
         self.check_for_watermarking()
         self.new_name_create()
         self.po = self.new_name[:7]
@@ -107,23 +121,40 @@ class File:
     def catalog_options(self, catalog=None):
         if catalog:
             self.bought_cat = catalog.bought
+            self.laser_collaborate = catalog.laser_collaborate
             self.catalog = '' if catalog.bought else catalog.name
             self.refill = catalog.refill_cat
             self.start_path_new_name = os.path.join(Paths.START_CATALOG, catalog.path_of_cat(), self.new_name)
             self.catalog_path = os.path.join(Paths.START_CATALOG, catalog.path_of_cat())
 
     def new_name_create(self):
-        annotate = 'bu' if self.sub_bought else 'buy'
-        self.new_name = self.file_name.lower().replace(annotate, '')
+        # annotate = 'bu' if self.sub_bought else 'buy'
+        self.new_name = self.file_name.lower().replace(self.annotate, '')
         self.new_name = '.'.join([self.new_name.strip().rstrip(), self.extension])
         self.new_name = File.delete_double_space(self.new_name)
         self.file_name = self.new_name.rsplit('.', 1)[0]
 
     def check_for_watermarking(self):
+
+        if any((self.laser_collaborate, self.bought_cat, self.bought_name)):
+            if self.laser_collaborate:
+                self.watermark = Paths.WATERMARK_KL
+            if self.bought_cat:
+                self.watermark = Paths.WATERMARK_BOUGHT
+
         if re.search(r"bu[^y]", self.name.lower()) is not None:
             self.sub_bought = True
+            self.annotate = "bu"
+            self.watermark = Paths.WATERMARK_SUB_BOUGHT
+            return
         elif 'buy' in self.name.lower():
             self.bought_name = True
+            self.annotate = "buy"
+            return
+        if re.search(r"kl", self.name.lower()) is not None:
+            self.laser_collaborate = True
+            self.annotate = "kl"
+            return
 
     def un_read_only(self):
         os.chmod(self.start_path, S_IWRITE)
@@ -182,7 +213,7 @@ class File:
         self.dest_path = os.path.join(Paths.PRODUCTION, self.po, self.new_name)
 
     def is_proper_name(self):
-        if any((self.refill, self.bought_cat)):
+        if any((self.refill, self.bought_cat, self.laser_collaborate)):
             return True
         return (self.catalog == self.po) if not self.bought_cat else True
 

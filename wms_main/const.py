@@ -8,7 +8,9 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.01
+VERSION = 1.05
+"""1.04Laser colaboration applied"""
+"""hotfix in func update_rec - 'any' issue (tuple skipped)"""
 
 
 class TimeConsts:
@@ -72,6 +74,7 @@ class Paths:
     """Path of watermarks"""
     WATERMARK_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_bought.jpg'
     WATERMARK_SUB_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
+    WATERMARK_KL = f'{LP}2__Baza_Danych\\_images\\water_mark_kl.jpg'
 
     """Items Managinng"""
     IR_FILE = f'{LP}2__Baza_Danych\\DMS_Produkcja\\EXPORT_ALL.XLSX'
@@ -80,8 +83,8 @@ class Paths:
 
 
     if IS_IT_TEST:
-        PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
-        START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+        PRODUCTION = 'C:/__main__/Dokumenty/sat/1__Rysunki/'
+        START_CATALOG = 'C:/__main__/Dokumenty/sat/4__Nowe_Rysunki/'
     else:
         """PRODUCTION - catalogs where drawings are stored. """
         PRODUCTION = f'{LP}1__Rysunki/'
@@ -123,6 +126,14 @@ class Options:
         'Zmiana na zakupowy'
     ]
 
+    LASER_COL_NAMES = [
+        'kl',
+        'laser kooperacja',
+        'laser_kooperacja',
+        'laser investa',
+        'laser'
+    ]
+
     """Extensions of the files, that are allowed to go."""
     ACC_EXT = [
         'pdf',
@@ -149,6 +160,7 @@ class CatalogType:
     REFILL = 'REFILL'
     NORMAL = 'NORMAL'
     REFILL_BOUGHT = 'REFILL_BOUGHT'
+    LASER_COL = 'LASER_COLLABORATE'
 
 
 TEST_RETURN_ORDERS = []
@@ -278,8 +290,8 @@ def so_list_getter():
 
 
 def main():
-    pass
-
+    if os.path.exists(Paths.LP):
+        print('yes')
 
 if __name__ == '__main__':
     main()
