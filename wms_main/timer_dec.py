@@ -10,7 +10,7 @@ def timer(func):
         start_point = time.time()
         func(*args, **kwargs)
         exec_time = time.time() - start_point
-        # print(f'Execution of {func.__name__}: {exec_time:.6f} s')
+        print(f'Execution of {func.__name__}: {exec_time:.6f} s')
         return float(exec_time)
     return wrapper
 

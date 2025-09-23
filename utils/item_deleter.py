@@ -1,44 +1,36 @@
 import os
 import os.path
-from wms_main.const import CURSOR, Paths
+from wms_main.const import CURSOR, Paths,db_commit
 
 
 def delete_item():
     print('Item Delete started.')
     item_delete_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_DELETE.csv")
+    if not os.path.exists(item_delete_file):
+        return True
     with open(item_delete_file, encoding='utf-8-sig') as file:
         i = 0
+        prod_order_list = []
         for record in file:
             if len(record.strip()) == 0:
                 continue
-            prod_ord_no = record.strip().split(',')[1]
-            delete_item_db(number=int(prod_ord_no))
+            prod_ord_no = record.strip().split(',')[0]
+            prod_order_list.append(prod_ord_no)
+    if prod_order_list:
+        orders_text ='('
+        for order in prod_order_list:
+            orders_text += order + ', '
             i += 1
-
+        orders_text = orders_text[:-2] + ')'
+        query = f'DELETE FROM Items WHERE Prod_Order IN {orders_text};'
+        if not db_commit(query=query, func_name='delete_item'):
+            return False
     print(f'{i} Item Deleted')
-
-
-def get_confirmation_from_db():
-    query = 'SELECT DISTINCT Confirmation FROM Sap;'
-    result = CURSOR.execute(query)
-    current_db_conf = []
-
-    for conf_no in result:
-        current_db_conf.append(conf_no[0])
-
-    return current_db_conf
-
-
-def delete_item_db(number):
-    query = f"DELETE FROM Items WHERE Prod_Order = {number}"
-    with CURSOR:
-        CURSOR.execute(query)
-        CURSOR.commit()
-    return None
+    return True
 
 
 def main():
-    delete_item()
+    return delete_item()
 
 
 if __name__ == '__main__':

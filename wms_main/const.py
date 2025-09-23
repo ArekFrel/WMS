@@ -8,6 +8,10 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
+VERSION = 1.05
+"""1.04Laser colaboration applied"""
+"""hotfix in func update_rec - 'any' issue (tuple skipped)"""
+
 
 class TimeConsts:
 
@@ -30,6 +34,9 @@ class TimeConsts:
     '''GCP_OCLOCK is time when all files are checked if they're new'''
     GCP = 15
 
+    '''UPDATES wms_table for planners every x minutes'''
+    PUT = 60
+
     """Time when TECO orders are set to completed. - obsolete"""
     # TECO_TIME = 15
 
@@ -49,33 +56,40 @@ class TimeConsts:
         TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 179
+        TIME_REFILL_CAT = 120
 
 
 class Paths:
-
-    RAPORT_CATALOG = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/'
-    REGISTER = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/reg.txt'
-    TRANSFER_FILE = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/transfer_history.txt'
-    UPDATE_CAT = 'T:/__wms_update__'
-    MODELS_CATALOG = 'W:/!!__PRODUKCJA__!!/5__Modele_3D/'
+    LP = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\'
+    RAPORT_CATALOG = f'{LP}2__Baza_Danych\\'
+    REGISTER = f'{LP}2__Baza_Danych\\reg.txt'
+    TRANSFER_FILE = f'{LP}2__Baza_Danych\\transfer_history.txt'
+    UPDATE_CAT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\TEMP\\__wms_update__'
+    MODELS_CATALOG = f'{LP}5__Modele_3D\\'
 
     """Path of AUTOMAT file"""
-    AUTOMAT_FILES_STORED = 'C:/Dokumenty/automat_light/WMS/'
+    AUTOMAT_FILES_STORED = 'C:/Users/plolprod5/OneDrive - Tetra Pak//'
     AUTOMAT_BAT = 'C:/Dokumenty/automat_light/WMS/AUTOMAT.bat'
 
     """Path of watermarks"""
-    WATERMARK_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_bought.jpg'
-    WATERMARK_SUB_BOUGHT = 'W:/!!__PRODUKCJA__!!/2__Baza_Danych/_images/water_mark_sub_bought.jpg'
+    WATERMARK_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_bought.jpg'
+    WATERMARK_SUB_BOUGHT = f'{LP}2__Baza_Danych\\_images\\water_mark_sub_bought.jpg'
+    WATERMARK_KL = f'{LP}2__Baza_Danych\\_images\\water_mark_kl.jpg'
+
+    """Items Managinng"""
+    IR_FILE = f'{LP}2__Baza_Danych\\DMS_Produkcja\\EXPORT_ALL.XLSX'
+    II_FILE = f'{LP}2__Baza_Danych\\ITEM_INSERT.csv'
+    ID_FILE = f'{LP}2__Baza_Danych\\ITEM_DELETE.csv'
+
 
     if IS_IT_TEST:
-        PRODUCTION = 'C:/Dokumenty/sat/1__Rysunki/'
-        START_CATALOG = 'C:/Dokumenty/sat/4__Nowe_Rysunki/'
+        PRODUCTION = 'C:/__main__/Dokumenty/sat/1__Rysunki/'
+        START_CATALOG = 'C:/__main__/Dokumenty/sat/4__Nowe_Rysunki/'
     else:
         """PRODUCTION - catalogs where drawings are stored. """
-        PRODUCTION = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
+        PRODUCTION = f'{LP}1__Rysunki/'
         """START_CATALOG - catalog where new drawing are uploaded by planners."""
-        START_CATALOG = 'W:/!!__PRODUKCJA__!!/4__Nowe_Rysunki/'
+        START_CATALOG = f'{LP}4__Nowe_Rysunki/'
 
 
 class Options:
@@ -104,11 +118,20 @@ class Options:
         'zakupowy',
         'zakupowe',
         'kupne',
+        'kupno',
         'kupowane',
         'kupowany',
         'zakup',
         'bought_script',
         'Zmiana na zakupowy'
+    ]
+
+    LASER_COL_NAMES = [
+        'kl',
+        'laser kooperacja',
+        'laser_kooperacja',
+        'laser investa',
+        'laser'
     ]
 
     """Extensions of the files, that are allowed to go."""
@@ -137,24 +160,23 @@ class CatalogType:
     REFILL = 'REFILL'
     NORMAL = 'NORMAL'
     REFILL_BOUGHT = 'REFILL_BOUGHT'
+    LASER_COL = 'LASER_COLLABORATE'
 
 
 TEST_RETURN_ORDERS = []
 TEST_RETURN_DRAWINGS = []
 TEST_RETURN_NUM = 5
 
-
 '''Name of refill catalogue.'''
 REFILL_CAT = 'X'
-
 
 """Name of merged drawings to be ignored by script 'list_new-files'"""
 MERGED_NAME = 'merged.pdf'
 
 """Minimal number of drawings to be merged in order"""
-
 MERGED_MIN = 2  # should be low value, f.e. 5
 # MERGED_TIME_PERIOD = 120# should be low value, f.e. 5
+
 
 '''
 **********************************
@@ -209,7 +231,7 @@ def db_commit(query, func_name):
 
     try:
         with CURSOR:
-            register(query)
+            # register(query)
             CURSOR.execute(query)
             CURSOR.commit()
         return True
@@ -231,6 +253,27 @@ def db_commit(query, func_name):
         return False
 
 
+def db_commit_getval(query):
+    try:
+        with CURSOR:
+            CURSOR.execute(query)
+            result = CURSOR.fetchval()
+        return result
+
+    except pyodbc.OperationalError:
+        return None
+
+    except pyodbc.DatabaseError:
+        return None
+
+    except pyodbc.Error:
+        return None
+
+    except Exception:
+        return None
+
+
+
 def so_list_getter():
     query = "SELECT " \
             "DISTINCT CONCAT([S.O.], ' ', [urządzenie Główne]) "\
@@ -247,8 +290,8 @@ def so_list_getter():
 
 
 def main():
-    pass
-
+    if os.path.exists(Paths.LP):
+        print('yes')
 
 if __name__ == '__main__':
     main()

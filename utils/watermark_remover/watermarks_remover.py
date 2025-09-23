@@ -1,4 +1,5 @@
 import fitz  # PyMuPDF
+from pymupdf.mupdf import FzErrorSystem
 import os
 from wms_main.const import Paths
 from stat import S_IWRITE
@@ -21,6 +22,9 @@ def remove_watermark(drawing):
 
     try:
         doc.saveIncr()
+    except FzErrorSystem:
+        print(f'Nie usunięto znaku wodnego w {drawing}.pdf.')
+        return
     except PermissionError:
         print(f'Zamknij rysunek {drawing}')
         return

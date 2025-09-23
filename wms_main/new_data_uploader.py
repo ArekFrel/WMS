@@ -2,9 +2,11 @@ import csv
 import inspect
 import os
 import os.path
+from datetime import datetime
+from wms_main.const import TimeConsts, Paths
 from wms_main import sap_date
-from utils import confirmation_deleter
-from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
+from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller
+from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 
 
@@ -21,10 +23,10 @@ def upload_new_data():
                     print(f'SAP_Insert file is empty.')
                     break
             query = query + formulate_query_record(record=record)
-            print(f'Records sent to database: {index + 1}', end="\r")
             query_counter += 1
             if query_counter == 50:
                 if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    print(f'Records sent to database: {index + 1}', end="\r")
                     query = ''
                     query_counter = 0
                 else:
@@ -32,28 +34,46 @@ def upload_new_data():
                     return False
         if query_counter != 0:
             if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-                pass
+                print(f'Records sent to database: {index + 1}', end="\r")
             else:
                 print('\nUnexpected error occurs during updating SAP.')
                 return False
-
         print('\n', end='\r')
     return True
 
 
 def upload_new_items():
-    print('Uploading new Items')
-    item_insert_file = os.path.join(Paths.RAPORT_CATALOG, "ITEM_INSERT.csv")
+    item_insert_file = Paths.II_FILE
     with open(item_insert_file) as file:
-        changed_records = csv.reader(file)
+        changed_records = list(csv.reader(file))
         i = 0
+        query = ''
+        try:
+            if not changed_records[0]:
+                return True
+        except IndexError:
+            return True
+
+        print('Uploading new Items')
         for record in changed_records:
-            if send_item_to_db(record=record):
-                i += 1
-                print(f'Items sent to database: {i}', end="\r")
+            po, item = record
+            query = query + f"Delete from dbo.Items  WHERE Prod_Order = '{po}' "
+            query = query + f"INSERT INTO dbo.Items (Prod_Order, Item) VALUES('{po}','{item}') "
+            i += 1
+            if i % 50 == 0:
+                if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    query = ''
+                    print(f'Items sent to database: {i}', end="\r")
+                else:
+                    return False
+        if query:
+            if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                print(f'Items sent to database: {i}')
             else:
-                break
-        print('\n', end='\r')
+                return False
+        return True
+
+
 
 
 def redate(date):
@@ -169,17 +189,6 @@ def formulate_query_record(record):
                 f"source.[Start Op Aktualny], source.[Finish Op Aktualny], " \
                 f"source.[Urządzenie Główne], source.[System Status Full]); "
 
-        # query = f"Delete from {table} WHERE Confirmation = {confirmation}; "\
-        #         f"Insert into dbo.{table} ([S.O.],[Obiekt],[P.O.],[Start P.O.],[Finish P.O.],[Ilość],[Urządzenie],[Brygada]," \
-        #         f"[Nr Op],[Operacja],[Start Op],[Finish Op],[Czas Plan],[Czas Raport],[Opis],[Create],[Planista 0]," \
-        #         f"[Ostatnia Zmiana],[Planista 1],[Release Aktualny],[Release Plan],[Network],[System Status]," \
-        #         f"[Confirmation],[Start P.O. Aktualny],[Finish P.O. Aktualny],[Start Op Aktualny],[Finish Op Aktualny]," \
-        #         f"[Urządzenie Główne], [System Status Full]) " \
-        #         f"VALUES('{so}','{obiekt}','{po}',{start_po},{finish_po},'{ilosc}','{urzadzenie}','{brygada}',"\
-        #         f"'{nr_op}','{operacja}',{start_op},{finish_op},'{czas_plan}','{czas_raport}','{opis}',{create},"\
-        #         f"'{planista_0}',{ostatnia_zmiana},'{planista_1}',{release_aktualny},"\
-        #         f"{release_plan},'{network}','{system_status}','{confirmation}',{start_po_aktualny}," \
-        #         f"{finish_po_aktualny},{start_op_aktualny},{finish_op_aktualny},'{urzadzenie_glowne}','{system_status_full}')"
     else:
         query = ''
     return query
@@ -188,8 +197,13 @@ def formulate_query_record(record):
 def status_select(stat: str) -> str:
     if 'CNF' in stat and 'PCNF' not in stat:
         return "TECO"
+    for _ in ('DSPT', 'DSEX', 'EXPL', 'EXTS'):
+        if _ in stat:
+            stat = stat.replace(_, '')
+    while '  ' in stat:
+        stat = stat.replace('  ', ' ')
     else:
-        return stat.split(' ')[-1]
+        return stat.rstrip().split(' ')[-1]
 
 
 def update_status(record):
@@ -212,12 +226,13 @@ def send_item_to_db(record):
         for i in range(0, (2 - len(record))):
             record.append('')
 
-    if record[1] != '':
-        if record[0] == '0':
+
+    if record[0] != '':
+        if record[1] == '0':
             item = 'NULL'
         else:
-            item = record[0]
-        prod_order = int(record[1])
+            item = record[1]
+        prod_order = int(record[0])
         query = f"DELETE FROM {table} WHERE Prod_Order = {prod_order}; "\
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
@@ -247,6 +262,17 @@ def slash_remover(string):
     return string.rstrip()
 
 
+def planer_seek(po_num, planer):
+    if planer != '':
+        return planer
+    found_planer = db_commit_getval(
+        f"Select distinct [Planista 0] from SAP where [P.O.] = {po_num} and [planista 0] != '';"
+    )
+    if found_planer:
+        return found_planer
+    return ''
+
+
 def uploader_checker():
     sap_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'SAP_INSERT.csv')
     if os.path.exists(sap_insert_path):
@@ -265,21 +291,23 @@ def uploader_checker():
     return False
 
 
+def item_files_delete():
+    if os.path.exists(Paths.II_FILE):
+        os.remove(Paths.II_FILE)
+    if os.path.exists(Paths.ID_FILE):
+        os.remove(Paths.ID_FILE)
+
+
 def uploader_item_checker():
-    item_insert_path = os.path.join(Paths.RAPORT_CATALOG, 'ITEM_INSERT.csv')
-    if os.path.exists(item_insert_path):
-        item_insert_date = os.path.getmtime(item_insert_path)
 
-        query = 'SELECT Item_Data FROM SAP_data;'
-        if not db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-            return False
-        result = CURSOR.execute(query)
+    query = "SELECT Item_data from sap_data;"
+    CURSOR.execute(query)
+    r = CURSOR.fetchval()
+    if r < datetime.fromtimestamp((os.path.getmtime(Paths.IR_FILE))):
+        return True
+    else:
+        return False
 
-        for date_time in result:
-            item_db_date = date_time[0].timestamp()
-            if item_insert_date > item_db_date:
-                return True
-    return False
 
 
 def update_system_status():
@@ -298,9 +326,22 @@ def update_system_status():
         print('\n', end='\r')
 
 
+def update_wms_table():
+    query = "SELECT DATEDIFF(MINUTE, wms_table_update, GETDATE()) FROM sap_data;"
+    CURSOR.execute(query)
+    COL_START = '\033[95m'
+    COL_END = '\033[0m'
+    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+        print(f'{COL_START}Updating wms_table for planners{COL_END}')
+        CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
+        sap_date.update(column='wms_table_update')
+
+
+
 def main():
     if uploader_checker():
         if upload_new_data():
+            planer_refiller.main()
             so_folder_creator()
             po_pumpblock_recorder()  # identyfikacja nowych zleceń na pump blocki
             sap_date.update(column='SAP_Skrypt_zmiana')
@@ -311,9 +352,19 @@ def main():
         print('No new data uploaded.')
 
     if uploader_item_checker():
-        upload_new_items()
+        proceed = item_handler.main()
+        if proceed:
+            proceed = upload_new_items()
+        else:
+            return False
+        if proceed:
+            proceed = item_deleter.main()
+        if proceed:
+            item_files_delete()
         sap_date.update(column='Item_Data')
         print('New Items uploaded')
+
+    update_wms_table()
 
     """UNREM if you need too update system Status"""
     # update_system_status()
@@ -322,7 +373,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # upload_new_data()
     pass
-    # so_folder_creator()
-
+    # uploader_item_checker()

@@ -6,7 +6,7 @@ from utils.quotation_export import check_for_qoutation_export
 from wms_main import sap_date, file_manager, new_data_uploader, self_update, add_new_files
 import subprocess
 import os
-from wms_main.const import Paths, TimeConsts, Options
+from wms_main.const import Paths, TimeConsts, Options, VERSION
 
 
 class Restart:
@@ -45,8 +45,8 @@ def print_reset_break():
 def wait(period):
     exec_time = 0
     while period > 0:
-        if Options.IQE:
-            exec_time = check_for_qoutation_export()
+        # if Options.IQE:
+        #     exec_time = check_for_qoutation_export()
         text = f'Next Refresh in {period:03d}s'
         print(text, end="\r")
         time.sleep(1 - exec_time)
@@ -68,6 +68,7 @@ def print_introduction():
     line_1 = 'AUTOMAT'
     COL_START = '\33[94m'
     COL_END = '\033[0m'
+    print(f"ver: {VERSION}")
     print(COL_START + ' ' + 48 * '_' + ' ' + COL_END)
     print(COL_START + '|' + 48 * ' ' + '|' + COL_END)
     print(COL_START + f'|{line_1: ^48}|' + COL_END)
@@ -88,15 +89,14 @@ def cycle():
     if new_data_uploader.main():
         file_manager.main()
 
-    if not Options.IQE:
-        check_for_qoutation_export()
+    # if not Options.IQE:
+    #     check_for_qoutation_export()
 
 
 def main():
     restart = Restart()
     if self_update.check_for_update():
         self_update.update()
-        subprocess.call(Paths.AUTOMAT_BAT)
         Restart.proceed = False
         return None
 
@@ -118,6 +118,7 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()
     if Restart.proceed:
         subprocess.call(Paths.AUTOMAT_BAT)
