@@ -373,5 +373,5 @@ def main():
 
 
 if __name__ == '__main__':
+    planer_refiller.main()
     pass
-    # uploader_item_checker()

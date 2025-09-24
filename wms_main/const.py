@@ -8,9 +8,10 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.05
+VERSION = 1.06
 """1.04Laser colaboration applied"""
-"""hotfix in func update_rec - 'any' issue (tuple skipped)"""
+"""1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
+"""1.06 planer refiller fixed. - query isses"""
 
 
 class TimeConsts:
