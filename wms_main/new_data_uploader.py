@@ -262,15 +262,15 @@ def slash_remover(string):
     return string.rstrip()
 
 
-def planer_seek(po_num, planer):
-    if planer != '':
-        return planer
-    found_planer = db_commit_getval(
-        f"Select distinct [Planista 0] from SAP where [P.O.] = {po_num} and [planista 0] != '';"
-    )
-    if found_planer:
-        return found_planer
-    return ''
+# def planer_seek(po_num, planer):
+#     if planer != '':
+#         return planer
+#     found_planer = db_commit_getval(
+#         f"Select distinct [Planista 0] from SAP where [P.O.] = {po_num} and [planista 0] != '';"
+#     )
+#     if found_planer:
+#         return found_planer
+#     return ''
 
 
 def uploader_checker():
@@ -373,5 +373,5 @@ def main():
 
 
 if __name__ == '__main__':
+    planer_refiller.main()
     pass
-    # uploader_item_checker()

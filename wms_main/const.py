@@ -8,9 +8,11 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.05
+VERSION = 1.07
 """1.04Laser colaboration applied"""
-"""hotfix in func update_rec - 'any' issue (tuple skipped)"""
+"""1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
+"""1.06 planer refiller fixed. - query isses"""
+"""1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name."""
 
 
 class TimeConsts:

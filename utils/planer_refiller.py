@@ -3,16 +3,7 @@ from pyodbc import Error, DataError, OperationalError
 import inspect
 
 def main():
-    query =     f"SELECT DISTINCT [P.O.], " \
-                f"case when pom.Planista is not null then pom.Planista " \
-                f"else pot.Planista " \
-                f"end as new_Planista " \
-                f"FROM sap S " \
-                f"LEFT JOIN Items I ON I.Prod_Order = S.[P.O.] " \
-                f"LEFT JOIN prod_order_planist  pop ON pop.SO_or_PO = concat(s.[s.o.], '_', i.item) " \
-                f"LEFT join prod_order_planist  pot ON CAST(pot.SO_or_PO AS VARCHAR) = CAST(s.[s.o.] AS VARCHAR) " \
-                f"LEFT JOIN prod_order_planist pom on CAST(pom.SO_or_PO as Varchar) = cast(s.[P.O.] AS Varchar) " \
-                f"WHERE [Planista 0] = '' ;"
+    query =f"SELECT * FROM UPDATE_PLANNER(); "
     try:
         CURSOR.execute(query)
         records = CURSOR.fetchall()
