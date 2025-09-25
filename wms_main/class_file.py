@@ -93,7 +93,6 @@ class File:
         self.annotate = ""
         self.file_name, self.extension = name.rsplit('.', 1)
         self.bought_cat = False
-        self.laser_collaborate = False
         self.catalog = ''
         self.refill = False
         self.new_name = self.name
@@ -103,6 +102,8 @@ class File:
         self.loose = not bool(self.catalog)
         self.bought_name = False
         self.sub_bought = False
+        self.laser_collaborate = False
+        self.file_categorize()
         # self.partially_cooperated = False
         self.watermark = None
         self.check_for_watermarking()
@@ -139,9 +140,10 @@ class File:
         if any((self.laser_collaborate, self.bought_cat, self.bought_name)):
             if self.laser_collaborate:
                 self.watermark = Paths.WATERMARK_KL
-            if self.bought_cat:
+            if any((self.bought_cat, self.bought_name)):
                 self.watermark = Paths.WATERMARK_BOUGHT
 
+    def file_categorize(self):
         if re.search(r"bu[^y]", self.name.lower()) is not None:
             self.sub_bought = True
             self.annotate = "bu"
