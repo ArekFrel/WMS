@@ -92,21 +92,19 @@ class File:
         self.name = name
         self.annotate = ""
         self.file_name, self.extension = name.rsplit('.', 1)
-        self.bought_cat = False
+        self.bought = False
         self.catalog = ''
         self.refill = False
         self.new_name = self.name
         self.start_path_new_name = os.path.join(Paths.START_CATALOG, self.new_name)
         self.catalog_path = Paths.START_CATALOG
+        self.laser_collaborate = False
         self.catalog_options(catalog)
         self.loose = not bool(self.catalog)
-        self.bought_name = False
         self.sub_bought = False
-        self.laser_collaborate = False
-        self.file_categorize()
-        # self.partially_cooperated = False
         self.watermark = None
-        self.check_for_watermarking()
+        self.file_categorize()
+        self.check_watermarking()
         self.new_name_create()
         self.po = self.new_name[:7]
         self.start_path = os.path.join(self.catalog_path, self.name)
@@ -121,7 +119,8 @@ class File:
 
     def catalog_options(self, catalog=None):
         if catalog:
-            self.bought_cat = catalog.bought
+            if catalog.bought:
+                self.bought = True
             self.laser_collaborate = catalog.laser_collaborate
             self.catalog = '' if catalog.bought else catalog.name
             self.refill = catalog.refill_cat
@@ -135,28 +134,34 @@ class File:
         self.new_name = File.delete_double_space(self.new_name)
         self.file_name = self.new_name.rsplit('.', 1)[0]
 
-    def check_for_watermarking(self):
-
-        if any((self.laser_collaborate, self.bought_cat, self.bought_name)):
-            if self.laser_collaborate:
-                self.watermark = Paths.WATERMARK_KL
-            if any((self.bought_cat, self.bought_name)):
-                self.watermark = Paths.WATERMARK_BOUGHT
-
     def file_categorize(self):
         if re.search(r"bu[^y]", self.name.lower()) is not None:
             self.sub_bought = True
             self.annotate = "bu"
-            self.watermark = Paths.WATERMARK_SUB_BOUGHT
             return
-        elif 'buy' in self.name.lower():
-            self.bought_name = True
+        if 'buy' in self.name.lower():
+            self.bought = True
             self.annotate = "buy"
             return
         if re.search(r"kl", self.name.lower()) is not None:
             self.laser_collaborate = True
             self.annotate = "kl"
             return
+
+    def check_watermarking(self):
+        if not any ((self.sub_bought, self.laser_collaborate, self.bought)):
+            return
+        if self.laser_collaborate:
+            self.watermark = Paths.WATERMARK_KL
+            return
+        if self.bought:
+            self.watermark = Paths.WATERMARK_BOUGHT
+            return
+        if self.sub_bought:
+            self.watermark = Paths.WATERMARK_SUB_BOUGHT
+            return
+
+
 
     def un_read_only(self):
         os.chmod(self.start_path, S_IWRITE)
@@ -215,9 +220,9 @@ class File:
         self.dest_path = os.path.join(Paths.PRODUCTION, self.po, self.new_name)
 
     def is_proper_name(self):
-        if any((self.refill, self.bought_cat, self.laser_collaborate)):
+        if any((self.refill, self.bought, self.laser_collaborate)):
             return True
-        return (self.catalog == self.po) if not self.bought_cat else True
+        return (self.catalog == self.po) if not self.bought else True
 
     @staticmethod
     def delete_double_space(text):

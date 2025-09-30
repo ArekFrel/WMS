@@ -143,10 +143,6 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
         komentarz = 'Część złożenia kupowanego'
     elif new_pdf.lower().endswith('h'):
         komentarz = 'częściowa kooperacja'
-        # last_id = -1                      '''recently deleted'''
-        # if new_pdf[-2] == ' ':            '''recently deleted'''
-        #     last_id = 2                   '''recently deleted'''
-        # new_pdf = new_pdf[:last_id]       '''recently deleted'''
     elif laser_colab:
         komentarz = 'Laser kooperacja'
     else:
@@ -158,8 +154,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
         query = f"Insert Into Technologia (" \
                   f"Plik, PO, Rysunek, OP_1, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
                   f") VALUES (" \
-                  f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Info', 8, '{komentarz}', 0, 1, '{now}'" \
-                  f");"
+                  f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Info', 8, '{komentarz}', 0, 1, '{now}';)"
         db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
         return None
     else:
@@ -199,7 +194,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
 def update_rec(file):
     draw_id, former_bought, former_laser_colab, tech_made = check_db_buy(file)
 
-    if any((file.bought_cat, file.bought_name, file.sub_bought, file.laser_collaborate)) and not former_bought:
+    if any((file.bought, file.sub_bought, file.laser_collaborate)) and not former_bought:
         if tech_made:
             if not file.sub_bought:
                 change_txt = 'Zmiana na zakupowy'
@@ -219,7 +214,7 @@ def update_rec(file):
         merger_information(file, text=change_txt)
         return
 
-    if not (file.bought_cat or file.bought_name) and former_bought:
+    if not file.bought and former_bought:
         query = f"UPDATE TECHNOLOGIA SET OP_1 = '', OP0 = '', OP1 = '', KOMENTARZ = 'Zmiana na do zrobienia', " \
                 f"STATUS_OP = 6, STAT = 0 WHERE ID = {draw_id};"
         db_commit(query, 'update_rec bought to made')
@@ -275,7 +270,7 @@ def cut_file_class(file):
     file.set_available_name()   # Change name if file exists in PRODUCTION and is not replaced
 
     if os.path.exists(file.dest_catalog):
-        if any((file.bought_cat, file.bought_name, file.sub_bought, file.laser_collaborate)):
+        if any((file.bought, file.sub_bought, file.laser_collaborate)):
             try:
                 os.rename(file.dest_path, file.dest_path)
             except PermissionError:
@@ -302,7 +297,7 @@ def cut_file_class(file):
     # if file has not been replaced, add it into database
     if not file.replace:
         new_rec(new_pdf=file.file_name,
-                buy=(file.bought_name or file.bought_cat),
+                buy=file.bought,
                 laser_colab=file.laser_collaborate,
                 sub_buy=file.sub_bought,
                 order=file.po)
@@ -500,5 +495,5 @@ def main():
 
 
 if __name__ == '__main__':
-    list_new_files()
+    list_new_files_class()
     pass
