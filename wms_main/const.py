@@ -6,13 +6,14 @@ import os
 from stat import S_IWRITE, S_IREAD
 
 """Using the variable below disables the actual script execution and enters test mode"""
-IS_IT_TEST = False
+IS_IT_TEST = True
 
-VERSION = 1.07
+VERSION = 1.08
 """1.04Laser colaboration applied"""
 """1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
 """1.06 planer refiller fixed. - query isses"""
 """1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name."""
+"""1.08 laser catalog issue fixed"""
 
 
 class TimeConsts:
@@ -21,7 +22,7 @@ class TimeConsts:
     below variable says in which minute does it start every 10 minutes
     variable range 0 - 9 included
     this variable must comply with task manager settings:
-    if Script launches everyday at 00:0X o'clock then variable should be = X
+    if Script launches every day at 00:0X o'clock then variable should be = X
     """
     MINUTE_START = 5
 
