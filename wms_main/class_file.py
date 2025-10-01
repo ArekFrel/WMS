@@ -128,7 +128,6 @@ class File:
             self.catalog_path = os.path.join(Paths.START_CATALOG, catalog.path_of_cat())
 
     def new_name_create(self):
-        # annotate = 'bu' if self.sub_bought else 'buy'
         self.new_name = self.file_name.lower().replace(self.annotate, '')
         self.new_name = '.'.join([self.new_name.strip().rstrip(), self.extension])
         self.new_name = File.delete_double_space(self.new_name)
