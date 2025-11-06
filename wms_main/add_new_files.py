@@ -11,6 +11,7 @@ from wms_main.timer_dec import timer
 from wms_main.const import *
 from pyodbc import Error
 from utils import stamps_adder
+from utils.bar_coder import coder as barcoder
 from utils.merger import merging
 from utils.pump_block_tracker import pb_tracker
 
@@ -136,7 +137,7 @@ def contains_pdfs(catalog):
         return False
 
 
-def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
+def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, sap_card=False, order=''):
     if buy:
         komentarz = 'kupowany'
     elif sub_buy:
@@ -270,9 +271,9 @@ def cut_file_class(file):
     file.set_available_name()   # Change name if file exists in PRODUCTION and is not replaced
 
     if os.path.exists(file.dest_catalog):
-        if any((file.bought, file.sub_bought, file.laser_collaborate)):
+        if any((file.bought, file.sub_bought, file.laser_collaborate, file.sap_card)):
             try:
-                os.rename(file.dest_path, file.dest_path)
+                os.rename(file.start_path, file.start_path)
             except PermissionError:
                 print(f'{file.name} -- not stamped, permission error.')
                 return
@@ -282,8 +283,12 @@ def cut_file_class(file):
             except FileNotFoundError:
                 pass
             # print('stamping here')
-            if not stamps_adder.stamper(file=file):
-                return False
+            if file.sap_card:
+                if not barcoder.coder(file=file):
+                    return False
+            else:
+                if not stamps_adder.stamper(file=file):
+                    return False
         else:
             try:
                 file.move_file()

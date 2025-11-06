@@ -91,6 +91,7 @@ class File:
     def __init__(self, name: str, catalog=None):
         self.name = name
         self.annotate = ""
+        self.sap_card = False
         self.file_name, self.extension = name.rsplit('.', 1)
         self.bought = False
         self.catalog = ''
@@ -145,6 +146,10 @@ class File:
         if re.search(r"kl", self.name.lower()) is not None:
             self.laser_collaborate = True
             self.annotate = "kl"
+            return
+        if re.search(r"sap", self.name.lower()) is not None:
+            self.sap_card = True
+            self.annotate = ""
             return
 
     def check_watermarking(self):
