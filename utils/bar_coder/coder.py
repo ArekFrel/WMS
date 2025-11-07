@@ -3,6 +3,12 @@ import fitz
 import barcode
 
 def coder(file):
+    if file.replace:
+        try:
+            os.remove(file.dest_path)
+        except PermissionError:
+            print(f'Cannot replace "{file.name}" and add barcode.')
+            return
     # create bar code graphics and save as temporary file
     writer_options = {
         'module_width': 0.1,  # szerokość kreski
@@ -33,6 +39,7 @@ def coder(file):
             offset_y + img_height
         )
         page.show_pdf_page(rect, image_pdf, 0)
+
         pdf_doc.save(file.dest_path)
     os.remove(f'{code_path}')
     # os.remove(file.start_path)
