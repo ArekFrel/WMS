@@ -309,7 +309,6 @@ def cut_file_class(file):
         return True
     else:
         update_rec(file)
-
     return True
 
 
@@ -443,7 +442,6 @@ def check_po_in_sap(po_num):
 def list_new_files_class():
 
     for item in os.listdir(Paths.START_CATALOG):
-
         deep_path = os.path.join(Paths.START_CATALOG, item)
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:

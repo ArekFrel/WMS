@@ -42,7 +42,8 @@ def coder(file):
 
         pdf_doc.save(file.dest_path)
     os.remove(f'{code_path}')
-    # os.remove(file.start_path)
+    os.remove(file.start_path)
+    return True
 
 def main():
     pass
