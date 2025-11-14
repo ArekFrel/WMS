@@ -22,8 +22,10 @@ def upload_new_data():
                 if ''.join(record) == '':
                     print(f'SAP_Insert file is empty.')
                     break
-            query = query + formulate_query_record(record=record)
-            query_counter += 1
+            add_query = formulate_query_record(record=record)
+            query = query + add_query
+            if len(add_query) > 0:
+                query_counter += 1
             if query_counter == 50:
                 if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
                     print(f'Records sent to database: {index + 1}', end="\r")
@@ -107,7 +109,7 @@ def formulate_query_record(record):
         operacja = record[9]
         start_op = redate(record[10])
         finish_op = redate(record[11])
-        czas_plan = record[12]
+        czas_plan = zero_remover(record[12])
         czas_raport = record[13]
         opis = record[14]
         create = redate(record[15])
@@ -261,16 +263,11 @@ def slash_remover(string):
         string = string[0:-1]
     return string.rstrip()
 
-
-# def planer_seek(po_num, planer):
-#     if planer != '':
-#         return planer
-#     found_planer = db_commit_getval(
-#         f"Select distinct [Planista 0] from SAP where [P.O.] = {po_num} and [planista 0] != '';"
-#     )
-#     if found_planer:
-#         return found_planer
-#     return ''
+def zero_remover(value):
+    if float(value) == 0:
+        return str(0.001)
+    else:
+        return value
 
 
 def uploader_checker():

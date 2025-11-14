@@ -11,6 +11,7 @@ from wms_main.timer_dec import timer
 from wms_main.const import *
 from pyodbc import Error
 from utils import stamps_adder
+from utils.bar_coder import coder as barcoder
 from utils.merger import merging
 from utils.pump_block_tracker import pb_tracker
 
@@ -136,7 +137,7 @@ def contains_pdfs(catalog):
         return False
 
 
-def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
+def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, sap_card=False, order=''):
     if buy:
         komentarz = 'kupowany'
     elif sub_buy:
@@ -177,7 +178,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, order=''):
         query_2 = f"Insert Into Technologia (" \
             f"Plik, PO, Rysunek, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Brygada', 'Brygada', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Laser', 'Laser', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
     else :
         query_2 = f"Insert Into Technologia (" \
@@ -270,9 +271,9 @@ def cut_file_class(file):
     file.set_available_name()   # Change name if file exists in PRODUCTION and is not replaced
 
     if os.path.exists(file.dest_catalog):
-        if any((file.bought, file.sub_bought, file.laser_collaborate)):
+        if any((file.bought, file.sub_bought, file.laser_collaborate, file.sap_card)):
             try:
-                os.rename(file.dest_path, file.dest_path)
+                os.rename(file.start_path, file.start_path)
             except PermissionError:
                 print(f'{file.name} -- not stamped, permission error.')
                 return
@@ -282,8 +283,12 @@ def cut_file_class(file):
             except FileNotFoundError:
                 pass
             # print('stamping here')
-            if not stamps_adder.stamper(file=file):
-                return False
+            if file.sap_card:
+                if not barcoder.coder(file=file):
+                    return False
+            else:
+                if not stamps_adder.stamper(file=file):
+                    return False
         else:
             try:
                 file.move_file()
@@ -304,7 +309,6 @@ def cut_file_class(file):
         return True
     else:
         update_rec(file)
-
     return True
 
 
@@ -438,7 +442,6 @@ def check_po_in_sap(po_num):
 def list_new_files_class():
 
     for item in os.listdir(Paths.START_CATALOG):
-
         deep_path = os.path.join(Paths.START_CATALOG, item)
         """ If path is not directory, and loose file are not forbidden."""
         if not os.path.isdir(deep_path) and Options.LOOSE_FILE_PERMISSION:
