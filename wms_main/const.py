@@ -68,10 +68,14 @@ class TimeConsts:
 class Paths:
     LP = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\'
     RAPORT_CATALOG = f'{LP}2__Baza_Danych\\'
+    AT_FILE = f'{LP}3__Pliki\\Brygady\\Brygady.xlsm'
     REGISTER = f'{LP}2__Baza_Danych\\reg.txt'
     TRANSFER_FILE = f'{LP}2__Baza_Danych\\transfer_history.txt'
     UPDATE_CAT = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\TEMP\\__wms_update__'
     MODELS_CATALOG = f'{LP}5__Modele_3D\\'
+    LASER_FORMER_BASE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PLOL\\P5_Material_Technology\\shared\\TrL\\zlec\\'
+    #                    \\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PLOL\\P5_Material_Technology
+    LASER_NEW_BASE = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PLOL\\P5_Material_Technology\\shared\\TrL\\_new_base\\'
 
     """Path of AUTOMAT file"""
     AUTOMAT_FILES_STORED = 'C:/Users/plolprod5/OneDrive - Tetra Pak//'
