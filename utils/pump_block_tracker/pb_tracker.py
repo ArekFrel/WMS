@@ -1,4 +1,5 @@
 import shutil
+import inspect
 from datetime import time
 from utils.pump_block_tracker.pump_block_technology import PbTech
 from wms_main.const import *
@@ -16,22 +17,22 @@ def copy_draw_file(draw, po, pb_id, pb):
     return True
 
 
-def drawing_multiplier(draw_id, draw, po, pcs, pb_id):
+def drawing_multiplier(draw_id, draw, po, pcs, item_id, func):
     query = ''
-    pb = pb_id + 1
+    item = item_id + 1
     for i in range(pcs - 1):
-        if not copy_draw_file(draw, po, pb_id, pb):
+        if not copy_draw_file(draw, po, item_id, item):
             break
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
         query = f"{query} INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
-            f"SELECT CONCAT('{draw}', ' {hash_id(pb)}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
+            f"SELECT CONCAT('{draw}', ' {hash_id(item)}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
-            f"CONCAT('{po}', ' ', '{draw}', ' {hash_id(pb)}'), '{now}' " \
+            f"CONCAT('{po}', ' ', '{draw}', ' {hash_id(item)}'), '{now}' " \
             f"FROM TECHNOLOGIA WHERE ID = {draw_id}"
-        pb = pb + 1
+        item = item + 1
     if query:
-        db_commit(query=query, func_name='drawing_multiplier')
+        db_commit(query=query, func_name=func)
 
 
 
@@ -42,9 +43,9 @@ def pb_id_updater(num):
     return None
 
 
-def pb_main_draw_rename(draw, po, pb_id):
+def main_draw_rename(draw, po, item_id):
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
-    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(pb_id)}.pdf')
+    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(item_id)}.pdf')
     try:
         os.rename(old_name, new_name)
         # shutil.copyfile(old_name, new_name)
@@ -96,10 +97,10 @@ def pumpblock_drawing_handler():
     pb_id = pumpblock_info_getter('ID')
     num = 0
     for draw_id, draw, po, pcs in po_drawings_data:
-        if not pb_main_draw_rename(draw, po, pb_id):
+        if not main_draw_rename(draw, po, pb_id):
             break
         pb_main_draw_tech_setter(draw_id, pb_id)
-        drawing_multiplier(draw_id, draw, po, pcs, pb_id)
+        drawing_multiplier(draw_id, draw, po, pcs, pb_id, 'pumpblock_drawing_handler')
         po_drawing_multiplied_setter(po)
         po_drawing_added_setter(po)
         pb_id = pb_id + pcs
@@ -156,7 +157,6 @@ def pumpblock_info_getter(arg):
                     "AND [Urządzenie] LIKE '%pump block%'"
         case _:
             return None
-
     try:
         CURSOR.execute(query)
         if arg in single_val:
@@ -182,11 +182,10 @@ def pumpblock_info_getter(arg):
 
 
 def main():
-    pass
-    # po_pumpblock_recorder()   # pass
-    # pumpblock_drawing_handler()
+    # pass
+    pumpblock_drawing_handler()
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()
+    # pass

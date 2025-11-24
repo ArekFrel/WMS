@@ -11,6 +11,7 @@
 /wms_main/dist
 /utils/__pycache__
 /utils/bar_coder/__pycache__
+utils/cylinders_tracker/__pycache__/
 /utils/ico_den.py
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
