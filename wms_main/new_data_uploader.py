@@ -8,6 +8,7 @@ from wms_main import sap_date
 from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
+from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
 
 
 def upload_new_data():
@@ -74,8 +75,6 @@ def upload_new_items():
             else:
                 return False
         return True
-
-
 
 
 def redate(date):
@@ -341,6 +340,7 @@ def main():
             planer_refiller.main()
             so_folder_creator()
             po_pumpblock_recorder()  # identyfikacja nowych zleceń na pump blocki
+            po_cylinder_recorder()  # identyfikacja nowych zleceń na cylindry
             sap_date.update(column='SAP_Skrypt_zmiana')
         else:
             return False

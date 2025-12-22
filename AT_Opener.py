@@ -1,5 +1,8 @@
 import ctypes, os, shutil, sys, time
-from wms_main.const import Paths
+
+class Paths:
+    LP = '\\\\PLOLFPS01.tp1.ad1.tetrapak.com\\PUBLIC\\!!__PRODUKCJA__!!\\'
+    AT_FILE = f'{LP}3__Pliki\\Brygady\\Brygady.xlsm'
 
 def update():
     if getattr(sys, 'frozen', False):

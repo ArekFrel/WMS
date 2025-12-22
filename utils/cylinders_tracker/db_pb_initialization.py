@@ -27,7 +27,7 @@ CREATE TABLE cylinders_orders (
 	[part] [varchar](32) NULL,
 	[type] [varchar](64) NULL,
 	[name] [varchar](64) NULL,
-	[status] [varchar](10) NULL,
+	[technology_set] [bit] NULL,
 	[stocks_counted] [bit] NULL,
 	[multiplied] [bit] NULL
 );

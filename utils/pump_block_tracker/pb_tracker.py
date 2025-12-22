@@ -7,8 +7,8 @@ from pyodbc import Error, DataError, OperationalError
 
 
 def copy_draw_file(draw, po, pb_id, pb):
-    base_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(pb_id)}.pdf')
-    new_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(pb)}.pdf')
+    base_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}{hash_id(pb_id)}.pdf')
+    new_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}{hash_id(pb)}.pdf')
     try:
         shutil.copyfile(base_file, new_file)
     except FileNotFoundError:
@@ -26,14 +26,13 @@ def drawing_multiplier(draw_id, draw, po, pcs, item_id, func):
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
         query = f"{query} INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
-            f"SELECT CONCAT('{draw}', ' {hash_id(item)}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
+            f"SELECT CONCAT('{draw}', '{hash_id(item)}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
-            f"CONCAT('{po}', ' ', '{draw}', ' {hash_id(item)}'), '{now}' " \
+            f"CONCAT('{po}', ' ', '{draw}', '{hash_id(item)}'), '{now}' " \
             f"FROM TECHNOLOGIA WHERE ID = {draw_id}"
         item = item + 1
     if query:
         db_commit(query=query, func_name=func)
-
 
 
 def pb_id_updater(num):
@@ -45,7 +44,7 @@ def pb_id_updater(num):
 
 def main_draw_rename(draw, po, item_id):
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
-    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw} {hash_id(item_id)}.pdf')
+    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}{hash_id(item_id)}.pdf')
     try:
         os.rename(old_name, new_name)
         # shutil.copyfile(old_name, new_name)
@@ -61,7 +60,7 @@ def main_draw_rename(draw, po, item_id):
 def pb_main_draw_tech_setter(draw_id, pb_id):
     tech = PbTech()
     query = f"UPDATE TECHNOLOGIA SET " \
-        f"Rysunek = CONCAT(Rysunek, ' {hash_id(pb_id)}'), " \
+        f"Rysunek = CONCAT(Rysunek, '{hash_id(pb_id)}'), " \
         f"Sztuki = 1, " \
         f"Materiał = 'duplex', " \
         f"OP0 = {tech.curr_op()}, " \
@@ -79,7 +78,7 @@ def pb_main_draw_tech_setter(draw_id, pb_id):
         f"Status_Op = 1, " \
         f"Stat = 0, " \
         f"Liczba_Operacji = {tech.tech_len}, " \
-        f"Plik = CONCAT(PO, ' ', Rysunek, ' {hash_id(pb_id)}')" \
+        f"Plik = CONCAT(PO, ' ', Rysunek, '{hash_id(pb_id)}')" \
         f"WHERE ID = {draw_id}"
     db_commit(query=query, func_name='pb_main_draw_tech_setter')
 
@@ -110,7 +109,7 @@ def pumpblock_drawing_handler():
 
 
 def hash_id(num: int):
-    return f"#{num:0>4}"
+    return f" #{num:0>4}"
 
 
 def po_drawing_added_setter(po):

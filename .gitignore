@@ -9,6 +9,7 @@
 /wms_main/__pycache__
 /wms_main/build
 /wms_main/dist
+/wms_main/const.py
 /utils/__pycache__
 /utils/bar_coder/__pycache__
 utils/cylinders_tracker/__pycache__/

@@ -83,14 +83,13 @@ def print_introduction():
 
 @time_break(from_=TimeConsts.FROM_OCLOCK, to_=TimeConsts.TO_OCLOCK)
 def cycle():
-
     print_now()
     sap_date.update(column='Automat')
+    if new_data_uploader.main():
+        file_manager.main()
     add_new_files.main()
     sap_date.update(column='Automat_Start')
 
-    if new_data_uploader.main():
-        file_manager.main()
 
     # if not Options.IQE:
     #     check_for_qoutation_export()
@@ -98,21 +97,20 @@ def cycle():
 
 def main():
     restart = Restart()
-    if self_update.check_for_update():
-        self_update.update()
-        Restart.proceed = False
-        return None
-
+    # if self_update.check_for_update():
+    #     self_update.update()
+    #     Restart.proceed = False
+    #     return None
     if restart.launch_able(arg="start"):
         print_introduction()
         while True:
             cycle()
             if restart.launch_able(arg="continue"):
                 wait(TimeConsts.TIME_OF_BREAK)
-                if self_update.check_for_update():
-                    self_update.update()
-                    Restart.proceed = True
-                    return None
+                # if self_update.check_for_update():
+                #     self_update.update()
+                #     Restart.proceed = True
+                #     return None
             else:
                 print_reset_break()
                 return None
@@ -123,5 +121,5 @@ def main():
 if __name__ == '__main__':
 
     main()
-    if Restart.proceed:
-        subprocess.call(Paths.AUTOMAT_BAT)
+    # if Restart.proceed:
+    #     subprocess.call(Paths.AUTOMAT_BAT)
