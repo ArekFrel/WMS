@@ -1,5 +1,4 @@
 import os
-from wms_main.const import Paths
 import fitz
 
 

@@ -14,6 +14,7 @@ from utils import stamps_adder
 from utils.bar_coder import coder as barcoder
 from utils.merger import merging
 from utils.pump_block_tracker import pb_tracker
+from utils.cylinders_tracker import cylinder_tracker
 
 catalogs_to_remove = []
 
@@ -455,6 +456,7 @@ def list_new_files_class():
     File.print_counter_status()
     File.set_counter_zero()
     pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
+    cylinder_tracker.cylinder_drawing_handler()  # Obsługa nowych rysunków na cylindry
 
 
 def file_handler(file_name, folder=None):
