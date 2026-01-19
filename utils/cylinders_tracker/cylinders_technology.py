@@ -53,7 +53,11 @@ class CylinderTechnology:
         return result
 
     def comment_setter(self, ):
-        return CylinderPartsNumber.COMMENTS.get(self.draw_type)
+        comment = CylinderPartsNumber.COMMENTS.get(self.draw_type)
+        if not comment:
+            return ''
+        else:
+            return comment
 
     def next_op(self):
         if self.stat >= len(self.tech) or self.pop_done:
