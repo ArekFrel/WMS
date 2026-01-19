@@ -1,8 +1,8 @@
 import shutil
 from datetime import datetime, time, date
 from wms_main.const import *
-from cylinders_data import *
-from cylinders_technology import *
+from utils.cylinders_tracker.cylinders_data import *
+from utils.cylinders_tracker.cylinders_technology import *
 from utils.pump_block_tracker.pb_tracker import copy_draw_file
 from pyodbc import Error, DataError, OperationalError
 
@@ -31,7 +31,7 @@ def cylinder_tech_setter(draw_id, draw, cylinder_id):
             f"Status_Op = 1, " \
             f"Stat = 0, " \
             f"Liczba_Operacji = {tech_route.tech_len}, " \
-            f"Plik = CONCAT(PO, ' ', Rysunek, ' {hash_num}')" \
+            f"Plik = CONCAT(PO, ' ', Rysunek, '{hash_num}')" \
             f"WHERE ID = {draw_id}"
     db_commit(query=query, func_name='cylinder_tech_setter')
 
@@ -47,6 +47,8 @@ def po_cylinder_recorder():
                 f" 0, {multiplied}, 0); "
         db_commit(query, func_name='po_cylinders_recorder')
         print(f"order {po} added.")
+
+    po_cylinder_recounter()
 
 def po_cylinder_recounter():
 
@@ -76,8 +78,13 @@ def po_cylinder_multiplied_setter(arg):
             f"WHERE PO = {arg}"
     db_commit(query, func_name='po_drawing_multiplied_setter')
 
+def po_cylinder_tech_done_setter(arg):
+    query = f"UPDATE cylinders_orders SET technology_set = 1 " \
+            f"WHERE PO = {arg}"
+    db_commit(query, func_name='po_drawing_tech_setter')
+
 def cylinder_drawing_handler():
-    drawings_data = cylinder_info_getter('ORPHAN_DRAWINGS_CYLINDER')  # wyszukiwanie nieobsłużonych rysunków pump blocków
+    drawings_data = cylinder_info_getter('ORPHAN_DRAWINGS_CYLINDER')  # wyszukiwanie nieobsłużonych rysunków cylindrów
     if not drawings_data:
         return
     cylinder_id = cylinder_info_getter('ID')
@@ -91,6 +98,7 @@ def cylinder_drawing_handler():
         cylinder_tech_setter(draw_id, draw, cylinder_id)
         drawing_multiplier(draw_id, draw, po, pcs, cylinder_id, 'cylinder_drawing_handler')
         po_cylinder_multiplied_setter(po)
+        po_cylinder_tech_done_setter(po)
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
             cylinder_id = cylinder_id + pcs
             num = num + pcs
@@ -159,7 +167,7 @@ def cylinder_info_getter(arg):
         case 'ORPHAN_DRAWINGS_CYLINDER':
             query = "SELECT T.id, T.Rysunek, T.PO, P.pcs from TECHNOLOGIA T " \
                     "RIGHT JOIN ( " \
-                    "SELECT PO, pcs FROM dbo.cylinders_orders WHERE multiplied = 0 ) P " \
+                    "SELECT PO, pcs FROM dbo.cylinders_orders WHERE multiplied = 0 or technology_set = 0 ) P " \
                     "ON T.[PO] = P.PO " \
                     "WHERE T.Status_Op = 6 " \
                     "ORDER BY T.ID;"
@@ -235,11 +243,11 @@ def init_id():
     db_commit(query, func_name='init_stock')
 
 def main():
+    po_cylinder_recorder()
     po_cylinder_recounter()
-    cylinder_drawing_handler()
 
 
 if __name__ == '__main__':
-    # reset_cylinder_base()
-    main()
+    reset_cylinder_base()
+    # main()
 
