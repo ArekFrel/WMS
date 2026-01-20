@@ -13,8 +13,8 @@ from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
 
 def upload_new_data():
     print('Refreshing SAP DataBase.')
-    sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "MY_INSERT.csv")
-    # sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
+    # sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "MY_INSERT.csv")
+    sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
         query = ''
@@ -284,7 +284,6 @@ def uploader_checker():
             sap_db_date = date_time[0].timestamp()
             if sap_insert_date > sap_db_date:
                 return True
-
     return False
 
 
@@ -371,4 +370,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # main()
     pass
