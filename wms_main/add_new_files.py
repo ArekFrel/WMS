@@ -275,6 +275,7 @@ def cut_file_class(file):
         if any((file.bought, file.sub_bought, file.laser_collaborate, file.sap_card)):
             try:
                 os.rename(file.start_path, file.start_path)
+                os.rename(file.dest_path, file.dest_path)
             except PermissionError:
                 print(f'{file.name} -- not stamped, permission error.')
                 return

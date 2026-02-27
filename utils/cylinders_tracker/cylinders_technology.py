@@ -2,14 +2,19 @@ class CylinderTechnology:
     """Set cylinders Technology here:"""
     CTDict = {
         'CYLINDER_MAIN' : {
-            'OP_1': 'T6-Mazak'
+            'OP_1': 'T6-Mazak',
+            'OP_2': 'Quality',
+            'OP_3': 'Kooperacja',
+            'OP_4': 'Quality'
         },
         'CYLINDER_TUBE' : {
             'OP_1': 'T1-Man',
-            'OP_2': 'T6-Mazak'
+            'OP_2': 'T6-Mazak',
+            'OP_3': 'Quality'
          },
         'CYLINDERS_WELDING' : {
-            'OP_1': 'Brygada'
+            'OP_1': 'Brygada',
+            'OP_2': 'Quality'
         },
         'FLANGE' : {
             'OP_1': 'Kooperacja',

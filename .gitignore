@@ -10,6 +10,7 @@
 /wms_main/build
 /wms_main/dist
 /wms_main/const.py
+/wms_main/temporary_funcs.py
 /utils/__pycache__
 /utils/bar_coder/__pycache__
 utils/cylinders_tracker/__pycache__/
