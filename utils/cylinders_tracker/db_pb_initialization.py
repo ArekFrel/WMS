@@ -29,7 +29,8 @@ CREATE TABLE cylinders_orders (
 	[name] [varchar](64) NULL,
 	[technology_set] [bit] NULL,
 	[stocks_counted] [bit] NULL,
-	[multiplied] [bit] NULL
+	[multiplied] [bit] NULL,
+	[lb_signed] [bit] null
 );
 """
 # wyzwalacz dla pb_identifier:

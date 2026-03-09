@@ -1,21 +1,35 @@
 class CylinderTechnology:
     """Set cylinders Technology here:"""
     CTDict = {
-        'CYLINDER_MAIN' : {
-            'OP_1': 'T6-Mazak',
-            'OP_2': 'Quality',
-            'OP_3': 'Kooperacja',
-            'OP_4': 'Quality'
-        },
-        'CYLINDER_TUBE' : {
+        # 'CYLINDER_MAIN' : {
+        #     'OP_1': 'T6-Mazak',
+        #     'OP_2': 'Quality',
+        #     'OP_3': 'Kooperacja',
+        #     'OP_4': 'Quality'
+        # },
+        'CYLINDER_MAIN': {
             'OP_1': 'T1-Man',
             'OP_2': 'T6-Mazak',
-            'OP_3': 'Quality'
-         },
-        'CYLINDERS_WELDING' : {
-            'OP_1': 'Brygada',
-            'OP_2': 'Quality'
+            'OP_3': 'Quality',
+            'OP_4': 'Brygada',
+            'OP_5': 'T6-Mazak',
+            'OP_6': 'Quality',
+            'OP_7': 'Kooperacja',
+            'OP_8': 'Quality'
         },
+        'CYLINDER_HONING': {
+            'OP_1': 'Brygada'
+        },
+
+        # 'CYLINDER_TUBE' : {
+        #     'OP_1': 'T1-Man',
+        #     'OP_2': 'T6-Mazak',
+        #     'OP_3': 'Quality'
+        #  },
+        # 'CYLINDERS_WELDING' : {
+        #     'OP_1': 'Brygada',
+        #     'OP_2': 'Quality'
+        # },
         'FLANGE' : {
             'OP_1': 'Kooperacja',
             'OP_2': 'T4-Fct',
@@ -75,12 +89,10 @@ class CylinderPartsNumber:
     draw_cyinder = {
         '59711120330': 'SLEEVE',  # CF500
         '59710920491': 'SLEEVE',  # CF1000
-        '59711021666': 'SLEEVE',  # CF2000
-        '59711021666': 'SLEEVE',  # CF3000
+        '59711021666': 'SLEEVE',  # CF2000 & CF3000
         '59711120328': 'FLANGE',  # CF500
         '59710920489': 'FLANGE',  # CF1000
-        '59711021664': 'FLANGE',  # CF2000
-        '59711021664': 'FLANGE',  # CF3000
+        '59711021664': 'FLANGE',  # CF2000 & CF3000
         '59711320582': 'FLANGE',  # CF4000
         '59711120329': 'CYLINDER_TUBE',  # CF500
         '59710920490': 'CYLINDER_TUBE',  # CF1000
@@ -97,7 +109,21 @@ class CylinderPartsNumber:
         '59711021662': 'CYLINDER_MAIN',  # CF2000
         '59711021677': 'CYLINDER_MAIN',  # CF3000
         '59711320580': 'CYLINDER_MAIN',  # CF4000
+        '59711120385': 'CYLINDER_HONING',  # CF500
+        '59710920633': 'CYLINDER_HONING',  # CF1000
+        '59711021890': 'CYLINDER_HONING',  # CF2000
+        '59711021892': 'CYLINDER_HONING',  # CF3000
+        '59711320665': 'CYLINDER_HONING',  # CF4000
     }
+
+    main_draw_types = {
+        '59711120326': 'CF500',  # CF500
+        '59710920487': 'CF1000',  # CF1000
+        '59711021662': 'CF2000',  # CF2000
+        '59711021677': 'CF3000',  # CF3000
+        '59711320580': 'CF4000',  # CF4000
+    }
+
     CYLINDER_SLEEVE = [
         '59711120330',  # CF500
         '59710920491',  # CF1000
@@ -132,7 +158,6 @@ class CylinderPartsNumber:
         '59711021662', # CF2000
         '59711021677', # CF3000
         '59711320580', # CF4000
-        '',  #
         ]
 
     MATERIALS = {
@@ -151,6 +176,25 @@ class CylinderPartsNumber:
         'CYLINDERS_WELDING': 'Rysunek Spawalniczy',
         'CYLINDER_MAIN': '',
     }
+
+    DICT_CYLINDER = {
+        'CF500-tube': '59711120329',
+        'CF500-welding': '59711120327',
+        'CF500-main': '59711120326',
+        'CF1000-tube': '59710920490',
+        'CF1000-welding': '59710920488',
+        'CF1000-main': '59710920487',
+        'CF2000-tube': '59711021665',
+        'CF2000-welding': '59711021663',
+        'CF2000-main': '59711021662',
+        'CF3000-tube': '59711021675',
+        'CF3000-welding': '59711021676',
+        'CF3000-main': '59711021677',
+        'CF4000-tube': '59711320583',
+        'CF4000-welding': '59711320581',
+        'CF4000-main': '59711320580',
+    }
+
 
 
 

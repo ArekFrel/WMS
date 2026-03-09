@@ -264,6 +264,39 @@ def del_empty_catalogs():
         shutil.rmtree(folder, ignore_errors=True, )
     catalogs_to_remove.clear()
 
+def delete_files():
+    query = 'SELECT * FROM files_to_delete;'
+    try:
+        CURSOR.execute(query)
+        ftd = CURSOR.fetchall()#ftd - files to delete
+        if not ftd:
+            return
+        ftd =  [val for val in ftd[0]]
+    except pyodbc.OperationalError:
+        print (f'Operational Error in "delete_files"')
+        return False
+    except pyodbc.DatabaseError:
+        print(f'Time exceeded in "delete_files"')
+        return False
+    except pyodbc.Error:
+        print(f'Database Error in "delete_files"')
+        return False
+    except Exception:
+        print(f'Something else during "delete_files" gone wrong!')
+        return False
+    for file in ftd:
+        file_path = os.path.join(Paths.PRODUCTION, file[0:7], f'{file}.pdf')
+        try:
+            os.remove(file_path)
+        except PermissionError:
+            continue
+        except FileNotFoundError:
+            db_commit(f"DELETE FROM files_to_delete WHERE draw = '{file}';", 'files removed')
+            continue
+        db_commit(f"DELETE FROM files_to_delete WHERE draw = '{file}';", 'files_removew')
+
+    return None
+
 
 def cut_file_class(file):
 
@@ -417,7 +450,6 @@ def truncate_bad_files():
     table = "Złe_Pliki"
     query = f"Delete From {table}"
     db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
-
     return None
 
 
@@ -458,6 +490,7 @@ def list_new_files_class():
     File.set_counter_zero()
     pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
     cylinder_tracker.cylinder_drawing_handler()  # Obsługa nowych rysunków na cylindry
+    delete_files()
 
 
 def file_handler(file_name, folder=None):
@@ -496,8 +529,11 @@ def main():
     elif not Options.GENERAL_CHECK_PERMISSION:
         list_new_files()
     list_new_files_class()
+    pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
+    cylinder_tracker.cylinder_drawing_handler()  # Obsługa nowych rysunków na cylindry
     merging()
     del_empty_catalogs()
+    delete_files()
 
 
 if __name__ == '__main__':
