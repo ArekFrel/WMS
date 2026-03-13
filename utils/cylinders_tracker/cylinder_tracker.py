@@ -118,7 +118,8 @@ def po_cylinder_recounter():
 
 def po_cylinder_multiplied_setter(arg):
     query = f"UPDATE cylinders_orders SET multiplied = 1 " \
-            f"WHERE PO = {arg}"
+            f"WHERE PO = {arg} ;" \
+            f"UPDATE OTM SET merged = 1 WHERE PO = {arg};"# added
     db_commit(query, func_name='po_drawing_multiplied_setter')
 
 def po_cylinder_tech_done_setter(arg):
@@ -134,7 +135,7 @@ def cylinder_drawing_handler():
     num = 0
     for draw_id, draw, po, pcs in drawings_data:
         if CylinderPartsNumber.draw_cyinder.get(draw) in (
-                'CYLINDER_TUBE','CYLINDERS_WELDING', 'CYLINDER_HONING'):
+                'CYLINDER_TUBE','CYLINDERS_WELDING'):
             continue
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
             do_proceed, new_name = main_draw_rename(draw, po, cylinder_id)
@@ -174,7 +175,7 @@ def drawing_multiplier(draw_id, draw, po, pcs, item_id, func):
 
 def lb_signer_orphan():
     """
-    Signieng missing main_cylinders with lb_numbers
+    Signing missing main_cylinders with lb_numbers
     """
 
     test_ids = cylinder_info_getter('cylinders_without_lb')
@@ -200,8 +201,8 @@ def lb_signer_auto(po, draw):
                                   f"cylinder_type = '{cyl_type}' AND used_in_tech IS NULL ORDER BY ID ASC"
     count_query = f"SELECT count(ID) FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}'" \
                   " AND used_in_tech IS NULL"
-    CURSOR.execute(count_query)
-    free_lbs = int(CURSOR.fetchval())
+
+    free_lbs = db_commit_getval(count_query)
     ids = cylinder_info_getter(arg=query_po, query_arg=1)
     for i, tech_id in enumerate(ids, 1):
         if i > free_lbs:
@@ -347,8 +348,8 @@ def init_id():
     db_commit(query, func_name='init_stock')
 
 def main():
-    po_cylinder_recorder()
-    po_cylinder_recounter()
+    # po_cylinder_recorder()
+    # po_cylinder_recounter()
     lb_signer_orphan()
 
 

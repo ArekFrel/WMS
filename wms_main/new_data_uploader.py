@@ -327,7 +327,7 @@ def update_wms_table():
     CURSOR.execute(query)
     COL_START = '\033[95m'
     COL_END = '\033[0m'
-    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+    if CURSOR.fetchval() > TimeConsts.PUTT - 1:
         print(f'{COL_START}Updating wms_table for planners{COL_END}')
         CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
         sap_date.update(column='wms_table_update')
