@@ -488,8 +488,8 @@ def list_new_files_class():
 
     File.print_counter_status()
     File.set_counter_zero()
-    pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
-    cylinder_tracker.cylinder_drawing_handler()  # Obsługa nowych rysunków na cylindry
+    # pb_tracker.pumpblock_drawing_handler()  # Obsługa nowych rysunków na pump blocki
+    # cylinder_tracker.cylinder_drawing_handler()  # Obsługa nowych rysunków na cylindry
     delete_files()
 
 

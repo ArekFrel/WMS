@@ -3,13 +3,11 @@ import os
 import fitz
 import shutil
 from datetime import datetime, time, date
-
 from sqlalchemy.testing.config import test_schema_2
-
 from wms_main.const import *
 from utils.cylinders_tracker.cylinders_data import *
 from utils.cylinders_tracker.cylinders_technology import *
-from utils.pump_block_tracker.pb_tracker import copy_draw_file
+# from utils.pump_block_tracker.pb_tracker import copy_draw_file
 from pyodbc import Error, DataError, OperationalError
 
 '''
@@ -17,12 +15,27 @@ TODO:
     -CYLINDER MAIN MERGINNG
     -CYLINDER MAIN MULTIPLYING
 '''
-def cylinder_tech_setter(draw_id, draw, cylinder_id):
+
+def copy_draw_file(draw, po, lb_dest):
+    base_file = os.path.join(Paths.PRODUCTION, str(po), f'{draw}.pdf')
+    new_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw.split('__')[0]}__{lb_dest}.pdf')
+    try:
+        shutil.copyfile(base_file, new_file)
+    except FileNotFoundError:
+        print(f'Aint no such file {base_file}')
+        return None
+    return True
+
+def cylinder_tech_setter(draw_id, draw, new_name=None):
 
     tech_route = CylinderTechnology(draw)
-    hash_num = hash_cyl_id(cylinder_id, tech_route.draw_type)
+    if not new_name:
+        new_name = draw
+    else:
+        new_name = new_name.split(' ')[1]
+    # hash_num = hash_cyl_id(cylinder_id, tech_route.draw_type)
     query = f"UPDATE TECHNOLOGIA SET " \
-            f"Rysunek = CONCAT(Rysunek, '{hash_num}'), " \
+            f"Rysunek = '{new_name}', " \
             f"Sztuki = 1, " \
             f"Materiał = '{tech_route.material}', " \
             f"Komentarz = '{tech_route.comment}', " \
@@ -41,8 +54,8 @@ def cylinder_tech_setter(draw_id, draw, cylinder_id):
             f"Status_Op = 1, " \
             f"Stat = 0, " \
             f"Liczba_Operacji = {tech_route.tech_len}, " \
-            f"Plik = CONCAT(PO, ' ', Rysunek, '{hash_num}')" \
-            f"WHERE ID = {draw_id}"
+            f"Plik = CONCAT( PO, ' ', '{new_name}') " \
+            f"WHERE ID = {draw_id};"
     db_commit(query=query, func_name='cylinder_tech_setter')
 
 def cylinder_drawing_merger(po, new_name, draw):
@@ -53,23 +66,26 @@ def cylinder_drawing_merger(po, new_name, draw):
     cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
     tube_draw = CylinderPartsNumber.DICT_CYLINDER.get(f'{cyl_type}-tube')
     weld_draw = CylinderPartsNumber.DICT_CYLINDER.get(f'{cyl_type}-welding')
+    hone_draw = CylinderPartsNumber.DICT_CYLINDER.get(f'{cyl_type}-honing')
     doc_1 = get_file_path(tube_draw)
     doc_2 = get_file_path(weld_draw)
+    doc_3 = get_file_path(hone_draw)
     temp_name = get_file_path('cyl_temp_file')
 
     # drawing merging:
     with fitz.open(doc_1) as doc:
         doc.insert_file(doc_2)
         doc.insert_file(new_name)
+        doc.insert_file(doc_3)
         doc.save(temp_name)
-    for file in (doc_1, doc_2, new_name):
+    for file in (doc_1, doc_2, new_name, doc_3):
         os.remove(file)
     # files removing
     os.rename(temp_name, new_name)
     os.chmod(new_name, S_IWRITE)
 
     #deleting from database
-    query = f"DELETE FROM TECHNOLOGIA WHERE po = {po} AND rysunek in ('{tube_draw}', '{weld_draw}')"
+    query = f"DELETE FROM TECHNOLOGIA WHERE po = {po} AND rysunek in ('{tube_draw}', '{weld_draw}', '{hone_draw}')"
     db_commit(query=query, func_name='cylinder_drawing_merger')
 
     #deleting from otm
@@ -131,47 +147,60 @@ def cylinder_drawing_handler():
     drawings_data = cylinder_info_getter('ORPHAN_DRAWINGS_CYLINDER')  # wyszukiwanie nieobsłużonych rysunków cylindrów
     if not drawings_data:
         return
-    cylinder_id = cylinder_info_getter('ID')
-    num = 0
+
     for draw_id, draw, po, pcs in drawings_data:
         if CylinderPartsNumber.draw_cyinder.get(draw) in (
                 'CYLINDER_TUBE','CYLINDERS_WELDING'):
             continue
+        new_name = None
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
-            do_proceed, new_name = main_draw_rename(draw, po, cylinder_id)
+            cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
+            lbs = lb_getter(cyl_type, pcs)
+            lb = lbs.pop(0)
+            do_proceed, new_name, new_path = main_draw_rename(draw, po, lb)
             if do_proceed:
-                cylinder_drawing_merger(po, new_name, draw)
+                cylinder_drawing_merger(po, new_path, draw)
+                lb_signer_single(new_name)
             else:
                 break
-        cylinder_tech_setter(draw_id, draw, cylinder_id)
-        if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
-            drawing_multiplier(draw_id, draw, po, pcs, cylinder_id, 'cylinder_drawing_handler')
-            lb_signer_auto(po, draw)
-            cylinder_id = cylinder_id + pcs
-            num = num + pcs
+            cylinder_tech_setter(draw_id, draw, new_name)
+            if pcs == 1:
+                continue
+            drawing_multiplier(draw_id, new_name, po, pcs, lbs)
+
         po_cylinder_multiplied_setter(po)
         po_cylinder_tech_done_setter(po)
 
-    if num:
-        cylinder_id_updater(num)
 
-def drawing_multiplier(draw_id, draw, po, pcs, item_id, func):
+def lb_getter(cyl_type, pcs):
+    query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' AND used_in_tech is NULL;"
+    lbs = get_lbs(query)
+    return lbs
 
-    query = ''
-    item = item_id + 1
-    for i in range(pcs - 1):
-        if not copy_draw_file(draw, po, item_id, item):
-            break
+
+
+def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
+
+    sent = 0
+    if not lbs:
+        return
+    for lb in lbs:
+        if not copy_draw_file(draw, po, lb):
+            return sent
+        po, draw = draw.split(' ')
+        draw = draw.split('__')[0]
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
-        query = f"{query} INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
+        query = f"INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
-            f"SELECT CONCAT('{draw}', '{hash_cyl_id(item, 'CYLINDER_MAIN' )}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
+            f"SELECT CONCAT('{draw}', '__{lb}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
-            f"CONCAT('{po}', ' ', '{draw}', '{hash_cyl_id(item, 'CYLINDER_MAIN')}'), '{now}' " \
-            f"FROM TECHNOLOGIA WHERE ID = {draw_id}"
-        item = item + 1
-    if query:
-        db_commit(query=query, func_name=func)
+            f"CONCAT('{po}', ' ', '{draw}', '__{lb}'), '{now}' " \
+            f"FROM TECHNOLOGIA WHERE ID = {draw_id};"
+        db_commit(query=query, func_name='drawing multiplier')
+        lb_signer_single(draw=f'{po} {draw}__{lb}')
+        sent += 1
+    return pcs - 1
+
 
 def lb_signer_orphan():
     """
@@ -210,6 +239,20 @@ def lb_signer_auto(po, draw):
         query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = {tech_id} " \
                      f"WHERE id = ({query_lb}) "
         db_commit(query_sign, func_name='lb_signer')
+
+def lb_signer_single(draw):
+    """ As a parameter received new name rysunek from Technologia, extract lb number and sing accordingly."""
+
+    idquery = f"SELECT id FROM technologia WHERE plik = '{draw}'"
+    lb = draw.split('__')[1]
+    try:
+        query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = ({idquery}) " \
+                     f"WHERE lb_num = '{lb}'; "
+        db_commit(query_sign, func_name='lb_signer')
+    except IndexError:
+        print("Niepoprawny parametr draw.")
+    return True
+
 
 def part_getter(device_name):
     if 'sleeve' in device_name.lower():
@@ -305,9 +348,9 @@ def hash_cyl_id(num: int, draw_type: str):
     else:
         return ''
 
-def main_draw_rename(draw, po, item_id) -> tuple:
+def main_draw_rename(draw, po, lb) -> tuple:
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
-    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}{hash_cyl_id(item_id, 'CYLINDER_MAIN')}.pdf')
+    new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}__{lb}.pdf')
     try:
         os.rename(old_name, new_name)
         # shutil.copyfile(old_name, new_name)
@@ -320,7 +363,7 @@ def main_draw_rename(draw, po, item_id) -> tuple:
         db_commit(query, 'inserting into files_to_delete')
         print(f'File locked {old_name}')
 
-    return True, new_name
+    return True, f'{po} {draw}__{lb}', new_name
 
 def start_stock():
 
@@ -354,5 +397,6 @@ def main():
 
 
 if __name__ == '__main__':
+    lb_signer_single()
     main()
 
