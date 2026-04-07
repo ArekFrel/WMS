@@ -17,7 +17,7 @@ utils/cylinders_tracker/__pycache__/
 /utils/ico_den.py
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
-data_manipulator.py
+/wms_main/get_drawings
 *.bat
 *.csv
 *.txt

@@ -1,20 +1,45 @@
-import os
-
 import fitz
 import shutil
-from datetime import datetime, time, date
-from sqlalchemy.testing.config import test_schema_2
+from datetime import time
 from wms_main.const import *
 from utils.cylinders_tracker.cylinders_data import *
 from utils.cylinders_tracker.cylinders_technology import *
-# from utils.pump_block_tracker.pb_tracker import copy_draw_file
 from pyodbc import Error, DataError, OperationalError
 
-'''
-TODO:
-    -CYLINDER MAIN MERGINNG
-    -CYLINDER MAIN MULTIPLYING
-'''
+from wms_main.teco_completer import print_red
+
+
+def cylinder_drawing_handler():
+    """
+    Main function of the module.
+    """
+    drawings_data = cylinder_info_getter('ORPHAN_DRAWINGS_CYLINDER')  # wyszukiwanie nieobsłużonych rysunków cylindrów
+    if not drawings_data:
+        return
+
+    for draw_id, draw, po, pcs in drawings_data:
+        if CylinderPartsNumber.draw_cyinder.get(draw) in (
+                'CYLINDER_TUBE','CYLINDERS_WELDING'):
+            continue
+        new_name = None
+        if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
+            cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
+            lbs = lb_getter(cyl_type, pcs)
+            lb = lbs.pop(0)
+            do_proceed, new_name, new_path = main_draw_rename(draw, po, lb)
+            if do_proceed:
+                cylinder_drawing_merger(po, new_path, draw)
+                lb_signer_single(new_name)
+            else:
+                break
+            cylinder_tech_setter(draw_id, draw, new_name)
+            if pcs == 1:
+                continue
+            drawing_multiplier(draw_id, new_name, po, pcs, lbs)
+
+        po_cylinder_multiplied_setter(po)
+        po_cylinder_tech_done_setter(po)
+
 
 def copy_draw_file(draw, po, lb_dest):
     base_file = os.path.join(Paths.PRODUCTION, str(po), f'{draw}.pdf')
@@ -103,11 +128,14 @@ def po_cylinder_recorder():
         cyl_type = type_getter(device)
 
         query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs}, '{part}', '{cyl_type}', '{device}', " \
-                f" 0, 0, 0, 0); "   #technology_set, stocks_counted, multiplied, merged
+                f" 0, 0, 0, 0); " \
+                f"DELETE FROM OTM WHERE PO = {po}; " \
+                f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'; "
+                #added - not tested
+
         if db_commit(query, func_name='po_cylinders_recorder'):
             print(f"order {po} added.")
 
-    po_cylinder_recounter()
 
 def po_cylinder_recounter():
 
@@ -122,10 +150,16 @@ def po_cylinder_recounter():
                         f"UPDATE dbo.cylinders_orders SET stocks_counted = 1 where po = {po}; "
 
             if part == 'cylinder':
-                if int(start_date) <= 0:
-                    query = f"UPDATE dbo.cylinders_stock SET sleeves_pcs = sleeves_pcs - {pcs}, " \
-                            f"flanges_pcs =  flanges_pcs - {pcs} WHERE cylinder_type = '{cyl_type}'; " \
-                            f"UPDATE dbo.cylinders_orders SET stocks_counted = 1 where po = {po}; "
+
+                try:
+                    if int(start_date) <= 0:
+                        query = f"UPDATE dbo.cylinders_stock SET sleeves_pcs = sleeves_pcs - {pcs}, " \
+                                f"flanges_pcs =  flanges_pcs - {pcs} WHERE cylinder_type = '{cyl_type}'; " \
+                                f"UPDATE dbo.cylinders_orders SET stocks_counted = 1 where po = {po}; "
+                except TypeError:
+                    register(f'TypeError: {datetime.now()}, {po}, {cyl_type}')
+                    print_red("Error occured, loged in.")
+                    continue
             if query:
                 db_commit(query, func_name='po_cylinder_recounter')
                 query = ""
@@ -143,45 +177,15 @@ def po_cylinder_tech_done_setter(arg):
             f"WHERE PO = {arg}"
     db_commit(query, func_name='po_drawing_tech_setter')
 
-def cylinder_drawing_handler():
-    drawings_data = cylinder_info_getter('ORPHAN_DRAWINGS_CYLINDER')  # wyszukiwanie nieobsłużonych rysunków cylindrów
-    if not drawings_data:
-        return
-
-    for draw_id, draw, po, pcs in drawings_data:
-        if CylinderPartsNumber.draw_cyinder.get(draw) in (
-                'CYLINDER_TUBE','CYLINDERS_WELDING'):
-            continue
-        new_name = None
-        if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
-            cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
-            lbs = lb_getter(cyl_type, pcs)
-            lb = lbs.pop(0)
-            do_proceed, new_name, new_path = main_draw_rename(draw, po, lb)
-            if do_proceed:
-                cylinder_drawing_merger(po, new_path, draw)
-                lb_signer_single(new_name)
-            else:
-                break
-            cylinder_tech_setter(draw_id, draw, new_name)
-            if pcs == 1:
-                continue
-            drawing_multiplier(draw_id, new_name, po, pcs, lbs)
-
-        po_cylinder_multiplied_setter(po)
-        po_cylinder_tech_done_setter(po)
-
 
 def lb_getter(cyl_type, pcs):
     query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' AND used_in_tech is NULL;"
     lbs = get_lbs(query)
     return lbs
 
-
-
 def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
 
-    sent = 0
+    sent = 0 #used if number of cylinders is higher than free lb numbers
     if not lbs:
         return
     for lb in lbs:
@@ -202,48 +206,14 @@ def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
     return pcs - 1
 
 
-def lb_signer_orphan():
-    """
-    Signing missing main_cylinders with lb_numbers
-    """
-
-    test_ids = cylinder_info_getter('cylinders_without_lb')
-    for tech_id, drawing in test_ids:
-        cyl_type = CylinderPartsNumber.main_draw_types.get(drawing.split(' ')[0])
-        query_lb = f"SELECT TOP(1) ID FROM lb_nums_cylinders WHERE " \
-                   f"cylinder_type = '{cyl_type}' AND used_in_tech IS NULL ORDER BY ID ASC"
-        query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = {tech_id} " \
-                     f"WHERE id = ({query_lb}) "
-        db_commit(query_sign, func_name='lb_signer')
-    return None
-
-
-def lb_signer_auto(po, draw):
-    """
-    Launched during cylinder_drawing_handler() wchich is launched by adding_new_files_class().
-    Normally takes po and drawing number as parameter.
-    Combines free lb numbers with proper Cylinders added to production.
-    """
-    cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
-    query_po = f"SELECT id FROM TECHNOLOGIA WHERE PO = {po} AND Rysunek LIKE '%#%'"
-    query_lb = f"SELECT TOP(1) ID FROM lb_nums_cylinders WHERE " \
-                                  f"cylinder_type = '{cyl_type}' AND used_in_tech IS NULL ORDER BY ID ASC"
-    count_query = f"SELECT count(ID) FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}'" \
-                  " AND used_in_tech IS NULL"
-
-    free_lbs = db_commit_getval(count_query)
-    ids = cylinder_info_getter(arg=query_po, query_arg=1)
-    for i, tech_id in enumerate(ids, 1):
-        if i > free_lbs:
-            break
-        query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = {tech_id} " \
-                     f"WHERE id = ({query_lb}) "
-        db_commit(query_sign, func_name='lb_signer')
-
 def lb_signer_single(draw):
-    """ As a parameter received new name rysunek from Technologia, extract lb number and sing accordingly."""
+    """
+    As a parameter received new name rysunek from Technologia, extract lb number and sing accordingly.
+    Applied with version 1.13.
+    """
 
     idquery = f"SELECT id FROM technologia WHERE plik = '{draw}'"
+    # idquery - query for just created recrod in technologia (drawing__lb)
     lb = draw.split('__')[1]
     try:
         query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = ({idquery}) " \
@@ -253,7 +223,6 @@ def lb_signer_single(draw):
         print("Niepoprawny parametr draw.")
     return True
 
-
 def part_getter(device_name):
     if 'sleeve' in device_name.lower():
         return 'sleeve'
@@ -261,12 +230,6 @@ def part_getter(device_name):
         return 'flange'
     else:
         return 'cylinder'
-
-def cylinder_id_updater(num):
-    if not num:
-        return
-    db_commit(f'UPDATE cylinders_identifier set cylinder_id_val = cylinder_id_val + {num}', func_name='cyl_id_updater')
-    return None
 
 def type_getter(device_name):
 
@@ -342,12 +305,6 @@ def cylinder_info_getter(arg, query_arg=0):
         print('Data Error.')
         return []
 
-def hash_cyl_id(num: int, draw_type: str):
-    if draw_type == 'CYLINDER_MAIN':
-        return f" #{num:0>4}"
-    else:
-        return ''
-
 def main_draw_rename(draw, po, lb) -> tuple:
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
     new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}__{lb}.pdf')
@@ -355,8 +312,8 @@ def main_draw_rename(draw, po, lb) -> tuple:
         os.rename(old_name, new_name)
         # shutil.copyfile(old_name, new_name)
     except FileNotFoundError:
-        print(f'Aint no such file {old_name}')
-        return False, False
+        print(f'Aint no such file {old_name}, main_draw_name')
+        return False, None, None
     except PermissionError:
         shutil.copyfile(old_name, new_name)
         query = f"INSERT INTO files_to_delete VALUES ('{old_name}')"
@@ -378,25 +335,26 @@ def reset_cylinder_base():
     po_cylinder_recorder()
     po_cylinder_recounter()
 
-def init_id():
-    adder = 0
-    pos = []
-    query = "UPDATE dbo.cylinders_orders SET multiplied = 1 WHERE po in ("
-    for po, pcs in cylinder_info_getter('cyl_orders'):
-        pos.append(str(po))
-        query += f"{po},"
-        adder += int(pcs)
-    query += f"{', '.join(pos)}); "
-    query += f"UPDATE cylinders_identifier SET cylinder_id_val = {adder + 1};"
-    db_commit(query, func_name='init_stock')
+"""Obsolete functions below:"""
+def lb_signer_orphan():
+    """
+    Signing missing main_cylinders with lb_numbers
+    In version 1.13 not used, to be verified if this is necessary.
+    """
+
+    test_ids = cylinder_info_getter('cylinders_without_lb')
+    for tech_id, drawing in test_ids:
+        cyl_type = CylinderPartsNumber.main_draw_types.get(drawing.split(' ')[0])
+        query_lb = f"SELECT TOP(1) ID FROM lb_nums_cylinders WHERE " \
+                   f"cylinder_type = '{cyl_type}' AND used_in_tech IS NULL ORDER BY ID ASC"
+        query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = {tech_id} " \
+                     f"WHERE id = ({query_lb}) "
+        db_commit(query_sign, func_name='lb_signer')
+    return None
 
 def main():
-    # po_cylinder_recorder()
-    # po_cylinder_recounter()
-    lb_signer_orphan()
-
+    pass
 
 if __name__ == '__main__':
-    lb_signer_single()
     main()
 
