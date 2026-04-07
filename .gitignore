@@ -13,6 +13,7 @@
 /wms_main/temporary_funcs.py
 /utils/__pycache__
 /utils/bar_coder/__pycache__
+utils/cylinders_tracker/cylinders_technology.py
 utils/cylinders_tracker/__pycache__/
 /utils/ico_den.py
 /utils/watermark_remover/__pycache__
