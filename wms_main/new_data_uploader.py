@@ -13,6 +13,7 @@ from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
 
 def upload_new_data():
     print('Refreshing SAP DataBase.')
+    # sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "MY_INSERT.csv")
     sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
     with open(sap_insert_file) as file:
         changed_records = csv.reader(file)
@@ -283,7 +284,6 @@ def uploader_checker():
             sap_db_date = date_time[0].timestamp()
             if sap_insert_date > sap_db_date:
                 return True
-
     return False
 
 
@@ -327,7 +327,7 @@ def update_wms_table():
     CURSOR.execute(query)
     COL_START = '\033[95m'
     COL_END = '\033[0m'
-    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+    if CURSOR.fetchval() > TimeConsts.PUTT - 1:
         print(f'{COL_START}Updating wms_table for planners{COL_END}')
         CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
         sap_date.update(column='wms_table_update')
@@ -370,5 +370,5 @@ def main():
 
 
 if __name__ == '__main__':
-    planer_refiller.main()
+    # main()
     pass
