@@ -19,13 +19,17 @@ def cylinder_drawing_handler():
 
     for draw_id, draw, po, pcs in drawings_data:
         if CylinderPartsNumber.draw_cyinder.get(draw) in (
-                'CYLINDER_TUBE','CYLINDERS_WELDING'):
+                'CYLINDER_TUBE','CYLINDERS_WELDING', 'CYLINDER_HONING'):
             continue
         new_name = None
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
             cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
             lbs = lb_getter(cyl_type, pcs)
-            lb = lbs.pop(0)
+            try:
+                lb = lbs.pop(0)
+            except IndexError:
+                print(f"Brak wolnych numerów LB!")
+                return
             do_proceed, new_name, new_path = main_draw_rename(draw, po, lb)
             if do_proceed:
                 cylinder_drawing_merger(po, new_path, draw)
@@ -43,7 +47,7 @@ def cylinder_drawing_handler():
 
 def copy_draw_file(draw, po, lb_dest):
     base_file = os.path.join(Paths.PRODUCTION, str(po), f'{draw}.pdf')
-    new_file = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw.split('__')[0]}__{lb_dest}.pdf')
+    new_file = os.path.join(Paths.PRODUCTION, str(po), f'{draw.split('__')[0]}__{lb_dest}.pdf')
     try:
         shutil.copyfile(base_file, new_file)
     except FileNotFoundError:
@@ -110,7 +114,7 @@ def cylinder_drawing_merger(po, new_name, draw):
     os.chmod(new_name, S_IWRITE)
 
     #deleting from database
-    query = f"DELETE FROM TECHNOLOGIA WHERE po = {po} AND rysunek in ('{tube_draw}', '{weld_draw}', '{hone_draw}')"
+    query = f"DELETE FROM TECHNOLOGIA WHERE po = {po} AND rysunek in ('{tube_draw}', '{weld_draw}', '{hone_draw}'); "
     db_commit(query=query, func_name='cylinder_drawing_merger')
 
     #deleting from otm
@@ -179,8 +183,9 @@ def po_cylinder_tech_done_setter(arg):
 
 
 def lb_getter(cyl_type, pcs):
-    query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' AND used_in_tech is NULL;"
-    lbs = get_lbs(query)
+    query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' " \
+            f" AND used_in_tech is NULL AND passed = 1;"
+    lbs = cylinder_info_getter(arg=query, query_arg=1)
     return lbs
 
 def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
@@ -308,18 +313,26 @@ def cylinder_info_getter(arg, query_arg=0):
 def main_draw_rename(draw, po, lb) -> tuple:
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
     new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}__{lb}.pdf')
+    query = f"UPDATE Technologia SET rysunek = '{draw}__{lb}', plik = '{po} {draw}__{lb}'" \
+            f"WHERE rysunek = '{draw}' AND po = {po};"
     try:
         os.rename(old_name, new_name)
         # shutil.copyfile(old_name, new_name)
     except FileNotFoundError:
         print(f'Aint no such file {old_name}, main_draw_name')
         return False, None, None
+    except FileNotFoundError:
+        print(f'Aint no such file {old_name}, main_draw_name')
+        return False, None, None
+    except FileExistsError:
+        print(f'{new_name} already exists.')
     except PermissionError:
         shutil.copyfile(old_name, new_name)
         query = f"INSERT INTO files_to_delete VALUES ('{old_name}')"
         db_commit(query, 'inserting into files_to_delete')
         print(f'File locked {old_name}')
 
+    db_commit(query, 'main_draw_rename')
     return True, f'{po} {draw}__{lb}', new_name
 
 def start_stock():
@@ -353,8 +366,8 @@ def lb_signer_orphan():
     return None
 
 def main():
+    cylinder_drawing_handler()
     pass
-
 if __name__ == '__main__':
     main()
 
