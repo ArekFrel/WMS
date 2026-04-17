@@ -18,6 +18,7 @@ utils/cylinders_tracker/__pycache__/
 /utils/ico_den.py
 /utils/watermark_remover/__pycache__
 /utils/pump_block_tracker/__pycache__
+/.vs/*
 *.bat
 *.csv
 *.txt
