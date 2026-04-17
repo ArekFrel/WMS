@@ -2,10 +2,8 @@ import time
 from datetime import datetime
 from wms_main.timer_dec import time_break
 import math
-from utils.quotation_export import check_for_qoutation_export
-from wms_main import sap_date, file_manager, new_data_uploader, self_update, add_new_files
+from wms_main import sap_date, file_manager, new_data_uploader, add_new_files
 from wms_main.const import IS_IT_TEST
-import subprocess
 import os
 from wms_main.const import Paths, TimeConsts, Options, VERSION
 
