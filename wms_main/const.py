@@ -8,7 +8,7 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.14
+VERSION = 1.15
 """1.04 Laser colaboration applied"""
 """1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
 """1.06 planer refiller fixed. - query isses"""
@@ -20,6 +20,7 @@ VERSION = 1.14
 """1.13 Cylinder tracker introduced."""
 """1.13 Cylinder tracker introduced."""
 """1.14 Cylinder tracker added tube passed/rejected."""
+"""1.15 Bar Coder extend """
 
 
 class TimeConsts:

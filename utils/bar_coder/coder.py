@@ -11,7 +11,7 @@ def coder(file):
             return
     # create bar code graphics and save as temporary file
     writer_options = {
-        'module_width': 0.1,  # szerokość kreski
+        'module_width': 0.2,  # szerokość kreski
         'module_height': 5.25,  # wysokość kreski
         'font_size': 3.0,
         'text_distance': 1.0,  # odległość tekstu od kodu
@@ -30,8 +30,8 @@ def coder(file):
         image_pdf = fitz.open("pdf", pdf_bytes)
         page = pdf_doc[0]
         page_width, page_height = page.rect.width, page.rect.height
-        img_width, img_height = 180, 42
-        offset_x, offset_y = 397.0, 65 #wsztrzelenie się w tabelkę
+        img_width, img_height = 175, 42
+        offset_x, offset_y = 402, 65 #wsztrzelenie się w tabelkę
         rect = fitz.Rect(
             page_width - img_width - offset_x,
             offset_y,

@@ -4,6 +4,7 @@
 /__wms_update__
 /build
 /deep_copy
+/_other/*
 /dist
 /_old
 /wms_main/__pycache__
