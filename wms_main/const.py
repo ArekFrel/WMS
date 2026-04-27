@@ -21,7 +21,7 @@ VERSION = 1.15
 """1.13 Cylinder tracker introduced."""
 """1.14 Cylinder tracker added tube passed/rejected."""
 """1.15 Bar Coder extend """
-"""1.15.1 Minor changes """
+"""1.15.1 Minor changeser 1.15.1 """
 
 
 class TimeConsts:
