@@ -41,6 +41,7 @@ def print_reset_break():
     os.system('')
     print('\033[1;32m' + 'Everything is ok, restart soon' + '\033[0m')
     countdown()
+    return None
 
 
 def wait(period):

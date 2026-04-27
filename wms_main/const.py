@@ -21,6 +21,7 @@ VERSION = 1.15
 """1.13 Cylinder tracker introduced."""
 """1.14 Cylinder tracker added tube passed/rejected."""
 """1.15 Bar Coder extend """
+"""1.15.1 Minor changes """
 
 
 class TimeConsts:
@@ -214,6 +215,7 @@ def register(text):
     def do_quit():
         if any(text.lower().startswith(start_text) for start_text in Options.NOREG_QUERIES):
             return True
+        return False
 
     if do_quit():
         return

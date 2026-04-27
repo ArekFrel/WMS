@@ -2,6 +2,7 @@ import inspect
 import os
 from wms_main.const import Paths, db_commit
 from datetime import datetime
+from const import register
 
 s_ins = 'sap_insert.csv'
 s3 = 'sap3.xlsx'
@@ -52,6 +53,8 @@ def remove_old():
     for s_old in files:
         file_to_delete = os.path.join(Paths.RAPORT_CATALOG, s_old + '.xlsx')
         os.remove(file_to_delete)
+        register(f'{Paths.RAPORT_CATALOG, s_old + '.xlsx'} - removed on ')
+
     print('SAP_old files removed.')
     return True
 
