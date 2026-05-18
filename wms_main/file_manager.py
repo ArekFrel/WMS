@@ -1,8 +1,7 @@
 import inspect
 import os
-from wms_main.const import Paths, db_commit
+from wms_main.const import Paths, db_commit, register
 from datetime import datetime
-from const import register
 
 s_ins = 'sap_insert.csv'
 s3 = 'sap3.xlsx'
