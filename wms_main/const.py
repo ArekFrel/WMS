@@ -8,7 +8,7 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.15
+VERSION = '1.15.2'
 """1.04 Laser colaboration applied"""
 """1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
 """1.06 planer refiller fixed. - query isses"""
@@ -22,6 +22,7 @@ VERSION = 1.15
 """1.14 Cylinder tracker added tube passed/rejected."""
 """1.15 Bar Coder extend """
 """1.15.1 Minor changeser 1.15.1 """
+"""1.15.2 file manager hotfixed"""
 
 
 class TimeConsts:
@@ -139,6 +140,7 @@ class Options:
 
     LASER_COL_NAMES = [
         'kl',
+        'lk',
         'laser kooperacja',
         'laser_kooperacja',
         'laser investa',
