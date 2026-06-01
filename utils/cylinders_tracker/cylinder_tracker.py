@@ -132,9 +132,9 @@ def po_cylinder_recorder():
         cyl_type = type_getter(device)
 
         query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs}, '{part}', '{cyl_type}', '{device}', " \
-                f" 0, 0, 0, 0); " \
+                f" 0, 0, 0); " \
                 f"DELETE FROM OTM WHERE PO = {po}; " \
-                f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'; "
+                f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'); "
                 #added - not tested
 
         if db_commit(query, func_name='po_cylinders_recorder'):
@@ -183,6 +183,7 @@ def po_cylinder_tech_done_setter(arg):
 
 
 def lb_getter(cyl_type, pcs):
+    """Selects from lb_nums_cylinders anly passed and not used tubes"""
     query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' " \
             f" AND used_in_tech is NULL AND passed = 1;"
     lbs = cylinder_info_getter(arg=query, query_arg=1)
