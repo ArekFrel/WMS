@@ -105,10 +105,16 @@ def cylinder_drawing_merger(po, new_name, draw):
     with fitz.open(doc_1) as doc:
         doc.insert_file(doc_2)
         doc.insert_file(new_name)
-        doc.insert_file(doc_3)
+        if os.path.exists(doc_3):
+            doc.insert_file(doc_3)
+        else:
+            register(f'{draw} missing hone drawing {hone_draw}. - merge skipped')
         doc.save(temp_name)
     for file in (doc_1, doc_2, new_name, doc_3):
-        os.remove(file)
+        try:
+            os.remove(file)
+        except FileNotFoundError:
+            register(f'{file} missing - removal skipped')
     # files removing
     os.rename(temp_name, new_name)
     os.chmod(new_name, S_IWRITE)
@@ -197,17 +203,17 @@ def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
     for lb in lbs:
         if not copy_draw_file(draw, po, lb):
             return sent
-        po, draw = draw.split(' ')
-        draw = draw.split('__')[0]
+        po, draw_part = draw.split(' ')
+        new_draw = draw_part.split('__')[0]
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
         query = f"INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
-            f"SELECT CONCAT('{draw}', '__{lb}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
+            f"SELECT CONCAT('{new_draw}', '__{lb}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
-            f"CONCAT('{po}', ' ', '{draw}', '__{lb}'), '{now}' " \
+            f"CONCAT('{po}', ' ', '{new_draw}', '__{lb}'), '{now}' " \
             f"FROM TECHNOLOGIA WHERE ID = {draw_id};"
         db_commit(query=query, func_name='drawing multiplier')
-        lb_signer_single(draw=f'{po} {draw}__{lb}')
+        lb_signer_single(draw=f'{po} {new_draw}__{lb}')
         sent += 1
     return pcs - 1
 
