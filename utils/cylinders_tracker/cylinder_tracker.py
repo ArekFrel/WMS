@@ -21,8 +21,8 @@ def cylinder_drawing_handler():
         if CylinderPartsNumber.draw_cyinder.get(draw) in (
                 'CYLINDER_TUBE','CYLINDERS_WELDING', 'CYLINDER_HONING'):
             continue
-        new_name = None
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
+            new_name = None
             cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
             lbs = lb_getter(cyl_type, pcs)
             try:
@@ -40,6 +40,8 @@ def cylinder_drawing_handler():
             if pcs == 1:
                 continue
             drawing_multiplier(draw_id, new_name, po, pcs, lbs)
+        else:
+            cylinder_tech_setter(draw_id=draw_id, draw=draw)
 
         po_cylinder_multiplied_setter(po)
         po_cylinder_tech_done_setter(po)
@@ -190,6 +192,10 @@ def po_cylinder_tech_done_setter(arg):
 
 def lb_getter(cyl_type, pcs):
     """Selects from lb_nums_cylinders anly passed and not used tubes"""
+
+    if cyl_type == 'CF3000':
+        cyl_type = 'CF2000'
+
     query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' " \
             f" AND used_in_tech is NULL AND passed = 1;"
     lbs = cylinder_info_getter(arg=query, query_arg=1)
@@ -350,9 +356,9 @@ def start_stock():
         print(query)
 
 def reset_cylinder_base():
-    db_commit('DELETE FROM dbo.cylinders_orders; DELETE FROM dbo.cylinders_stock; ', func_name='reset_cylinder_base')
+    db_commit('DELETE FROM dbo.cylinders_stock; ', func_name='reset_cylinder_base')
     start_stock()
-    po_cylinder_recorder()
+    # po_cylinder_recorder()
     po_cylinder_recounter()
 
 """Obsolete functions below:"""
