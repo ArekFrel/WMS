@@ -25,6 +25,7 @@ VERSION = '1.15.3'
 """1.15.2 file manager hotfixed"""
 """1.15.3 cylinder tracker hotfixed"""
 """1.15.4 teco completer - cylinders excluded"""
+"""1.15.5 cylinders components hotfix"""
 
 
 class TimeConsts:

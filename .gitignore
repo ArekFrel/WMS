@@ -11,6 +11,7 @@
 /wms_main/build
 /wms_main/get drawings/*
 /wms_main/dist
+/wms_main/utils
 /wms_main/temporary_funcs.py
 /utils/__pycache__/*
 /utils/bar_coder/__pycache__
