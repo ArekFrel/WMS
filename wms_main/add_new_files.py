@@ -18,6 +18,7 @@ from utils.cylinders_tracker import cylinder_tracker
 
 catalogs_to_remove = []
 
+"""To perform debugging, launch this module from lanch.py file"""
 
 @timer
 def list_new_files():

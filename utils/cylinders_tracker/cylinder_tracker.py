@@ -25,6 +25,9 @@ def cylinder_drawing_handler():
             new_name = None
             cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
             lbs = lb_getter(cyl_type, pcs)
+            if len(lbs) < pcs:
+                print(f"Brak wolnych numerów LB!")
+                return
             try:
                 lb = lbs.pop(0)
             except IndexError:
@@ -197,7 +200,7 @@ def lb_getter(cyl_type, pcs):
         cyl_type = 'CF2000'
 
     query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' " \
-            f" AND used_in_tech is NULL AND passed = 1;"
+            f" AND used_in_tech is NULL AND passed = 1 order by id;"
     lbs = cylinder_info_getter(arg=query, query_arg=1)
     return lbs
 

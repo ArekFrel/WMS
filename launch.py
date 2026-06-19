@@ -119,6 +119,7 @@ def main():
 
 if __name__ == '__main__':
 
+    # add_new_files.list_new_files_class()
     main()
     # if Restart.proceed:
     #     subprocess.call(Paths.AUTOMAT_BAT)
