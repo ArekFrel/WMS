@@ -8,7 +8,7 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = '1.15.7'
+VERSION = '1.15.8'
 """1.04 Laser colaboration applied"""
 """1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
 """1.06 planer refiller fixed. - query isses"""
@@ -28,6 +28,7 @@ VERSION = '1.15.7'
 """1.15.5 cylinders components hotfix"""
 """1.15.6 lb signed all at once"""
 """1.15.7 lb ordered by id in lb_getter"""
+"""1.15.8 Szlif Auto added to laser colab"""
 
 
 class TimeConsts:
