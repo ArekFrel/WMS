@@ -29,6 +29,7 @@ VERSION = '1.15.8'
 """1.15.6 lb signed all at once"""
 """1.15.7 lb ordered by id in lb_getter"""
 """1.15.8 Szlif Auto added to laser colab"""
+"""1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers."""
 
 
 class TimeConsts:

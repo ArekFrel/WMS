@@ -27,7 +27,7 @@ def cylinder_drawing_handler():
             lbs = lb_getter(cyl_type, pcs)
             if len(lbs) < pcs:
                 print(f"Brak wolnych numerów LB!")
-                return
+                continue
             try:
                 lb = lbs.pop(0)
             except IndexError:
@@ -265,6 +265,7 @@ def type_getter(device_name):
         return 'CF3000'
     if 'CF4000' == device_name:
         return 'CF4000'
+    return ''
 
 def cylinder_info_getter(arg, query_arg=0):
     single_val = ['ID']
