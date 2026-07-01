@@ -178,7 +178,7 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, sap_card=False
             f");"
     elif laser_colab:
         query_2 = f"Insert Into Technologia (" \
-            f"Plik, PO, Rysunek, OP_1, OP_2, OP0, OP1 Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, PO, Rysunek, OP_1, OP_2, OP0, OP1, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
             f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Laser' ,'S1-Szlif Auto', 'Laser', 'S1-Szlif Auto', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"

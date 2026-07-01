@@ -8,29 +8,34 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = '1.15.8'
-"""1.04 Laser colaboration applied"""
-"""1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
-"""1.06 planer refiller fixed. - query isses"""
-"""1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name."""
-"""1.08 laser catalog issue fixed"""
-"""1.09 issue with info files handled"""
-"""1.10 changed from Brygada to Laser in Laser Colaboration"""
-"""1.11 BarCode sap info inputer"""
-"""1.13 Cylinder tracker introduced."""
-"""1.13 Cylinder tracker introduced."""
-"""1.14 Cylinder tracker added tube passed/rejected."""
-"""1.15 Bar Coder extend """
-"""1.15.1 Minor changeser 1.15.1 """
-"""1.15.2 file manager hotfixed"""
-"""1.15.3 cylinder tracker hotfixed"""
-"""1.15.4 teco completer - cylinders excluded"""
-"""1.15.5 cylinders components hotfix"""
-"""1.15.6 lb signed all at once"""
-"""1.15.7 lb ordered by id in lb_getter"""
-"""1.15.8 Szlif Auto added to laser colab"""
-"""1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers."""
 
+
+VERSION_DESCRIPTIONS = [
+    '1.04 Laser colaboration applied',
+    '1.05 hotfix in func update_rec - "any" issue (tuple skipped)',
+    '1.06 planer refiller fixed. - query isses',
+    '1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name.',
+    '1.08 laser catalog issue fixed',
+    '1.09 issue with info files handled',
+    '1.10 changed from Brygada to Laser in Laser Colaboration',
+    '1.11 BarCode sap info inputer',
+    '1.13 Cylinder tracker introduced.',
+    '1.13 Cylinder tracker introduced.',
+    '1.14 Cylinder tracker added tube passed/rejected.',
+    '1.15 Bar Coder extend ',
+    '1.15.1 Minor changeser 1.15.1 ',
+    '1.15.2 file manager hotfixed',
+    '1.15.3 cylinder tracker hotfixed',
+    '1.15.4 teco completer - cylinders excluded',
+    '1.15.5 cylinders components hotfix',
+    '1.15.6 lb signed all at once',
+    '1.15.7 lb ordered by id in lb_getter',
+    '1.15.8 Szlif Auto added to laser colab',
+    '1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers.',
+    '1.15.91 laser colab missing coma fixed'
+]
+
+VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
 
 class TimeConsts:
 
