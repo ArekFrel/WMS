@@ -240,6 +240,7 @@ def lb_signer_single(draw):
         query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = ({idquery}) " \
                      f"WHERE lb_num = '{lb}'; "
         db_commit(query_sign, func_name='lb_signer')
+        register(f'Assigned properly {query_sign}')
     except IndexError:
         print("Niepoprawny parametr draw.")
     return True
@@ -330,7 +331,7 @@ def cylinder_info_getter(arg, query_arg=0):
 def main_draw_rename(draw, po, lb) -> tuple:
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
     new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}__{lb}.pdf')
-    query = f"UPDATE Technologia SET rysunek = '{draw}__{lb}', plik = '{po} {draw}__{lb}'" \
+    query = f"UPDATE Technologia SET rysunek = '{draw}__{lb}', plik = '{po} {draw}__{lb}' " \
             f"WHERE rysunek = '{draw}' AND po = {po};"
     try:
         os.rename(old_name, new_name)
@@ -385,6 +386,9 @@ def lb_signer_orphan():
 def main():
     cylinder_drawing_handler()
     pass
+
+
 if __name__ == '__main__':
     main()
+
 

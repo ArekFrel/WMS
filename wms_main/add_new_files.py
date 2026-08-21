@@ -345,6 +345,8 @@ def cut_file_class(file):
         return True
     else:
         update_rec(file)
+
+
     return True
 
 
@@ -505,6 +507,9 @@ def file_handler(file_name, folder=None):
         if new_bad_file(new_pdf=file.name, catalog=file.catalog):
             print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
             File.add_bad_file()
+    text = f'{file.name}, {file.new_name}, {file.catalog}, {file.bought}, {file.replace}, {file.watermark}'
+    register(text=text)
+
 
 
 def catalog_handler(name, path):

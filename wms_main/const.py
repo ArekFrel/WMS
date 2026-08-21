@@ -32,7 +32,8 @@ VERSION_DESCRIPTIONS = [
     '1.15.7 lb ordered by id in lb_getter',
     '1.15.8 Szlif Auto added to laser colab',
     '1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers.',
-    '1.15.91 laser colab missing coma fixed'
+    '1.15.91 laser colab missing coma fixed',
+    '1.15.92 flange technology changed'
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
@@ -80,7 +81,7 @@ class TimeConsts:
         TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 120
+        TIME_REFILL_CAT = 1
 
 
 class Paths:
