@@ -199,7 +199,10 @@ class File:
     def set_file_modifable(self):
         os.chmod(self.start_path, S_IWRITE)
         if os.path.exists(self.dest_path):
-            os.chmod(self.dest_path, S_IWRITE)
+            try:
+                os.chmod(self.dest_path, S_IWRITE)
+            except PermissionError:
+                print(f'Permission Error: {self.dest_path}')
 
     def create_catalog(self):
         # Creating po folder if not exists
