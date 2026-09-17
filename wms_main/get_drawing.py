@@ -26,9 +26,9 @@ def resource_path():
 
 
 def main():
-    # query = input('Opisz materiał "LIKE SQL": ')
-    # QUERY = f"SELECT * FROM TECHNOLOGIA WHERE materiał LIKE '{query}';"
-    QUERY = f"SELECT * FROM TECHNOLOGIA WHERE rysunek LIKE '175410%' and (OP_1 Like 'F%' OR OP_2 Like 'F%' OR OP_3 Like 'F%') AND Materiał not like '#%' and materiał not like 'fi%';"
+    query = input('Opisz materiał "LIKE SQL": ')
+    QUERY = f"SELECT * FROM TECHNOLOGIA WHERE {query};"
+    # QUERY = f"SELECT * FROM TECHNOLOGIA WHERE rysunek LIKE '175410%' and (OP_1 Like 'F%' OR OP_2 Like 'F%' OR OP_3 Like 'F%') AND Materiał not like '#%' and materiał not like 'fi%';"
     app_path = resource_path()
     source_cat = 'W:/!!__PRODUKCJA__!!/1__Rysunki/'
     destination = os.path.join(app_path, 'get_drawings')
@@ -74,6 +74,7 @@ def main():
         except FileNotFoundError:
             print(f'nie skopiowano pliku: {plik}')
             continue
+    os.startfile(f"{destination}")
 
 
 if __name__ == '__main__':

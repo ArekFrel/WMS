@@ -34,6 +34,7 @@ VERSION_DESCRIPTIONS = [
     '1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers.',
     '1.15.91 laser colab missing coma fixed',
     '1.15.92 flange technology changed'
+    '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. '
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
@@ -41,7 +42,7 @@ VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
 class TimeConsts:
 
     """Script runs in 10-minutes cycle,
-    below variable says in which minute does it start every 10 minutes
+    below variable says at which minute does it start every 10 minutes
     variable range 0 - 9 included
     this variable must comply with task manager settings:
     if Script launches every day at 00:0X o'clock then variable should be = X

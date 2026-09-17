@@ -136,14 +136,28 @@ def cylinder_drawing_merger(po, new_name, draw):
 
 def po_cylinder_recorder():
 
+    def param_counter(arg):
+        '''This function prevent no-Cylinder orders -with "cylinder" in its name to go to  '''
+        if arg in (None, '', ' '):
+            return 1
+        else:
+            return 0
+
+    def pcs_recouter(cylinder_type, pieces):
+        if cyl_type in (None, '', ' '):
+            return 0
+        else:
+            return pcs
+
     po_to_record = cylinder_info_getter('new')  # Select new cylinder orders
+
     for row in po_to_record:
         po, start_date, device, planner, pcs, status = row
         part = part_getter(device)
         cyl_type = type_getter(device)
 
-        query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs}, '{part}', '{cyl_type}', '{device}', " \
-                f" 0, 0, 0); " \
+        query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs_recouter(cyl_type, pcs)}, '{part}', '{cyl_type}', '{device}', " \
+                f" {param_counter(cyl_type)}, {param_counter(cyl_type)}, {param_counter(cyl_type)}); " \
                 f"DELETE FROM OTM WHERE PO = {po}; " \
                 f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'); "
                 #added - not tested
