@@ -33,8 +33,9 @@ VERSION_DESCRIPTIONS = [
     '1.15.8 Szlif Auto added to laser colab',
     '1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers.',
     '1.15.91 laser colab missing coma fixed',
-    '1.15.92 flange technology changed'
-    '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. '
+    '1.15.92 flange technology changed',
+    '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. ',
+    '1.15.94 Conn timeout into 60 '
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
@@ -84,7 +85,8 @@ class TimeConsts:
         TIMEOUT_FOR_PLANERS = 1800
         TIME_REFILL_CAT = 1
 
-
+    """Database Variables."""
+    DB_CONN_TIMEOUT = 60
 class Paths:
     LP = LPconf
     RAPORT_CATALOG = f'{LP}2__Baza_Danych\\'
@@ -222,7 +224,7 @@ CONN = pyodbc.connect(
     "Database="+DATABASE+";"
     "Trusted_Connection=yes;"
 )
-CONN.timeout = 20
+CONN.timeout = TimeConsts.DB_CONN_TIMEOUT
 CURSOR = CONN.cursor()
 
 

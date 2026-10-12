@@ -328,8 +328,11 @@ def update_wms_table():
     COL_START = '\033[95m'
     COL_END = '\033[0m'
     if CURSOR.fetchval() > TimeConsts.PUT - 1:
-        print(f'{COL_START}Updating wms_table for planners{COL_END}')
-        CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
+        print(f'{COL_START}Updating wms_table for planners.{COL_END}')
+        if not db_commit("EXECUTE [dbo].[wms_TABLE_update]", 'update_wms_table for planners'):
+            print(f'{COL_START}Finished.{COL_END}')
+        else:
+            print(f'{COL_START}Not finished - Error occured.{COL_END}')
         sap_date.update(column='wms_table_update')
 
 
