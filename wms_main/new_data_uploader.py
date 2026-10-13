@@ -9,6 +9,7 @@ from utils import confirmation_deleter, item_deleter, item_handler, planer_refil
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
+from wms_main.timer_dec import timer
 
 
 def upload_new_data():
@@ -323,17 +324,23 @@ def update_system_status():
 
 
 def update_wms_table():
-    query = "SELECT DATEDIFF(MINUTE, wms_table_update, GETDATE()) FROM sap_data;"
-    CURSOR.execute(query)
-    COL_START = '\033[95m'
-    COL_END = '\033[0m'
-    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+
+    @timer
+    def update_wms_table_db_commit():
+        COL_START = '\033[95m'
+        COL_END = '\033[0m'
         print(f'{COL_START}Updating wms_table for planners.{COL_END}')
-        if not db_commit("EXECUTE [dbo].[wms_TABLE_update]", 'update_wms_table for planners'):
+        if db_commit("EXECUTE [dbo].[wms_TABLE_update]", 'update_wms_table for planners'):
             print(f'{COL_START}Finished.{COL_END}')
         else:
             print(f'{COL_START}Not finished - Error occured.{COL_END}')
         sap_date.update(column='wms_table_update')
+
+    query = "SELECT DATEDIFF(MINUTE, wms_table_update, GETDATE()) FROM sap_data;"
+    CURSOR.execute(query)
+
+    if CURSOR.fetchval() > TimeConsts.PUT - 1:
+        update_wms_table_db_commit()
 
 
 
@@ -373,5 +380,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     pass

@@ -9,7 +9,6 @@ from stat import S_IWRITE, S_IREAD
 IS_IT_TEST = False
 
 
-
 VERSION_DESCRIPTIONS = [
     '1.04 Laser colaboration applied',
     '1.05 hotfix in func update_rec - "any" issue (tuple skipped)',
@@ -35,7 +34,8 @@ VERSION_DESCRIPTIONS = [
     '1.15.91 laser colab missing coma fixed',
     '1.15.92 flange technology changed',
     '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. ',
-    '1.15.94 Conn timeout into 60 '
+    '1.15.94 Conn timeout into 60 ',
+    '1.15.95 timer added to wcms_table_upadte '
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
@@ -87,6 +87,8 @@ class TimeConsts:
 
     """Database Variables."""
     DB_CONN_TIMEOUT = 60
+
+
 class Paths:
     LP = LPconf
     RAPORT_CATALOG = f'{LP}2__Baza_Danych\\'
