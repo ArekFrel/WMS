@@ -35,14 +35,16 @@ VERSION_DESCRIPTIONS = [
     '1.15.92 flange technology changed',
     '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. ',
     '1.15.94 Conn timeout into 60 ',
-    '1.15.95 timer added to wcms_table_upadte '
+    '1.15.95 timer added to wcms_table_upadte ',
+    '1.15.96 new data uploader optimized '
+
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
 
 class TimeConsts:
 
-    """Script runs in 10-minutes cycle,
+    """Script runs in 10-minutes cycle, (it is reffered in launch.py/ Restart/ launch_able function)
     below variable says at which minute does it start every 10 minutes
     variable range 0 - 9 included
     this variable must comply with task manager settings:
