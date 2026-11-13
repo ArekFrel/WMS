@@ -37,7 +37,7 @@ VERSION_DESCRIPTIONS = [
     '1.15.94 Conn timeout into 60 ',
     '1.15.95 timer added to wcms_table_upadte ',
     '1.15.96 new data uploader optimized ',
-    '1.16.01 Obiekt updater applied '
+    '1.16.00 Obiekt updater applied '
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
