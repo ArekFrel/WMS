@@ -3,21 +3,8 @@ import pandas as pd
 import numpy as np
 from wms_main.const import Paths, db_get_with_query, db_commit
 
-def data_collector(arg):
 
-    match arg:
-        case 'sap3':
-            result = []
-            pass
-        case 'db':
-            result = []
-            pass
-        case _:
-            result = []
-
-    return result
-
-def data_merger(
+def update_obiekt(
         _regular = True,
         _do_update=False,
         _change_in_sap=False
@@ -42,32 +29,40 @@ def data_merger(
     df_sql['SO'] = df_sql['SO'].astype(int)
 
     # Get table SO_Obiekt saved ind DataBase
-    df_saved = db_get_with_query(query='SELECT * FROM SO_OBIEKT;',
-                               func_name='data_merger',
-                               type_get='list')
-    df_saved = pd.DataFrame(np.array(df_saved), columns=['SO', 'Obiekt'])
-    df_saved['SO'] = df_saved['SO'].astype(int)
+    df_saved = db_get_with_query(
+        query='SELECT * FROM SO_OBIEKT;',
+        func_name='data_merger',
+        type_get='list'
+    )
+    if len(df_saved) > 0:
+        df_saved = pd.DataFrame(np.array(df_saved), columns=['SO', 'Obiekt'])
+        df_saved['SO'] = df_saved['SO'].astype(int)
 
     # Setting Target dataFrame - what data should be in SO_Obiekt table
     df_target = df_sql.merge(df, on='SO', how='left')
 
     #Joining data to get rows to remove from SO_Obiekt table.
-    df_delete = df_saved.merge(df_target, on='SO', how='left', indicator=True)
-    df_delete = df_delete.query('_merge == "left_only"')
-    df_delete = df_delete.drop(columns=['Obiekt_x', 'Obiekt_y', '_merge'])
+    if len(df_saved) > 0:
+        df_delete = df_saved.merge(df_target, on='SO', how='left', indicator=True)
+        df_delete = df_delete.query('_merge == "left_only"')
+        df_delete = df_delete.drop(columns=['Obiekt_x', 'Obiekt_y', '_merge'])
+        df_update = df_target.merge(df_saved, on='SO', how='left', indicator=True)
+        df_update = df_update.query('_merge == "left_only"')
+        df_update = df_update.drop(columns=['Obiekt_y', '_merge'])
+        df_update.rename(columns={'Obiekt_x': 'Obiekt'}, inplace=True)
+    else:
+        df_delete = []
+        df_update = df_target
 
-    # Joining data to get rows to insert into SO_Obiekt table.
-    df_update = df_target.merge(df_saved, on='SO', how='left', indicator=True)
-    df_update = df_update.query('_merge == "left_only"')
-    df_update = df_update.drop(columns=['Obiekt_y', '_merge'])
-    df_update.rename(columns={'Obiekt_x': 'Obiekt'}, inplace=True)
 
     if _do_update:
         query = 'DELETE FROM so_obiekt'
         db_commit(query, '_do_update')
         for index, row in df_target.iterrows():
             so, obiekt = row['SO'], row['Obiekt']
-            query = f"INSERT INTO SO_OBIEKT (SO, OBIEKT), VALUES({so}, {obiekt}); "
+            if so == 0:
+                continue
+            query = f"INSERT INTO SO_OBIEKT (SO, OBIEKT) VALUES({so}, '{obiekt}'); "
             db_commit(query, 'obiekt_updater, inserting')
             print(query)
         return
@@ -97,12 +92,13 @@ def data_merger(
 
     if _change_in_sap:
         for so, obiekt in df_target['SO', 'Obiekt']:
-            query = f"UPDATE sap set Obiekt = {obiekt} WHERE SO = {so}; "
+            query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE SO = {so}; "
             db_commit(query, 'change_in_sap')
 
 
 def main():
-    data_merger()
+    pass
+
 
 if __name__ == '__main__':
     main()
