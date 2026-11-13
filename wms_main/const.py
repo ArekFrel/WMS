@@ -36,8 +36,8 @@ VERSION_DESCRIPTIONS = [
     '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. ',
     '1.15.94 Conn timeout into 60 ',
     '1.15.95 timer added to wcms_table_upadte ',
-    '1.15.96 new data uploader optimized '
-
+    '1.15.96 new data uploader optimized ',
+    '1.16.01 Obiekt updater applied '
 ]
 
 VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
@@ -285,6 +285,46 @@ def db_commit(query, func_name):
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
+
+
+def db_get_with_query(query, func_name, type_get):
+
+    def print_red(text):
+        COL_START = '\33[91m'
+        COL_END = '\033[0m'
+        print(COL_START + f'{text}' + COL_END)
+        register(text)
+        register(query)
+
+    try:
+        with CURSOR:
+            CURSOR.execute(query)
+            match type_get:
+                case 'int':
+                    result = [int(val[0]) for val in CURSOR.fetchall()]
+                case 'str':
+                    result = [str(val[0]) for val in CURSOR.fetchall()]
+                case 'list':
+                    result = [val for val in CURSOR.fetchall()]
+                case _:
+                    result = []
+
+    except pyodbc.OperationalError:
+        print_red(f'Operational Error in "{func_name}"')
+        return False
+
+    except pyodbc.DatabaseError:
+        print_red(f'Time exceeded in "{func_name}"')
+        return False
+
+    except pyodbc.Error:
+        print_red(f'Database Error in "{func_name}"')
+        return False
+
+    except Exception:
+        print_red(f'Something else during "{func_name}" gone wrong!')
+
+    return result
 
 
 def db_commit_getval(query):

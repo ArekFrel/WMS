@@ -70,7 +70,10 @@ def upload_new_data():
                     query_counter += 1
                 if query_counter == 50:
                     db_quick_commit(query, 'upload_new_data')
+                    query_counter = 0
+                    query = ''
                     print(f'Records sent to database: {index + 1}', end="\r")
+
 
             if query_counter != 0:
                 if db_quick_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
