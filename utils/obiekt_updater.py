@@ -9,9 +9,9 @@ def update_obiekt(
         _do_update=False,
         _change_in_sap=False
 ):
-    # Get data from sap_3_old File
+    # Get data from sap_3 File
     df = pd.read_excel(
-        os.path.join(Paths.RAPORT_CATALOG, 'sap3_old.xlsx'),
+        os.path.join(Paths.RAPORT_CATALOG, 'sap3.xlsx'),
         usecols=['SO#', 'Final Customer name']
     )
     df['SO#'] = df['SO#'].astype(int)
