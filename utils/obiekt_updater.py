@@ -2,10 +2,8 @@ import os
 import pandas as pd
 import numpy as np
 from wms_main.const import Paths, db_get_with_query, db_commit, db_quick_commit, CURSOR
-from wms_main.timer_dec import timer
 
 
-@timer
 def update_obiekt(
         _regular = True,
         _do_update=False,
@@ -121,8 +119,6 @@ def main():
     #     _do_update=False,
     #     _change_in_sap=False
     # )
-
-
 
 if __name__ == '__main__':
     main()

@@ -1,55 +1,18 @@
 import csv
 import inspect
-import pyodbc
 import os
 import os.path
 from datetime import datetime
-from wms_main.const import TimeConsts, register, IS_IT_TEST
+from wms_main.const import TimeConsts, db_quick_commit
 from wms_main import sap_date
 from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller, obiekt_updater
-from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
+from wms_main.const import CURSOR, Paths, db_commit, so_list_getter
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
 from wms_main.timer_dec import timer
 
 
 def upload_new_data():
-
-    def db_quick_commit(cursor, query, func_name):
-
-        def print_red(text):
-            COL_START = '\33[91m'
-            COL_END = '\033[0m'
-            print(COL_START + f'{text}' + COL_END)
-            register(text)
-            register(query)
-
-        if IS_IT_TEST:
-            print(query)
-            register('TEST =========' + query)
-            return None
-
-        try:
-            # register(query)
-            CURSOR.execute(query)
-            CURSOR.commit()
-            return True
-
-        except pyodbc.OperationalError:
-            print_red(f'Operational Error in "{func_name}"')
-            return False
-
-        except pyodbc.DatabaseError:
-            print_red(f'Time exceeded in "{func_name}"')
-            return False
-
-        except pyodbc.Error:
-            print_red(f'Database Error in "{func_name}"')
-            return False
-
-        except Exception:
-            print_red(f'Something else during "{func_name}" gone wrong!')
-            return False
 
     print('Refreshing SAP DataBase.')
     # sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "MY_INSERT.csv")
@@ -69,7 +32,11 @@ def upload_new_data():
                 if len(add_query) > 0:
                     query_counter += 1
                 if query_counter == 50:
-                    db_quick_commit(query, 'upload_new_data')
+                    db_quick_commit(
+                        cursor=CURSOR,
+                        query=query,
+                        func_name='upload_new_data'
+                    )
                     query_counter = 0
                     query = ''
                     print(f'Records sent to database: {index + 1}', end="\r")
@@ -267,7 +234,6 @@ def send_item_to_db(record):
         for i in range(0, (2 - len(record))):
             record.append('')
 
-
     if record[0] != '':
         if record[1] == '0':
             item = 'NULL'
@@ -278,6 +244,7 @@ def send_item_to_db(record):
                 f"INSERT INTO dbo.{table} (Prod_Order, Item) " \
                 f"VALUES({prod_order},{item})"
         return db_commit(query=query, func_name=inspect.currentframe().f_code.co_name)
+    return None
 
 
 def so_folder_creator():
