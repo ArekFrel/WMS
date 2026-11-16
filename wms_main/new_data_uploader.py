@@ -43,7 +43,11 @@ def upload_new_data():
 
 
             if query_counter != 0:
-                if db_quick_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                if db_quick_commit(
+                        cursor=CURSOR,
+                        query=query,
+                        func_name=inspect.currentframe().f_code.co_name
+                ):
                     print(f'Records sent to database: {index + 1}', end="\r")
                 else:
                     print('\nUnexpected error occurs during updating SAP.')
