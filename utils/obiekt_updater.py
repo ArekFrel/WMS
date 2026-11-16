@@ -1,9 +1,11 @@
 import os
 import pandas as pd
 import numpy as np
-from wms_main.const import Paths, db_get_with_query, db_commit
+from wms_main.const import Paths, db_get_with_query, db_commit, db_quick_commit, CURSOR
+from wms_main.timer_dec import timer
 
 
+@timer
 def update_obiekt(
         _regular = True,
         _do_update=False,
@@ -54,7 +56,6 @@ def update_obiekt(
         df_delete = []
         df_update = df_target
 
-
     if _do_update:
         query = 'DELETE FROM so_obiekt'
         db_commit(query, '_do_update')
@@ -91,13 +92,36 @@ def update_obiekt(
             db_commit(query, 'ubiekt_updater, updater')
 
     if _change_in_sap:
-        for so, obiekt in df_target['SO', 'Obiekt']:
-            query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE SO = {so}; "
-            db_commit(query, 'change_in_sap')
+        # for index, row in df_target.iterrows():
+        #     so, obiekt = row['SO'], row['Obiekt']
+        #     if so == 0:
+        #         continue
+        #     query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE [S.O.] = {so}; "
+        #     db_commit(query, 'obiekt_updater, updater')
+        #     print(query)
+
+        with CURSOR:
+            for index, row in df_target.iterrows():
+                so, obiekt = row['SO'], row['Obiekt']
+                if so == 0 :
+                    continue
+                query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE [S.O.] = {so}; "
+                print(query)
+                db_quick_commit(
+                    cursor=CURSOR,
+                    query=query,
+                    func_name='change_in_sap'
+                )
 
 
 def main():
     pass
+    # update_obiekt(
+    #     _regular=False,
+    #     _do_update=False,
+    #     _change_in_sap=False
+    # )
+
 
 
 if __name__ == '__main__':

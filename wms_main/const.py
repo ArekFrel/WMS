@@ -266,8 +266,46 @@ def db_commit(query, func_name):
     try:
         with CURSOR:
             # register(query)
+            pass
             CURSOR.execute(query)
             CURSOR.commit()
+        return True
+
+    except pyodbc.OperationalError:
+        print_red(f'Operational Error in "{func_name}"')
+        return False
+
+    except pyodbc.DatabaseError:
+        print_red(f'Time exceeded in "{func_name}"')
+        return False
+
+    except pyodbc.Error:
+        print_red(f'Database Error in "{func_name}"')
+        return False
+
+    except Exception:
+        print_red(f'Something else during "{func_name}" gone wrong!')
+        return False
+
+
+def db_quick_commit(cursor, query, func_name):
+
+    def print_red(text):
+        COL_START = '\33[91m'
+        COL_END = '\033[0m'
+        print(COL_START + f'{text}' + COL_END)
+        register(text)
+        register(query)
+
+    if IS_IT_TEST:
+        print(query)
+        register('TEST =========' + query)
+        return None
+
+    try:
+        # register(query)
+        cursor.execute(query)
+        cursor.commit()
         return True
 
     except pyodbc.OperationalError:

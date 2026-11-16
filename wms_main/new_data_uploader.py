@@ -15,7 +15,7 @@ from wms_main.timer_dec import timer
 
 def upload_new_data():
 
-    def db_quick_commit(query, func_name):
+    def db_quick_commit(cursor, query, func_name):
 
         def print_red(text):
             COL_START = '\33[91m'
