@@ -8,25 +8,44 @@ from stat import S_IWRITE, S_IREAD
 """Using the variable below disables the actual script execution and enters test mode"""
 IS_IT_TEST = False
 
-VERSION = 1.15
-"""1.04 Laser colaboration applied"""
-"""1.05 hotfix in func update_rec - 'any' issue (tuple skipped)"""
-"""1.06 planer refiller fixed. - query isses"""
-"""1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name."""
-"""1.08 laser catalog issue fixed"""
-"""1.09 issue with info files handled"""
-"""1.10 changed from Brygada to Laser in Laser Colaboration"""
-"""1.11 BarCode sap info inputer"""
-"""1.13 Cylinder tracker introduced."""
-"""1.13 Cylinder tracker introduced."""
-"""1.14 Cylinder tracker added tube passed/rejected."""
-"""1.15 Bar Coder extend """
 
+VERSION_DESCRIPTIONS = [
+    '1.04 Laser colaboration applied',
+    '1.05 hotfix in func update_rec - "any" issue (tuple skipped)',
+    '1.06 planer refiller fixed. - query isses',
+    '1.07 file categorize function added which fixed watermarking problem with buy or laser colab in file name.',
+    '1.08 laser catalog issue fixed',
+    '1.09 issue with info files handled',
+    '1.10 changed from Brygada to Laser in Laser Colaboration',
+    '1.11 BarCode sap info inputer',
+    '1.13 Cylinder tracker introduced.',
+    '1.13 Cylinder tracker introduced.',
+    '1.14 Cylinder tracker added tube passed/rejected.',
+    '1.15 Bar Coder extend ',
+    '1.15.1 Minor changeser 1.15.1 ',
+    '1.15.2 file manager hotfixed',
+    '1.15.3 cylinder tracker hotfixed',
+    '1.15.4 teco completer - cylinders excluded',
+    '1.15.5 cylinders components hotfix',
+    '1.15.6 lb signed all at once',
+    '1.15.7 lb ordered by id in lb_getter',
+    '1.15.8 Szlif Auto added to laser colab',
+    '1.15.9 cylinder handler loop fixed - it continues (instead of early return) when missing lb numbers.',
+    '1.15.91 laser colab missing coma fixed',
+    '1.15.92 flange technology changed',
+    '1.15.93 prevent from "cylinder-like" order names to go to cylinders_order table in db. ',
+    '1.15.94 Conn timeout into 60 ',
+    '1.15.95 timer added to wcms_table_upadte ',
+    '1.15.96 new data uploader optimized ',
+    '1.16.00 Obiekt updater applied '
+]
+
+VERSION = VERSION_DESCRIPTIONS[-1].split(' ')[0]
 
 class TimeConsts:
 
-    """Script runs in 10-minutes cycle,
-    below variable says in which minute does it start every 10 minutes
+    """Script runs in 10-minutes cycle, (it is reffered in launch.py/ Restart/ launch_able function)
+    below variable says at which minute does it start every 10 minutes
     variable range 0 - 9 included
     this variable must comply with task manager settings:
     if Script launches every day at 00:0X o'clock then variable should be = X
@@ -66,7 +85,10 @@ class TimeConsts:
         TIME_REFILL_CAT = 1
     else:
         TIMEOUT_FOR_PLANERS = 1800
-        TIME_REFILL_CAT = 120
+        TIME_REFILL_CAT = 1
+
+    """Database Variables."""
+    DB_CONN_TIMEOUT = 60
 
 
 class Paths:
@@ -138,6 +160,7 @@ class Options:
 
     LASER_COL_NAMES = [
         'kl',
+        'lk',
         'laser kooperacja',
         'laser_kooperacja',
         'laser investa',
@@ -205,7 +228,7 @@ CONN = pyodbc.connect(
     "Database="+DATABASE+";"
     "Trusted_Connection=yes;"
 )
-CONN.timeout = 20
+CONN.timeout = TimeConsts.DB_CONN_TIMEOUT
 CURSOR = CONN.cursor()
 
 
@@ -214,6 +237,7 @@ def register(text):
     def do_quit():
         if any(text.lower().startswith(start_text) for start_text in Options.NOREG_QUERIES):
             return True
+        return False
 
     if do_quit():
         return
@@ -242,6 +266,7 @@ def db_commit(query, func_name):
     try:
         with CURSOR:
             # register(query)
+            pass
             CURSOR.execute(query)
             CURSOR.commit()
         return True
@@ -261,6 +286,83 @@ def db_commit(query, func_name):
     except Exception:
         print_red(f'Something else during "{func_name}" gone wrong!')
         return False
+
+
+def db_quick_commit(cursor, query, func_name):
+
+    def print_red(text):
+        COL_START = '\33[91m'
+        COL_END = '\033[0m'
+        print(COL_START + f'{text}' + COL_END)
+        register(text)
+        register(query)
+
+    if IS_IT_TEST:
+        print(query)
+        register('TEST =========' + query)
+        return None
+
+    try:
+        # register(query)
+        cursor.execute(query)
+        cursor.commit()
+        return True
+
+    except pyodbc.OperationalError:
+        print_red(f'Operational Error in "{func_name}"')
+        return False
+
+    except pyodbc.DatabaseError:
+        print_red(f'Time exceeded in "{func_name}"')
+        return False
+
+    except pyodbc.Error:
+        print_red(f'Database Error in "{func_name}"')
+        return False
+
+    except Exception:
+        print_red(f'Something else during "{func_name}" gone wrong!')
+        return False
+
+
+def db_get_with_query(query, func_name, type_get):
+
+    def print_red(text):
+        COL_START = '\33[91m'
+        COL_END = '\033[0m'
+        print(COL_START + f'{text}' + COL_END)
+        register(text)
+        register(query)
+
+    try:
+        with CURSOR:
+            CURSOR.execute(query)
+            match type_get:
+                case 'int':
+                    result = [int(val[0]) for val in CURSOR.fetchall()]
+                case 'str':
+                    result = [str(val[0]) for val in CURSOR.fetchall()]
+                case 'list':
+                    result = [val for val in CURSOR.fetchall()]
+                case _:
+                    result = []
+
+    except pyodbc.OperationalError:
+        print_red(f'Operational Error in "{func_name}"')
+        return False
+
+    except pyodbc.DatabaseError:
+        print_red(f'Time exceeded in "{func_name}"')
+        return False
+
+    except pyodbc.Error:
+        print_red(f'Database Error in "{func_name}"')
+        return False
+
+    except Exception:
+        print_red(f'Something else during "{func_name}" gone wrong!')
+
+    return result
 
 
 def db_commit_getval(query):

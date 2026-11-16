@@ -18,6 +18,7 @@ from utils.cylinders_tracker import cylinder_tracker
 
 catalogs_to_remove = []
 
+"""To perform debugging, launch this module from lanch.py file"""
 
 @timer
 def list_new_files():
@@ -177,9 +178,9 @@ def new_rec(new_pdf, buy=False, sub_buy=False, laser_colab=False, sap_card=False
             f");"
     elif laser_colab:
         query_2 = f"Insert Into Technologia (" \
-            f"Plik, PO, Rysunek, OP_1, OP0, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
+            f"Plik, PO, Rysunek, OP_1, OP_2, OP0, OP1, Status_Op, Komentarz, Stat, Liczba_Operacji, Kiedy" \
             f") VALUES (" \
-            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Laser', 'Laser', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
+            f"'{new_pdf}', '{new_pdf[0:7]}', '{new_pdf[8:]}', 'Laser' ,'S1-Szlif Auto', 'Laser', 'S1-Szlif Auto', 6 ,'{komentarz}' ,0 ,11 ,'{now}'" \
             f");"
     else :
         query_2 = f"Insert Into Technologia (" \
@@ -344,6 +345,8 @@ def cut_file_class(file):
         return True
     else:
         update_rec(file)
+
+
     return True
 
 
@@ -504,6 +507,9 @@ def file_handler(file_name, folder=None):
         if new_bad_file(new_pdf=file.name, catalog=file.catalog):
             print(f'bad file: {file.file_name} in catalog: "4__Nowe_Rysunki/{file.catalog}"')
             File.add_bad_file()
+    text = f'{file.name}, {file.new_name}, {file.catalog}, {file.bought}, {file.replace}, {file.watermark}'
+    register(text=text)
+
 
 
 def catalog_handler(name, path):

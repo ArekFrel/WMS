@@ -1,5 +1,5 @@
 import inspect
-from .const import CURSOR, db_commit, register, TimeConsts
+from wms_main.const import CURSOR, db_commit, register, TimeConsts
 from pyodbc import OperationalError, DatabaseError, Error
 
 

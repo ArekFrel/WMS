@@ -1,48 +1,87 @@
 import csv
 import inspect
+import pyodbc
 import os
 import os.path
 from datetime import datetime
-from wms_main.const import TimeConsts, Paths
+from wms_main.const import TimeConsts, register, IS_IT_TEST
 from wms_main import sap_date
-from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller
+from utils import confirmation_deleter, item_deleter, item_handler, planer_refiller, obiekt_updater
 from wms_main.const import CURSOR, Paths, db_commit, so_list_getter, db_commit_getval
 from utils.pump_block_tracker.pb_tracker import po_pumpblock_recorder
 from utils.cylinders_tracker.cylinder_tracker import po_cylinder_recorder
+from wms_main.timer_dec import timer
 
 
 def upload_new_data():
+
+    def db_quick_commit(cursor, query, func_name):
+
+        def print_red(text):
+            COL_START = '\33[91m'
+            COL_END = '\033[0m'
+            print(COL_START + f'{text}' + COL_END)
+            register(text)
+            register(query)
+
+        if IS_IT_TEST:
+            print(query)
+            register('TEST =========' + query)
+            return None
+
+        try:
+            # register(query)
+            CURSOR.execute(query)
+            CURSOR.commit()
+            return True
+
+        except pyodbc.OperationalError:
+            print_red(f'Operational Error in "{func_name}"')
+            return False
+
+        except pyodbc.DatabaseError:
+            print_red(f'Time exceeded in "{func_name}"')
+            return False
+
+        except pyodbc.Error:
+            print_red(f'Database Error in "{func_name}"')
+            return False
+
+        except Exception:
+            print_red(f'Something else during "{func_name}" gone wrong!')
+            return False
+
     print('Refreshing SAP DataBase.')
     # sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "MY_INSERT.csv")
     sap_insert_file = os.path.join(Paths.RAPORT_CATALOG, "SAP_INSERT.csv")
-    with open(sap_insert_file) as file:
-        changed_records = csv.reader(file)
-        query = ''
-        query_counter = 0
-        for index, record in enumerate(changed_records):
-            if index == 0:
-                if ''.join(record) == '':
-                    print(f'SAP_Insert file is empty.')
-                    break
-            add_query = formulate_query_record(record=record)
-            query = query + add_query
-            if len(add_query) > 0:
-                query_counter += 1
-            if query_counter == 50:
-                if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-                    print(f'Records sent to database: {index + 1}', end="\r")
-                    query = ''
+    with CURSOR:
+        with open(sap_insert_file) as file:
+            changed_records = csv.reader(file)
+            query = ''
+            query_counter = 0
+            for index, record in enumerate(changed_records):
+                if index == 0:
+                    if ''.join(record) == '':
+                        print(f'SAP_Insert file is empty.')
+                        break
+                add_query = formulate_query_record(record=record)
+                query = query + add_query
+                if len(add_query) > 0:
+                    query_counter += 1
+                if query_counter == 50:
+                    db_quick_commit(query, 'upload_new_data')
                     query_counter = 0
+                    query = ''
+                    print(f'Records sent to database: {index + 1}', end="\r")
+
+
+            if query_counter != 0:
+                if db_quick_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
+                    print(f'Records sent to database: {index + 1}', end="\r")
                 else:
                     print('\nUnexpected error occurs during updating SAP.')
                     return False
-        if query_counter != 0:
-            if db_commit(query=query, func_name=inspect.currentframe().f_code.co_name):
-                print(f'Records sent to database: {index + 1}', end="\r")
-            else:
-                print('\nUnexpected error occurs during updating SAP.')
-                return False
-        print('\n', end='\r')
+            print('\n', end='\r')
     return True
 
 
@@ -323,19 +362,29 @@ def update_system_status():
 
 
 def update_wms_table():
+
+    @timer
+    def update_wms_table_db_commit():
+        COL_START = '\033[95m'
+        COL_END = '\033[0m'
+        print(f'{COL_START}Updating wms_table for planners.{COL_END}')
+        if db_commit("EXECUTE [dbo].[wms_TABLE_update]", 'update_wms_table for planners'):
+            print(f'{COL_START}Finished.{COL_END}')
+        else:
+            print(f'{COL_START}Not finished - Error occured.{COL_END}')
+        sap_date.update(column='wms_table_update')
+
     query = "SELECT DATEDIFF(MINUTE, wms_table_update, GETDATE()) FROM sap_data;"
     CURSOR.execute(query)
-    COL_START = '\033[95m'
-    COL_END = '\033[0m'
+
     if CURSOR.fetchval() > TimeConsts.PUT - 1:
-        print(f'{COL_START}Updating wms_table for planners{COL_END}')
-        CURSOR.execute("EXECUTE [dbo].[wms_TABLE_update]")
-        sap_date.update(column='wms_table_update')
+        update_wms_table_db_commit()
 
 
 
 def main():
     if uploader_checker():
+        obiekt_updater.update_obiekt()
         if upload_new_data():
             planer_refiller.main()
             so_folder_creator()
@@ -370,5 +419,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     pass

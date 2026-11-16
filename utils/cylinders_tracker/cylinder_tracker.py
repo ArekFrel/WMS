@@ -21,10 +21,13 @@ def cylinder_drawing_handler():
         if CylinderPartsNumber.draw_cyinder.get(draw) in (
                 'CYLINDER_TUBE','CYLINDERS_WELDING', 'CYLINDER_HONING'):
             continue
-        new_name = None
         if CylinderPartsNumber.draw_cyinder.get(draw) == 'CYLINDER_MAIN':
+            new_name = None
             cyl_type = CylinderPartsNumber.main_draw_types.get(draw)
             lbs = lb_getter(cyl_type, pcs)
+            if len(lbs) < pcs:
+                print(f"Brak wolnych numerów LB!")
+                continue
             try:
                 lb = lbs.pop(0)
             except IndexError:
@@ -40,6 +43,8 @@ def cylinder_drawing_handler():
             if pcs == 1:
                 continue
             drawing_multiplier(draw_id, new_name, po, pcs, lbs)
+        else:
+            cylinder_tech_setter(draw_id=draw_id, draw=draw)
 
         po_cylinder_multiplied_setter(po)
         po_cylinder_tech_done_setter(po)
@@ -105,10 +110,16 @@ def cylinder_drawing_merger(po, new_name, draw):
     with fitz.open(doc_1) as doc:
         doc.insert_file(doc_2)
         doc.insert_file(new_name)
-        doc.insert_file(doc_3)
+        if os.path.exists(doc_3):
+            doc.insert_file(doc_3)
+        else:
+            register(f'{draw} missing hone drawing {hone_draw}. - merge skipped')
         doc.save(temp_name)
     for file in (doc_1, doc_2, new_name, doc_3):
-        os.remove(file)
+        try:
+            os.remove(file)
+        except FileNotFoundError:
+            register(f'{file} missing - removal skipped')
     # files removing
     os.rename(temp_name, new_name)
     os.chmod(new_name, S_IWRITE)
@@ -125,16 +136,30 @@ def cylinder_drawing_merger(po, new_name, draw):
 
 def po_cylinder_recorder():
 
+    def param_counter(arg):
+        '''This function prevent no-Cylinder orders -with "cylinder" in its name to go to  '''
+        if arg in (None, '', ' '):
+            return 1
+        else:
+            return 0
+
+    def pcs_recouter(cylinder_type, pieces):
+        if cyl_type in (None, '', ' '):
+            return 0
+        else:
+            return pcs
+
     po_to_record = cylinder_info_getter('new')  # Select new cylinder orders
+
     for row in po_to_record:
         po, start_date, device, planner, pcs, status = row
         part = part_getter(device)
         cyl_type = type_getter(device)
 
-        query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs}, '{part}', '{cyl_type}', '{device}', " \
-                f" 0, 0, 0, 0); " \
+        query = f"INSERT INTO cylinders_orders VALUES ({po}, {pcs_recouter(cyl_type, pcs)}, '{part}', '{cyl_type}', '{device}', " \
+                f" {param_counter(cyl_type)}, {param_counter(cyl_type)}, {param_counter(cyl_type)}); " \
                 f"DELETE FROM OTM WHERE PO = {po}; " \
-                f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'; "
+                f"INSERT INTO files_to_delete VALUES ('{os.path.join(Paths.PRODUCTION, str(po), f'{po} merged.pdf')}'); "
                 #added - not tested
 
         if db_commit(query, func_name='po_cylinders_recorder'):
@@ -183,8 +208,13 @@ def po_cylinder_tech_done_setter(arg):
 
 
 def lb_getter(cyl_type, pcs):
+    """Selects from lb_nums_cylinders anly passed and not used tubes"""
+
+    if cyl_type == 'CF3000':
+        cyl_type = 'CF2000'
+
     query = f"SELECT TOP({pcs}) lb_num FROM lb_nums_cylinders WHERE cylinder_type = '{cyl_type}' " \
-            f" AND used_in_tech is NULL AND passed = 1;"
+            f" AND used_in_tech is NULL AND passed = 1 order by id;"
     lbs = cylinder_info_getter(arg=query, query_arg=1)
     return lbs
 
@@ -196,17 +226,17 @@ def drawing_multiplier(draw_id: int, draw: str, po:int, pcs: int, lbs):
     for lb in lbs:
         if not copy_draw_file(draw, po, lb):
             return sent
-        po, draw = draw.split(' ')
-        draw = draw.split('__')[0]
+        po, draw_part = draw.split(' ')
+        new_draw = draw_part.split('__')[0]
         now = str(datetime.fromtimestamp(time.time(), ))[0:-3]
         query = f"INSERT INTO TECHNOLOGIA (RYSUNEK, PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, OP_5, " \
             f"OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, Plik, Kiedy) " \
-            f"SELECT CONCAT('{draw}', '__{lb}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
+            f"SELECT CONCAT('{new_draw}', '__{lb}'), PO, Sztuki, Materiał, OP_1, OP_2, OP_3, OP_4, " \
             f"OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP0, OP1, Status_op, Stat, Liczba_Operacji, " \
-            f"CONCAT('{po}', ' ', '{draw}', '__{lb}'), '{now}' " \
+            f"CONCAT('{po}', ' ', '{new_draw}', '__{lb}'), '{now}' " \
             f"FROM TECHNOLOGIA WHERE ID = {draw_id};"
         db_commit(query=query, func_name='drawing multiplier')
-        lb_signer_single(draw=f'{po} {draw}__{lb}')
+        lb_signer_single(draw=f'{po} {new_draw}__{lb}')
         sent += 1
     return pcs - 1
 
@@ -224,6 +254,7 @@ def lb_signer_single(draw):
         query_sign = f"UPDATE lb_nums_cylinders SET used_in_tech = ({idquery}) " \
                      f"WHERE lb_num = '{lb}'; "
         db_commit(query_sign, func_name='lb_signer')
+        register(f'Assigned properly {query_sign}')
     except IndexError:
         print("Niepoprawny parametr draw.")
     return True
@@ -249,6 +280,7 @@ def type_getter(device_name):
         return 'CF3000'
     if 'CF4000' == device_name:
         return 'CF4000'
+    return ''
 
 def cylinder_info_getter(arg, query_arg=0):
     single_val = ['ID']
@@ -313,7 +345,7 @@ def cylinder_info_getter(arg, query_arg=0):
 def main_draw_rename(draw, po, lb) -> tuple:
     old_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}.pdf')
     new_name = os.path.join(Paths.PRODUCTION, str(po), f'{po} {draw}__{lb}.pdf')
-    query = f"UPDATE Technologia SET rysunek = '{draw}__{lb}', plik = '{po} {draw}__{lb}'" \
+    query = f"UPDATE Technologia SET rysunek = '{draw}__{lb}', plik = '{po} {draw}__{lb}' " \
             f"WHERE rysunek = '{draw}' AND po = {po};"
     try:
         os.rename(old_name, new_name)
@@ -343,9 +375,9 @@ def start_stock():
         print(query)
 
 def reset_cylinder_base():
-    db_commit('DELETE FROM dbo.cylinders_orders; DELETE FROM dbo.cylinders_stock; ', func_name='reset_cylinder_base')
+    db_commit('DELETE FROM dbo.cylinders_stock; ', func_name='reset_cylinder_base')
     start_stock()
-    po_cylinder_recorder()
+    # po_cylinder_recorder()
     po_cylinder_recounter()
 
 """Obsolete functions below:"""
@@ -368,6 +400,9 @@ def lb_signer_orphan():
 def main():
     cylinder_drawing_handler()
     pass
+
+
 if __name__ == '__main__':
     main()
+
 
