@@ -80,24 +80,16 @@ def update_obiekt(
                     f"USING (VALUES ('{so}', '{obiekt}')) " \
                     f"AS SOURCE (SO, OBIEKT) " \
                     f"ON target.SO = source.SO " \
-                    f"WHEN MARCHED THEN " \
+                    f"WHEN MATCHED THEN " \
                     f"UPDATE SET " \
                     f"target.SO = source.SO," \
-                    f"target.Obiekt = source.Obiekt" \
+                    f"target.Obiekt = source.Obiekt " \
                     f"WHEN NOT MATCHED BY TARGET THEN " \
                     f"INSERT (SO, OBIEKT)" \
                     f"VALUES (source.SO, source.OBIEKT);"
             db_commit(query, 'ubiekt_updater, updater')
 
     if _change_in_sap:
-        # for index, row in df_target.iterrows():
-        #     so, obiekt = row['SO'], row['Obiekt']
-        #     if so == 0:
-        #         continue
-        #     query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE [S.O.] = {so}; "
-        #     db_commit(query, 'obiekt_updater, updater')
-        #     print(query)
-
         with CURSOR:
             for index, row in df_target.iterrows():
                 so, obiekt = row['SO'], row['Obiekt']
@@ -113,12 +105,12 @@ def update_obiekt(
 
 
 def main():
-    pass
     # update_obiekt(
     #     _regular=False,
     #     _do_update=False,
     #     _change_in_sap=False
     # )
+    pass
 
 if __name__ == '__main__':
     main()
