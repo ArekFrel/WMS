@@ -2,18 +2,16 @@ import os
 import pandas as pd
 import numpy as np
 from wms_main.const import Paths, db_get_with_query, db_commit, db_quick_commit, CURSOR
-from wms_main.timer_dec import timer
 
 
-@timer
 def update_obiekt(
         _regular = True,
         _do_update=False,
         _change_in_sap=False
 ):
-    # Get data from sap_3_old File
+    # Get data from sap_3 File
     df = pd.read_excel(
-        os.path.join(Paths.RAPORT_CATALOG, 'sap3_old.xlsx'),
+        os.path.join(Paths.RAPORT_CATALOG, 'sap3.xlsx'),
         usecols=['SO#', 'Final Customer name']
     )
     df['SO#'] = df['SO#'].astype(int)
@@ -82,24 +80,16 @@ def update_obiekt(
                     f"USING (VALUES ('{so}', '{obiekt}')) " \
                     f"AS SOURCE (SO, OBIEKT) " \
                     f"ON target.SO = source.SO " \
-                    f"WHEN MARCHED THEN " \
+                    f"WHEN MATCHED THEN " \
                     f"UPDATE SET " \
                     f"target.SO = source.SO," \
-                    f"target.Obiekt = source.Obiekt" \
+                    f"target.Obiekt = source.Obiekt " \
                     f"WHEN NOT MATCHED BY TARGET THEN " \
                     f"INSERT (SO, OBIEKT)" \
                     f"VALUES (source.SO, source.OBIEKT);"
             db_commit(query, 'ubiekt_updater, updater')
 
     if _change_in_sap:
-        # for index, row in df_target.iterrows():
-        #     so, obiekt = row['SO'], row['Obiekt']
-        #     if so == 0:
-        #         continue
-        #     query = f"UPDATE sap set Obiekt = '{obiekt}' WHERE [S.O.] = {so}; "
-        #     db_commit(query, 'obiekt_updater, updater')
-        #     print(query)
-
         with CURSOR:
             for index, row in df_target.iterrows():
                 so, obiekt = row['SO'], row['Obiekt']
@@ -115,14 +105,12 @@ def update_obiekt(
 
 
 def main():
-    pass
     # update_obiekt(
     #     _regular=False,
     #     _do_update=False,
     #     _change_in_sap=False
     # )
-
-
+    pass
 
 if __name__ == '__main__':
     main()
